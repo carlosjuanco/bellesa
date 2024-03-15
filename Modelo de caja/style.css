@@ -22,3 +22,80 @@ Presentational styles
 .awesome {
   --flow-space: 2rem;
 }
+
+/*
+  Segundo ejemplo
+*/
+/* SETTINGS */
+:root {
+  --color-primary: #3740ff;
+  --color-primary-dark: #272eb5;
+  --color-primary-light: #3740ff;
+  --color-primary-x-light: #e8f0fe;
+  --color-light: #ffffff;
+  --color-dark: #202124;
+  --color-off-white: #f3f4f4;
+  --color-mid: #5f6368;
+  --color-mid-dark: #3c4043;
+  --color-stroke: #dadce0;
+  --metric-gutter: 1.5rem;
+  --metric-box-spacing: 1rem;
+  --metric-radius: 3px;
+  --generic-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3),
+    0px 2px 6px 2px rgba(60, 64, 67, 0.15);
+  --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.box {
+    padding: var(--metric-box-spacing);
+    border: 1px solid var(--color-stroke);
+    box-shadow: var(--generic-shadow);
+    font-weight: 500;
+    text-align: center;
+    max-width: 40rem;
+}
+.box-layout {
+    display: grid;
+    width: max-content;
+    gap: 0.5rem;
+    grid-template-columns: 1fr min-content;
+}
+img, picture {
+    max-width: 100%;
+    display: block;
+}
+
+.dimension-label {
+  position: relative;
+  text-align: center;
+  font-family: var(--font-mono);
+  color: var(--color-primary-dark);
+}
+.dimension-label::before {
+    content: "";
+    width: 134px;
+    height: 8px;
+    background-image: url(data:image/svg+xml;utf8,<svg viewBox="0 0 134 8" fill="%23DADCE0" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 3.897L6.75 0v3.397h120.5V0L134 3.897l-6.75 3.897V4.397H6.75v3.397L0 3.897z"/></svg>);
+    background-position: center center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.box-demo {
+  width: 400px;
+  height: 400px;
+}
+
+.box-demo[data-sizing="intrinsic"] {
+  width: max-content;
+  height: max-content;
+}
+
+.box-layout {
+  display: grid;
+  width: max-content;
+  gap: 0.5rem;
+  grid-template-columns: 1fr min-content;
+}
