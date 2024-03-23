@@ -18,7 +18,8 @@ func main() {
 	fmt.Println("Red[0]: ", red[0])
 
 	//Modificar
-	red[0] = "🚑"
+	red[0] = "🚑" //Al modificar el índice 0, se modifican el arreglo cars
+	// y things
 	fmt.Println("Red[1]", red[1])
 	fmt.Println("Things: ", things)
 	fmt.Println("Cars: ", cars)
@@ -30,10 +31,10 @@ func main() {
 	fmt.Println("Cars: ", cars2)
 
 	fmt.Println("Se puede no especificar el índice final, obtendriamos el mismo resultado\n")
-	red2 := things[4:]  // "🚨", "🎈"
+	red2 := things[4:] // "🚨", "🎈"
 	fmt.Println("Red: ", red2)
 
-	fmt.Println("Se puede no especificar el índice inicial y final, obtendriamos el arreglo original\n")
+	fmt.Println("Se puede no especificar el índice inicial y final, obtendremos el arreglo original\n")
 	all := things[:]
 	fmt.Println("Todos: ", all)
 }
