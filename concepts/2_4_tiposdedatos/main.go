@@ -53,13 +53,26 @@ func main() {
 	c := uint16(aa) + bb
 	fmt.Printf("Tipo: %T, Valor: %v\n", c, c)
 
-	// El identificador blan
+	// El identificador blank
 	var d uint8 = 200
 	var e uint16 = 800
 
 	_ = uint16(d) + e
 
 	fmt.Printf("Tipo: %T, Valor: %v\n", d, d)
+	fmt.Printf("Ignorar el índice del ciclo for\n")
+	numeros := []int{1, 2, 3, 4, 5}
+    for _, valor := range numeros {
+        fmt.Println(valor)
+    }
+    fmt.Printf("Ignorar valores de retorno de una función:\n")
+
+    // Ignora el primer valor retornado
+    _, segundoValor := retornaDosValores()
+    fmt.Println(segundoValor)
+
+    fmt.Printf("Pregunte en ChatGPT 3.5 y me quede con la misma duda\n")
+    
 
 	fmt.Printf("Valor por defecto de los tipo de datos\n")
 	fmt.Printf("Bool\n")
@@ -73,4 +86,8 @@ func main() {
 	fmt.Printf("Numérico\n")
 	var i uint8
 	fmt.Printf("Tipo: %T, Valor: %v\n", i, i)
+}
+
+func retornaDosValores() (int, int) {
+	return 3, 7
 }
