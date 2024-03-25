@@ -8,12 +8,14 @@ func main() {
 	pets := animals[1:3] //"🐶", "🦮"
 
 	pets = append(pets, "🐈", "🐶", "😻")
+	// Nota: Mientras no rebase la capacidad, se modifica el slice y
+	//		arreglo original
 
 	// array[4]string{"🐶", "🦮", "🐦‍⬛", "🐘"}
 	// array[8]string{"🐶", "🦮", "🐈", "🐶", "😻"}
 
-	// ¿Cual es la razon por el que la capacidad es 8 del slice pets?
-	// Cuando uno se pasa de la capcidad del arreglo origen "animals"
+	// ¿Cual es la razón por la que la capacidad es 8 del slice pets?
+	// Cuando uno se pasa de la capacidad del arreglo origen "animals"
 	// Toma de referencia la capacidad de "pets" y lo multiplica 2
 	// Nota: Solo lo hace 1 vez hace la multiplicación.
 
@@ -39,13 +41,14 @@ func main() {
 	fmt.Println("Tamaño de pets: ", len(pets3))
 	fmt.Println("Capacidad de pets: ", cap(pets3))
 
+	// Valor por defecto de los slices
 	fmt.Printf("Valor por defecto de los slices\n")
 	var pets4 []string
 	fmt.Println("Pets: ", pets4)
 	fmt.Println("Tamaño de pets: ", len(pets4))
 	fmt.Println("Capacidad de pets: ", cap(pets4))
-	// ¿Como validamos que un slice esta vacio?
-	// Ocupamos la funcion nil
+	// ¿Cómo validamos que un slice está vacío?
+	// Ocupamos la función nil
 	fmt.Printf("Validar que este vacio un slic\n")
-	fmt.Println("¿Esta vacio pets4: ", pets4 == nil)
+	fmt.Println("¿Está vacío pets4: ", pets4 == nil)
 }
