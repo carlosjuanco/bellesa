@@ -65,11 +65,19 @@ func main() {
     for _, valor := range numeros {
         fmt.Println(valor)
     }
+    fmt.Printf("¿Que pasa si solo dejamos la variable valor\n")
+    for valor := range numeros {
+        fmt.Println(valor)
+    }
     fmt.Printf("Ignorar valores de retorno de una función:\n")
 
     // Ignora el primer valor retornado
     _, segundoValor := retornaDosValores()
     fmt.Println(segundoValor)
+
+    fmt.Printf("Ignorar valores en la declaración de asignación:\n")
+    var z, _ int = 5, 10
+    fmt.Println(z) // Imprime: 5
 
     fmt.Printf("Pregunte en ChatGPT 3.5 y me quede con la misma duda\n")
     
