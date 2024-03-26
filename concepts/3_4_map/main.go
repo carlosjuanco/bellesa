@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("Primera forma de crear un mapa")
-	fmt.Println("Primero declara y posterimente asigna valores")
+	fmt.Println("Primero declara y posteriormente asigna valores")
 	music := make(map[string]string)
 	music["guitar"] = "🎸"
 	music["violin"] = "🎻"
@@ -29,9 +29,9 @@ func main() {
 
 	fmt.Println("Acceder a un elemento de un mapa que no existe")
 	fmt.Println(music["fake"])
-	fmt.Println("Devuelve un valor vacio, de acuerto al valor por defecto del tipo de dato")
+	fmt.Println("Devuelve un valor vacío, de acuerdo al valor por defecto del tipo de dato")
 
-	fmt.Println("¿Como puedo saber si una llave de una mapa existe?")
+	fmt.Println("¿Cómo puedo saber si una llave de un mapa existe?")
 	valor, existe := music["fake"]
 	fmt.Println(valor, existe)
 }
