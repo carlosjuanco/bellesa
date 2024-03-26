@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selectores</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <article>
+        <p>Quiero ser rojo y más grande que el otro texto.</p>
+        <p>Quiero tener el tamaño normal y el color predeterminado.</p>
+    </article>
+    <hr></hr>
+    <h1>Selectores simples</h1>
+    <hr></hr>
+    <h2>Selector universal</h2>
+    <p>Un selector universal, también conocido como comodín, coincide con cualquier elemento.</p>
+    <code>
+    * {
+      color: hotpink;
+    }
+    </code>
+    <h2>Selector de tipo</h2>
+    <p>Un selector de tipo coincide directamente con un elemento HTML.</p>
+    <code>
+    section {
+      padding: 2em;
+    }
+    </code>
+    <h2>Selector de clase</h2>
+    <p>Un elemento HTML puede tener uno o más elementos definidos en su atributo class. El selector de clase coincide con cualquier elemento que tenga esa clase aplicada.</p>
+    <code>
+      &lt;div class="my-class"&gt;&lt;/div&gt; <br>
+      &lt;button class="my-class"&gt;&lt;/button&gt; <br>
+      &lt;p class="my-class"&gt;&lt;/p&gt;<br>
+    </code>
+    <code>
+    .my-class {
+      color: red;
+    }
+    </code>
+</body>
+
+</html>
