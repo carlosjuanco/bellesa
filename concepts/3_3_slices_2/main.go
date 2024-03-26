@@ -3,13 +3,13 @@ package main
 import "fmt"
 
 func main() {
-	// capt(): # de elementos del arreglo origen, apartir del índice donde se creo el slice.
+	// capt(): # de elementos del arreglo origen, a partir del índice donde se creó el slice.
 	animals := [5]string{"🦍", "🐶", "🦮", "🐦‍⬛", "🐘"}
 	pets := animals[1:3] //"🐶", "🦮"
 
 	pets = append(pets, "🐈", "🐶", "😻")
 	// Nota: Mientras no rebase la capacidad, se modifica el slice y
-	//		arreglo original
+	//		el arreglo original
 
 	// array[4]string{"🐶", "🦮", "🐦‍⬛", "🐘"}
 	// array[8]string{"🐶", "🦮", "🐈", "🐶", "😻"}
