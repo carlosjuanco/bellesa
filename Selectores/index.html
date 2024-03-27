@@ -92,6 +92,59 @@
     <p data-type="Primary">
       Esto significa que si un elemento HTML tuviera un data-type igual a Primary, en lugar de primary, no se mostraría en texto rojo. Puede hacer lo opuesto (insensibilidad a mayúsculas y minúsculas) mediante el uso de un operador i.
     </p>
+
+    <br><br>
+
+    <p>
+      Junto con los operadores de casos, tiene acceso a los operadores que buscan porciones coincidentes de cadenas dentro de los valores de los atributos.
+    </p>
+    <code>
+      /* Un href que contiene "example.com" */ <br>
+      [href*='example.com'] { <br>
+        color: red; <br>
+      } <br>
+      <br>
+      /* Un href que comienza con https */ <br>
+      [href^='https'] { <br>
+        color: green; <br>
+      } <br>
+      <br>
+      /* Un href que termina con .com */ <br>
+      [href$='.com'] { <br>
+        color: blue; <br>
+      } <br>
+    </code>
+
+    <main>
+      <div class="wrapper">
+        <article class="flow">
+            <h1>Attribute selectors</h1>
+            <figure class="callout">
+                <p>
+                    Usar un selector de atributos que busque un valor de atributo que tenga el sufijo un patrón ([attr$=value]) es útil para buscar ciertos tipos de archivos en el atributo href de un enlace.
+
+                </p>
+                <p>
+                    En este ejemplo, utilizamos ese enfoque para agregar un ícono para el tipo de archivo.
+                </p>
+            </figure>
+            <h2>Downloads</h2>
+            <ul>
+                <li>
+                    <a href="my-image.jpg">An example image</a>
+                </li>
+                <li>
+                    <a href="my-document.pdf">An example document</a>
+                </li>
+                <li>
+                    <a href="my-document.pdf">Another example document</a>
+                </li>
+            </ul>
+        </article>
+      </div>
+    </main>
+
+    <a href="https://web.dev/learn/css/selectors?hl=es">Enlace de sitio web sacado la practica</a>
 </body>
 
 </html>
