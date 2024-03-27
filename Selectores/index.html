@@ -42,6 +42,56 @@
       color: red;
     }
     </code>
+    <h2>Selector de ID</h2>
+    <p>Un elemento HTML con un atributo id debe ser el único elemento en una página con ese valor de identificación. Debe seleccionar elementos con un selector de ID como este:</p>
+    <code>
+      #rad {
+        border: 1px solid blue;
+      }
+    </code>
+    <p>Este CSS aplicaría un borde azul al elemento HTML que tiene un atributo id igual a rad, así:</p>
+    <code>
+      &lt;div id="rad"&gt;&lt;/div&gt;
+    </code>
+
+    <h2>Selector de atributos</h2>
+
+    <p>Puede buscar elementos que tengan un determinado atributo HTML, o que tengan un determinado valor para un atributo HTML, si utiliza el selector de atributos. Puede indicarle a CSS que busque atributos si encierra el selector entre corchetes cuadrados ([ ]).
+    </p>
+    <code>
+      [data-type='primary'] {
+        color: red;
+      }
+    </code>
+    <p>Este CSS busca todos los elementos que tienen un atributo data-type con un valor de primary, de la siguiente manera:</p>
+    <code>
+      &lt;div data-type="primary"&gt;&lt;/div&gt;
+    </code>
+    <p>En lugar de buscar un valor específico de data-type, también puede buscar elementos que presenten el atributo, independientemente de su valor.</p>
+    <code>
+      [data-type] {
+        color: red;
+      }
+    </code>
+    <br>
+    <code>
+      &lt;div data-type="primary"&gt;&lt;/div&gt;
+      <br>
+      &lt;div data-type="secondary"&gt;&lt;/div&gt;
+    </code>
+    <p><strong>Ambos</strong> tendrán texto rojo.</p>
+
+    <br><br>
+    <p>Puede utilizar selectores de atributos que distingan entre mayúsculas y minúsculas si añade un operador s a su selector de atributos.</p>
+    <code>
+      [data-type='primary' s] {
+        color: red;
+      }
+    </code>
+
+    <p data-type="Primary">
+      Esto significa que si un elemento HTML tuviera un data-type igual a Primary, en lugar de primary, no se mostraría en texto rojo. Puede hacer lo opuesto (insensibilidad a mayúsculas y minúsculas) mediante el uso de un operador i.
+    </p>
 </body>
 
 </html>

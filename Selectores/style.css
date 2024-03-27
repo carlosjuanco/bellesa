@@ -2,3 +2,6 @@ article p:first-of-type {
     color: red;
     font-size: 1.5em;
 }
+[data-type='primary' s]{
+    color:red
+}
