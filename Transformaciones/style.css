@@ -1,0 +1,22 @@
+.element-rotate {
+  width: 100px;
+  height: 100px;
+  background: indigo;
+  transform: rotate(45deg);
+  margin-bottom: 40px;
+}
+.element-translate {
+  width: 100px;
+  height: 100px;
+  background: #6f5582;
+  transform: translate(134px, 19px);
+  margin-bottom: 40px;
+  border: 10px solid #95af28;
+}
+.element-scale {
+  width: 100px;
+  height: 100px;
+  background: #6f5582;
+  transform: scale(1.5);
+  margin-bottom: 66px;
+}
