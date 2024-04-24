@@ -6,7 +6,7 @@ func main() {
 	// slices: Son apuntadores a array, no poseen datos
 	things := [7]string{"🚕", "🚗", "🚘", "🚙", "🚔", "🚨", "🎈"}
 	cars := things[0:5] // "🚕", "🚗", "🚘", "🚙", "🚔"
-	red := things[4:7]  // "🚨", "🎈"
+	red := things[4:7]  // "🚔", "🚨", "🎈"
 
 	// El indice final es "Excluyente", debe de sumarse uno para obtener hasta
 	// la posición que se desea.
