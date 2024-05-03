@@ -36,8 +36,17 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(dirs)
+	fs := []file{}
 	for _, v := range dirs {
-		fmt.Println(v.Name())
+		f, err := getFile(v, false)
+		if err != nil {
+			panic(err)
+		}
+		fs = append(fs, f)
 	}
+	fmt.Println(fs)
+}
+
+func getFile(dir fs.DirEntry, isHidden bool) (file, error) {
+	return file{}, nil
 }
