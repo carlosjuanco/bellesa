@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/fs"
 	"os"
 )
 
@@ -48,5 +49,20 @@ func main() {
 }
 
 func getFile(dir fs.DirEntry, isHidden bool) (file, error) {
-	return file{}, nil
+	info, err := dir.Info()
+	if err != nil {
+		return file{}, fmt.Errorf("dir.Info(): %v", err)
+	}
+	f := file{
+		name:             dir.Name(),
+		fileType:         0,
+		isDir:            dir.IsDir(),
+		isHidden:         isHidden,
+		userName:         "j",
+		groupName:        "juancho",
+		size:             info.Size(),
+		modificationTime: info.ModTime(),
+		mode:             info.Mode().String(),
+	}
+	return f, nil
 }
