@@ -1,0 +1,99 @@
+--------------------------
+         En Mac
+--------------------------
+--------------------------
+Estructura de las carpetas
+--------------------------
+/*
+	Al momento de automatizar esta tarea
+	Podemos guardar los nombres de los directorios en variables
+	para reemplazarlos en donde lo ocupamos
+*/
+Raíz
+proyecto_iasd
+proyecto_iasd/bd
+proyecto_iasd/api/zeus_api
+proyecto_iasd/app/zeus_app
+--------------------------
+Descargar las imágenes
+--------------------------
+docker pull mysql:8.0.34
+docker pull juancholll/iasd_api
+docker pull node:16.14.0
+--------------------------
+Crear todos los contenedores
+--------------------------
+Base de datos
+docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
+
+Crear la base de datos con nombre 'iasd'
+
+//Contenedor para la API
+/*
+	Al momento de automatizar esta tarea
+	En este paso podemos crear el contenedor sin entrar al contenedor,
+	sin escribir el parámetro -it
+*/
+docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
+/*
+	Al momento de automatizar esta tarea
+	Dirigirnos al directorio proyecto_iasd/api/iasd_api
+*/
+git clone https://github.com/carlosjuanco/zeus-api.git
+/*
+	Al momento de automatizar esta tarea
+	Podemos entrar al contendor con los comandos
+	docker start <ID contenedor>
+	docker attach <ID contenedor>
+*/
+Ejecutar dentro del contenedor
+/*
+	Al momento de automatizar esta tarea
+	Nos dirigimos al directorio e instalamos las dependencias
+*/
+cd /home/demo/zeus_api
+composer install
+cp .env.example .env
+Crear el archivo .env y establecer las credenciales de la base de datos.
+//Para correr las migraciones
+php artisan migrate:fresh --seed
+/*
+	Nota: Al correr las pruebas unitarias me aparece el mensaje
+	Generate your application encryption key using `php artisan key:generate`.
+	Lo ejecute y nos muestra 
+	 INFO  Application key set successfully. 
+	Con el comando anterior aplicado corrieron las pruebas unitarias
+	sin problemas.
+	Le pregunte a chatGpt y me respondio claramente, lo puse en el apartado
+	"Nuevas cosas aprendidas" del documento "Docker24.0.2"
+
+*/
+php artisan test
+php artisan serve --host=172.17.0.3 --port=80
+
+//Crear el contenedor para la App
+/*
+	Al momento de automatizar esta tarea
+	En este paso podemos crear el contenedor sin entrar al contenedor,
+	sin escribir el parámetro -it
+*/
+docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 78a186e50fd5 /bin/bash
+git clone https://github.com/carlosjuanco/taag-app.git
+/*
+	Al momento de automatizar esta tarea
+	Nos dirigimos al directorio e instalamos las dependencias
+*/
+cd home/demo/taag-app
+npm install
+
+Visualizar la app en el navegador
+En el archivo “package.json”, en la propiedad “scripts”, seguido de la propiedad 
+“dev”, después de la palabra vite, agregamos los valores 
+“--host=172.17.0.4 --port=81”
+
+En el archivo main.ts a la variable axios.defaults.baseURL = 'http://172.17.0.3:8080/api' 
+establecer la url del contenedor api
+
+npm run dev
+
+Escribir en el navegador http://localhost:8081
