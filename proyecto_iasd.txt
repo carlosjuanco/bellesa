@@ -86,14 +86,9 @@ git clone https://github.com/carlosjuanco/taag-app.git
 cd home/demo/taag-app
 npm install
 
-Visualizar la app en el navegador
-En el archivo “package.json”, en la propiedad “scripts”, seguido de la propiedad 
-“dev”, después de la palabra vite, agregamos los valores 
-“--host=172.17.0.4 --port=81”
-
 En el archivo main.ts a la variable axios.defaults.baseURL = 'http://172.17.0.3:8080/api' 
 establecer la url del contenedor api
 
-npm run dev
+npm run serve -- --port 81
 
 Escribir en el navegador http://localhost:8081
