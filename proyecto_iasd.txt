@@ -71,19 +71,21 @@ php artisan migrate:fresh --seed
 php artisan test
 php artisan serve --host=172.17.0.3 --port=80
 
-//Crear el contenedor para la App
+--------------------------
+Crear el contenedor para la App
+--------------------------
 /*
 	Al momento de automatizar esta tarea
 	En este paso podemos crear el contenedor sin entrar al contenedor,
 	sin escribir el parámetro -it
 */
-docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 78a186e50fd5 /bin/bash
-git clone https://github.com/carlosjuanco/taag-app.git
+docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 2c6213d49b9c /bin/bash
+git clone https://github.com/carlosjuanco/meca-app.git
 /*
 	Al momento de automatizar esta tarea
 	Nos dirigimos al directorio e instalamos las dependencias
 */
-cd home/demo/taag-app
+cd home/demo/meca-app
 npm install
 
 En el archivo main.ts a la variable axios.defaults.baseURL = 'http://172.17.0.3:8080/api' 
