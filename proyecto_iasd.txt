@@ -80,15 +80,23 @@ Crear el contenedor para la App
 	sin escribir el parámetro -it
 */
 docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 2c6213d49b9c /bin/bash
+/*
+	Ejecutamos el siguiente comando git, fuera del contenedor.
+	Al momento de automatizar esta tarea
+	Dirigirnos al directorio proyecto_iasd/app/
+*/
 git clone https://github.com/carlosjuanco/meca-app.git
 /*
+	Ejecutamos el siguiente comando, dentro del contenedor
 	Al momento de automatizar esta tarea
 	Nos dirigimos al directorio e instalamos las dependencias
 */
 cd home/demo/meca-app
 npm install
 
-En el archivo main.ts a la variable axios.defaults.baseURL = 'http://172.17.0.3:8080/api' 
+Crear el archivo .env y ponerle el texto “VUE_APP_BASE_URL=/”
+
+En el archivo main.ts a la variable axios.defaults.baseURL = 'http://localhost:8080/api' 
 establecer la url del contenedor api
 
 npm run serve -- --port 81
