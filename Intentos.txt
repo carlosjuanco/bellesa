@@ -1,0 +1,62 @@
+--------------------------
+Intento 5
+		Diferencias
+	Estar en la rama iasdMaqueta
+	Instalar versiones exactas de las dependencias. 
+	Actualizar la libreria doctrine/dbal a la versión 3.8.4
+Credenciales para la base de datos
+
+DB_CONNECTION=mysql
+DB_HOST=172.17.0.2 //Ip del contenedor de la BD
+DB_PORT=3306 //Puerto del contenedor (adentro)
+DB_DATABASE=
+DB_USERNAME=root
+DB_PASSWORD=
+--------------------------
+docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_apii 64c45e73b66f /bin/bash
+exit
+cd Documents/proyecto_iasd/api
+git clone https://github.com/carlosjuanco/zeus-api.git zeus-api-cuatro
+cd zeus-api-cuatro
+git checkout iasdMaqueta
+git branch
+docker start 6f7f772c598b
+docker attach 6f7f772c598b
+cd /home/demo/zeus-api-cuatro
+composer require laravel/framework:9.52.15
+php artisan --version
+php artisan key:generate
+composer require doctrine/dbal:3.8.4
+cp .env.example .env
+php artisan migrate:fresh --seed
+php artisan test
+--------------------------
+Aprendizaje: Existen dos paquetes que hacen referencia a Laravel.
+	laravel/framework y laravel/laravel, me acorde cuando leí un poco respecto
+	a como debemos de crear librerías y la primera seccion es el autor, el 
+	segundo es el nombre que deseamos.
+
+	Cheque en las versión de laravel/laravel y no encontre ninguna version
+	9.52.15, se me hizo extraño, así que investigue en laravel/framework, aquí 
+	si encontre el 9.52.15, lo cual me pregunte, ¿entonces cual estoy utilizando?.
+	Me acorde que para saber que paquete estoy utilizando, debo de ir al archivo
+	composer.json y checar que libreria estoy utilizando, lo cual me indica 
+	laravel/framework, obviamente era evidente.
+
+	Así que se dije, lo mas seguro que cuando quise instalar las dependencias, 
+	cuando comence todo de nuevo, seguramente ocupe laravel/laravel, por ese motivo
+	me marcaba el error "Could not find package laravel/laravel with version 9.52.15"
+	Que efectivamente en el paquete laravel/laravel no existe esa version. Cheque mi documentacion y efectivamente ocupe ese paquete.
+
+	Ahora se me ocurrio dije por que no al instalar las dependencias especifico la
+	libreria y la version, ahora que sé que de que paquete tomarlo, pero me salio el 
+	error "Invalid argument laravel/framework:9.52.15. Use "composer require laravel/framework:9.52.15" instead to add packages to your composer.json.", me acorde con
+	este error, cuando hice el comienzo de todo, desde cero, que decía que ese
+	comando sirve para especificar que necesito eso y que posteriormente se instala
+	es como decir composer install laravel/framework:9.52.15, pero por indicaciones
+	de composer debe de ser "composer require laravel/framework:9.52.15", así 
+	lo ejecute y cuando comenzó me decía "./composer.json has been updated"
+	Me emocione, comenzo a realizar la instalación, finalmente comprobe que sea la 
+	version de laravel que necesito y sí.
+
+	woooooooooooooola.

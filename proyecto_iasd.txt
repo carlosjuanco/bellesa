@@ -1,44 +1,31 @@
 --------------------------
          En Mac
+
+Sistema operativo: macOs Sonoma
+Versión: 14.3
+Fecha: 13 de Mayo del 2024
+Proyecto: iasd
+Descripción del proyecto: Proyecto iglesia adventista del séptimo día 
 --------------------------
 --------------------------
-Estructura de las carpetas
+1.-Crear las carpeta raíz
 --------------------------
-/*
-	Al momento de automatizar esta tarea
-	Podemos guardar los nombres de los directorios en variables
-	para reemplazarlos en donde lo ocupamos
-*/
-Raíz
 proyecto_iasd
-proyecto_iasd/bd
-proyecto_iasd/api/zeus_api
-proyecto_iasd/app/zeus_app
+2.-En la carpeta raíz crer 3 carpetas con los siguientes nombre
+	bd
+	api
+	app
 --------------------------
-Descargar las imágenes
+3.-Ejecutar los siguientes comandos
 --------------------------
+cd /Users/juan/Documents/proyecto_iasd/api
+
 docker pull mysql:8.0.34
-docker pull juancholll/iasd_api
-docker pull node:16.14.0
---------------------------
-Crear todos los contenedores
---------------------------
-Base de datos
+
 docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
 
-Crear la base de datos con nombre 'iasd'
-
-//Contenedor para la API
-/*
-	Al momento de automatizar esta tarea
-	En este paso podemos crear el contenedor sin entrar al contenedor,
-	sin escribir el parámetro -it
-*/
 docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
-/*
-	Al momento de automatizar esta tarea
-	Dirigirnos al directorio proyecto_iasd/api/iasd_api
-*/
+
 git clone https://github.com/carlosjuanco/zeus-api.git
 /*
 	Al momento de automatizar esta tarea

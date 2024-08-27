@@ -1,0 +1,9 @@
+--------------------------
+Reglas para tener un órden
+--------------------------
+1.-Los nombre de la carpeta raíz, llevará la siguiente nomenclatura.
+	<proyecto_abreviatura_del_proyecto>
+	Ejemplo: proyecto_iasd
+	Abreviatura: iasd
+	Descripción: Iglesia Adventista del Séptimo día(iasd)
+2.-Nombre del contenedor
