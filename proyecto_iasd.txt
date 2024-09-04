@@ -7,7 +7,6 @@ Fecha: 13 de Mayo del 2024
 Proyecto: iasd
 Descripción del proyecto: Proyecto iglesia adventista del séptimo día 
 --------------------------
---------------------------
 1.-Crear las carpeta raíz
 --------------------------
 proyecto_iasd
@@ -16,76 +15,50 @@ proyecto_iasd
 	api
 	app
 --------------------------
-3.-Ejecutar los siguientes comandos
+3.-Crear el contenedor para la base de datos
 --------------------------
 cd /Users/juan/Documents/proyecto_iasd/api
 
 docker pull mysql:8.0.34
-
 docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
-
+exit
+--------------------------
+4.-Crear el contenedor para la App
+--------------------------
 docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
-
-git clone https://github.com/carlosjuanco/zeus-api.git
-/*
-	Al momento de automatizar esta tarea
-	Podemos entrar al contendor con los comandos
-	docker start <ID contenedor>
-	docker attach <ID contenedor>
-*/
-Ejecutar dentro del contenedor
-/*
-	Al momento de automatizar esta tarea
-	Nos dirigimos al directorio e instalamos las dependencias
-*/
-cd /home/demo/zeus_api
-composer install
+exit
+cd Documents/proyecto_iasd/api
+git clone https://github.com/carlosjuanco/zeus-api.git zeus-api
+cd zeus-api
+docker start 6f7f772c598b
+docker attach 6f7f772c598b
+cd /home/demo/zeus-api
+composer require laravel/framework:9.52.15
+php artisan --version
+php artisan key:generate
+composer require doctrine/dbal:3.8.4
 cp .env.example .env
-Crear el archivo .env y establecer las credenciales de la base de datos.
-//Para correr las migraciones
 php artisan migrate:fresh --seed
-/*
-	Nota: Al correr las pruebas unitarias me aparece el mensaje
-	Generate your application encryption key using `php artisan key:generate`.
-	Lo ejecute y nos muestra 
-	 INFO  Application key set successfully. 
-	Con el comando anterior aplicado corrieron las pruebas unitarias
-	sin problemas.
-	Le pregunte a chatGpt y me respondio claramente, lo puse en el apartado
-	"Nuevas cosas aprendidas" del documento "Docker24.0.2"
-
-*/
+exit
+git checkout test
 php artisan test
+docker start 6f7f772c598b
+docker attach 6f7f772c598b
 php artisan serve --host=172.17.0.3 --port=80
-
+Escribir en el navegador http://localhost:8080
 --------------------------
-Crear el contenedor para la App
+5.-Crear el contenedor para la App
 --------------------------
-/*
-	Al momento de automatizar esta tarea
-	En este paso podemos crear el contenedor sin entrar al contenedor,
-	sin escribir el parámetro -it
-*/
 docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 2c6213d49b9c /bin/bash
-/*
-	Ejecutamos el siguiente comando git, fuera del contenedor.
-	Al momento de automatizar esta tarea
-	Dirigirnos al directorio proyecto_iasd/app/
-*/
+exit
+cd ../app
 git clone https://github.com/carlosjuanco/meca-app.git
-/*
-	Ejecutamos el siguiente comando, dentro del contenedor
-	Al momento de automatizar esta tarea
-	Nos dirigimos al directorio e instalamos las dependencias
-*/
+docker start 6f7f772c598b
+docker attach 6f7f772c598b
 cd home/demo/meca-app
 npm install
-
-Crear el archivo .env y ponerle el texto “VUE_APP_BASE_URL=/”
-
-En el archivo main.ts a la variable axios.defaults.baseURL = 'http://localhost:8080/api' 
+touch "VUE_APP_BASE_URL=/" > .env
+En el archivo main.ts a la variable axios.defaults.baseURL = 'http://localhost:8080/api'
 establecer la url del contenedor api
-
 npm run serve -- --port 81
-
 Escribir en el navegador http://localhost:8081
