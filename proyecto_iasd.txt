@@ -17,19 +17,17 @@ proyecto_iasd
 --------------------------
 3.-Crear el contenedor para la base de datos
 --------------------------
-cd /Users/juan/Documents/proyecto_iasd/api
-
 docker pull mysql:8.0.34
 docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
-exit
 --------------------------
-4.-Crear el contenedor para la App
+4.-Crear el contenedor para la API
 --------------------------
+cd /Users/juan/Documents/proyecto_iasd/api
+docker push juancholll/iasd_api
 docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
 exit
-cd Documents/proyecto_iasd/api
-git clone https://github.com/carlosjuanco/zeus-api.git zeus-api
-cd zeus-api
+git clone https://github.com/carlosjuanco/zeus-api.git
+docker ps -a
 docker start 6f7f772c598b
 docker attach 6f7f772c598b
 cd /home/demo/zeus-api
@@ -38,27 +36,46 @@ php artisan --version
 cp .env.example .env
 php artisan key:generate
 composer require doctrine/dbal:3.8.4
+//  Creamos la base de datos 
+//  y ponemos los datos en el archivo .env
+
+DB_CONNECTION=mysql
+DB_HOST=172.17.0.2 //Ip del contenedor de la BD
+DB_PORT=3306 //Puerto del contenedor (adentro)
+DB_DATABASE=prueba
+DB_USERNAME=root
+DB_PASSWORD=juan
+
 php artisan migrate:fresh --seed
 exit
+cd zeus-api
 git checkout test
-php artisan test
 docker start 6f7f772c598b
 docker attach 6f7f772c598b
+cd /home/demo/zeus-api
+php artisan test
+exit
+git checkout main
+docker start 6f7f772c598b
+docker attach 6f7f772c598b
+cd /home/demo/zeus-api
 php artisan serve --host=172.17.0.3 --port=80
 Escribir en el navegador http://localhost:8080
 --------------------------
-5.-Crear el contenedor para la App
+5.-Crear el contenedor para la APP
 --------------------------
+// En otra ventana de la terminal
+docker push node:20.14.0
 docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 2c6213d49b9c /bin/bash
 exit
 cd ../app
 git clone https://github.com/carlosjuanco/meca-app.git
+docker ps -a
 docker start 6f7f772c598b
 docker attach 6f7f772c598b
 cd home/demo/meca-app
 npm install
 touch "VUE_APP_BASE_URL=/" > .env
-En el archivo main.ts a la variable axios.defaults.baseURL = 'http://localhost:8080/api'
-establecer la url del contenedor api
+En el archivo main.ts a la variable axios.defaults.baseURL = 'http://localhost:8080/api', establecer la url del contenedor api
 npm run serve -- --port 81
 Escribir en el navegador http://localhost:8081
