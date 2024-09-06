@@ -35,9 +35,9 @@ docker attach 6f7f772c598b
 cd /home/demo/zeus-api
 composer require laravel/framework:9.52.15
 php artisan --version
+cp .env.example .env
 php artisan key:generate
 composer require doctrine/dbal:3.8.4
-cp .env.example .env
 php artisan migrate:fresh --seed
 exit
 git checkout test
