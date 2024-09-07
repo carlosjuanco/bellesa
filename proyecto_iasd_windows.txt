@@ -1,8 +1,8 @@
 --------------------------
          En Mac
 
-Sistema operativo: macOs Sonoma
-Versión: 14.3
+Sistema operativo: Windows 11 Home Single Language
+Versión: 11
 Fecha: 13 de Mayo del 2024
 Proyecto: iasd
 Descripción del proyecto: Proyecto iglesia adventista del séptimo día
@@ -25,18 +25,19 @@ proyecto_iasd
 3.-Crear el contenedor para la base de datos
 --------------------------
 docker pull mysql:8.0.34
-docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
+docker run --name iasd_bd -e MYSQL_ROOT_PASSWORD=juan -p 3307:3306 -e MYSQL_ROOT_HOST=% -v /d/Documentos/proyecto_iasd/bd:/var/lib/mysql -d mysql:8.0.34
 --------------------------
 4.-Crear el contenedor para la API
 --------------------------
-cd /Users/juan/Documents/proyecto_iasd/api
+D:
+cd Documentos\proyecto_iasd\api
 docker pull juancholll/iasd_api
-docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
+docker run -v /d/Documentos/proyecto_iasd/api:/home/demo -p 8080:80 -it --name iasd_api 64c45e73b66f /bin/bash
 exit
 git clone https://github.com/carlosjuanco/zeus-api.git
 docker ps -a
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start 2812578e04e5
+docker attach 2812578e04e5
 cd /home/demo/zeus-api
 composer require laravel/framework:9.52.15
 php artisan --version
@@ -49,7 +50,7 @@ composer require doctrine/dbal:3.8.4
 DB_CONNECTION=mysql
 DB_HOST=172.17.0.2 //Ip del contenedor de la BD
 DB_PORT=3306 //Puerto del contenedor (adentro)
-DB_DATABASE=prueba
+DB_DATABASE=iasd
 DB_USERNAME=root
 DB_PASSWORD=juan
 
@@ -57,14 +58,14 @@ php artisan migrate:fresh --seed
 exit
 cd zeus-api
 git checkout test
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start 2812578e04e5
+docker attach 2812578e04e5
 cd /home/demo/zeus-api
 php artisan test
 exit
 git checkout main
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start 2812578e04e5
+docker attach 2812578e04e5
 cd /home/demo/zeus-api
 php artisan serve --host=172.17.0.3 --port=80
 Escribir en el navegador http://localhost:8080
@@ -73,13 +74,14 @@ Escribir en el navegador http://localhost:8080
 --------------------------
 // En otra ventana de la terminal
 docker pull node:20.14.0
-docker run -v /Users/juan/Documents/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 2c6213d49b9c /bin/bash
+docker run -v /d/Documentos/proyecto_iasd/app:/home/demo -p 8081:81 -it --name iasd_app 4881ae721235 /bin/bash
 exit
-cd ../app
+D:
+cd Documentos\proyecto_iasd\app
 git clone https://github.com/carlosjuanco/meca-app.git
 docker ps -a
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start 7470770e9662
+docker attach 7470770e9662
 cd home/demo/meca-app
 npm install
 touch "VUE_APP_BASE_URL=/" > .env
