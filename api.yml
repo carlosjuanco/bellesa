@@ -23,5 +23,5 @@ services:
       cp .env.example .env && 
       php artisan key:generate && 
       composer require doctrine/dbal:3.8.4 && 
-      php artisan test && 
+      php artisan migrate:fresh --seed && 
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
