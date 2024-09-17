@@ -1,0 +1,20 @@
+# Sistema operativo: macOs Sonoma
+# Versión: 14.3
+# Fecha: 16 de Septiembre del 2024
+# Proyecto: iasd
+# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
+
+version: '1.0'
+
+services:
+  mysql:
+    image: mysql:8.0.34
+    container_name: iasd_bd
+    environment:
+      - MYSQL_ROOT_PASSWORD=juan
+      - MYSQL_ROOT_HOST=%
+    ports:
+      - "3307:3306"
+    volumes:
+      - /Users/juan/Documents/proyecto_iasd/bd:/var/lib/mysql
+    restart: unless-stopped
