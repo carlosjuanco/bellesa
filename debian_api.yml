@@ -1,0 +1,26 @@
+# Sistema operativo: Linux
+# Distribución: Debian
+# Versión: 12
+# Fecha: 24 de Septiembre del 2024
+# Proyecto: iasd
+# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
+
+services:
+  iasd_api:
+    image: juancholll/iasd_api  # La imagen que se va a utilizar
+    container_name: iasd_api  # Nombre del contenedor
+    ports:
+      - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
+    stdin_open: true  # Mantiene abierto el stdin
+    tty: true  # Habilita una terminal interactiva
+    command: /bin/bash -c "
+      cd /home/demo/zeus-api && 
+      composer require laravel/framework:9.52.15 && 
+      php artisan --version && 
+      cp .env.example .env && 
+      php artisan key:generate && 
+      composer require doctrine/dbal:3.8.4 && 
+      php artisan migrate:fresh --seed && 
+      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
