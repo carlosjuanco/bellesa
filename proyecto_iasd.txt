@@ -35,8 +35,8 @@ docker run -v /Users/juan/Documents/proyecto_iasd/api:/home/demo -p 8080:80 -it 
 exit
 git clone https://github.com/carlosjuanco/zeus-api.git
 docker ps -a
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start iasd_api
+docker attach iasd_api
 cd /home/demo/zeus-api
 composer require laravel/framework:9.52.15
 php artisan --version
@@ -57,14 +57,14 @@ php artisan migrate:fresh --seed
 exit
 cd zeus-api
 git checkout test
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start iasd_api
+docker attach iasd_api
 cd /home/demo/zeus-api
 php artisan test
 exit
 git checkout main
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start iasd_api
+docker attach iasd_api
 cd /home/demo/zeus-api
 php artisan serve --host=172.17.0.3 --port=80
 Escribir en el navegador http://localhost:8080
@@ -78,8 +78,8 @@ exit
 cd ../app
 git clone https://github.com/carlosjuanco/meca-app.git
 docker ps -a
-docker start 6f7f772c598b
-docker attach 6f7f772c598b
+docker start iasd_app
+docker attach iasd_app
 cd home/demo/meca-app
 npm install
 touch "VUE_APP_BASE_URL=/" > .env
