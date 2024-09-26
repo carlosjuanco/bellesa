@@ -1,0 +1,13 @@
+# Sistema operativo: Linux
+# Distribución: Debian
+# Versión: 12
+# Fecha: 26 de Septiembre del 2024
+# Proyecto: iasd
+# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
+
+# Orden de ejecución
+docker-compose -f debian_setup_api.yml up -d
+docker-compose -f debian_bd.yml up -d
+docker-compose -f debian_api.yml up -d
+docker-compose -f debian_setup_app.yml up -d
+docker-compose -f debian_app.yml up -d
