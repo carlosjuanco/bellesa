@@ -1,0 +1,58 @@
+--------------------------
+Sistema operativo: Windows
+Versión: 11 Home Single Language
+Fecha: 30 de Septiembre del 2024
+Proyecto: iasd
+Descripción del proyecto: Proyecto iglesia adventista del séptimo día
+
+Requisitos
+-wsl
+-Docker desktop = 4.29.0
+-Docker engine = 26.0.0
+-docker-compose => 2.29.7
+-Workbench ó
+-dbeaver >= 23.1.5.202308201919
+-git >= 2.39.2
+--------------------------
+1.-Instalar Debian con WSL
+--------------------------
+Abrir PowerShell
+
+wsl --install -d debian
+
+Establecemos el nombre de usuario y contraseña
+Cuando termine abrimos una nueva ventana, seleccionamos debian
+
+sudo apt-get update
+sudo apt-get upgrade
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+VERSION_STRING=5:26.0.0-1~debian.12~bookworm
+sudo apt-get install docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo service docker start
+--------------------------
+2.-Compartir un volumen
+--------------------------
+Ir a "Este equipo" y clic en "Conectar a una unidad de red"
+\\wsl$\Debian
+--------------------------
+3.-Crear las carpeta raíz
+--------------------------
+proyecto_iasd
+En la carpeta raíz crer 3 carpetas con los siguientes nombre
+	bd
+	api
+	app
