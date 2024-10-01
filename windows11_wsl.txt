@@ -44,15 +44,34 @@ sudo apt-get install docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING con
 
 sudo service docker start
 --------------------------
-2.-Compartir un volumen
+2.-Instalar docker-compose
+--------------------------
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+--------------------------
+3.-Compartir un volumen
 --------------------------
 Ir a "Este equipo" y clic en "Conectar a una unidad de red"
 \\wsl$\Debian
 --------------------------
-3.-Crear las carpeta raíz
+4.-Crear las carpeta raíz
 --------------------------
 proyecto_iasd
 En la carpeta raíz crer 3 carpetas con los siguientes nombre
 	bd
 	api
 	app
+--------------------------
+5.-Clonar los respositorios
+--------------------------
+cd Z:/home/juan/Documentos/proyecto_iasd/api
+git clone https://github.com/carlosjuanco/zeus-api.git
+--------------------------
+6.-Orden de ejecución
+--------------------------
+windows11_wsl.txt
+docker-compose -f windows11_bd.yml up -d
+docker-compose -f windows11_api.yml up -d
+docker-compose -f windows11_setup_app.yml up -d
+docker-compose -f windows11_app.yml up -d
