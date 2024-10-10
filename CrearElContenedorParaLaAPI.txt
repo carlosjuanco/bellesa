@@ -1,0 +1,39 @@
+sudo docker pull debian:12.7
+sudo docker run -v /home/juan/Documentos/proyecto_iasd/api:/home/demo -p 8080:80 -it --name proyecto_api debian:12.7 /bin/bash
+
+# Actualizar el sistema operativo
+apt-get update -y
+apt-get -y upgrade
+apt install -y wget
+# Descargar php 8.1.28 de su página oficinal
+wget https://www.php.net/distributions/php-8.1.28.tar.gz
+tar -xzvf php-8.1.28.tar.gz
+cd php-8.1.28
+# Instalar dependencias necesarias
+apt-get install -y build-essential
+apt-get install -y pkg-config
+apt-get install -y libxml2-dev
+apt-get install libsqlite3-dev
+#Dependencia para composer
+apt-get install libssl-dev
+# Instalar PHP
+./configure --with-curl
+make && make install
+php -v
+cp php.ini-production /usr/local/lib/php.ini
+cd ..
+rm php-8.1.28.tar.gz
+rm -r php-8.1.28
+
+# Instalar composer 2.5.8
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+# Debe de salir ese mensaje: Installer verified
+php composer-setup.php --version=2.5.8
+php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
+composer -v
+
+# Dependencias para laravel
+apt-get install -y libcurl4-openssl-dev
+apt-get install -y zip

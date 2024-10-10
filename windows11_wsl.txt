@@ -69,6 +69,7 @@ En la carpeta raíz crer 3 carpetas con los siguientes nombre
 --------------------------
 5.-Clonar los respositorios
 --------------------------
+#Ingresar al PowerShell
 cd Z:/home/juan/Documentos/proyecto_iasd/api
 git clone https://github.com/carlosjuanco/zeus-api.git
 --------------------------
