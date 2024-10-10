@@ -76,7 +76,7 @@ git clone https://github.com/carlosjuanco/zeus-api.git
 6.-Orden de ejecución
 --------------------------
 windows11_wsl.txt
-docker-compose -f windows11_bd.yml up -d
-docker-compose -f windows11_api.yml up -d
-docker-compose -f windows11_setup_app.yml up -d
-docker-compose -f windows11_app.yml up -d
+sudo docker-compose -f windows11_bd.yml up -d
+sudo docker-compose -f windows11_api.yml up
+sudo docker-compose -f windows11_setup_app.yml up
+sudo docker-compose -f windows11_app.yml up

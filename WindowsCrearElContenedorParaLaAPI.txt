@@ -37,3 +37,6 @@ composer -v
 # Dependencias para laravel
 apt-get install -y libcurl4-openssl-dev
 apt-get install -y zip
+
+#Dependencias para mysql
+apt install -y php-mysql
