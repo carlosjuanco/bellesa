@@ -14,10 +14,18 @@ apt-get install -y build-essential
 apt-get install -y pkg-config
 apt-get install -y libxml2-dev
 apt-get install libsqlite3-dev
+# Para el driver pdo_mysql
+apt-get install -y libzip-dev
 #Dependencia para composer
 apt-get install libssl-dev
+# Dependencias para laravel
+apt-get install -y libcurl4-openssl-dev
 # Instalar PHP
-./configure --with-curl
+./configure --with-curl \
+--enable-mysqlnd \
+--with-pdo-mysql \
+--with-pdo-mysql=mysqlnd \
+--with-openssl
 make && make install
 php -v
 cp php.ini-production /usr/local/lib/php.ini
@@ -35,7 +43,6 @@ mv composer.phar /usr/local/bin/composer
 composer -v
 
 # Dependencias para laravel
-apt-get install -y libcurl4-openssl-dev
 apt-get install -y zip
 
 #Dependencias para mysql
