@@ -15,11 +15,12 @@ services:
       - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
+    # El comando cp .env.example .env debe hacerse a mano
+    # Se presentan problemas de permisos se se automatiza
     command: /bin/bash -c "
       cd /home/demo/zeus-api && 
       composer require laravel/framework:9.52.15 && 
       php artisan --version && 
-      cp .env.example .env && 
       php artisan key:generate && 
       composer require doctrine/dbal:3.8.4 && 
       php artisan migrate:fresh --seed && 

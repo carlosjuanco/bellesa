@@ -23,6 +23,9 @@ wsl --install -d debian
 Establecemos el nombre de usuario y contraseña
 Cuando termine abrimos una nueva ventana, seleccionamos debian
 
+#Saber que versión tengo de debian
+cat /etc/debian_version
+#Bajar actualizaciones 
 sudo apt-get update -y
 sudo apt-get -y upgrade
 # Add Docker's official GPG key:
@@ -46,7 +49,10 @@ sudo apt-get update -y
 VERSION_STRING=5:26.0.0-1~debian.12~bookworm
 sudo apt-get install docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin -y
 
+#Iniciar el servicio de doker
 sudo service docker start
+#Mostrar la versión de docker
+sudo docker -v
 --------------------------
 2.-Instalar docker-compose
 --------------------------
@@ -72,11 +78,17 @@ En la carpeta raíz crer 3 carpetas con los siguientes nombre
 #Ingresar al PowerShell
 cd Z:/home/juan/Documentos/proyecto_iasd/api
 git clone https://github.com/carlosjuanco/zeus-api.git
+cd ..\..
+git clone https://github.com/carlosjuanco/bellesa.git
+cd bellesa
+git checkout docker
 --------------------------
 6.-Orden de ejecución
 --------------------------
-windows11_wsl.txt
+#Ejecutar dentro de Debian
+cd Documentos/bellesa
 sudo docker-compose -f windows11_bd.yml up -d
+# WindowsCrearElContenedorParaLaAPI.txt
 sudo docker-compose -f windows11_api.yml up
 sudo docker-compose -f windows11_setup_app.yml up
 sudo docker-compose -f windows11_app.yml up
