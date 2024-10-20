@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  proyecto_api:
+    image: debian:12.7
+    container_name: proyecto_api
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/api:/home/demo
+    ports:
+      - "8080:80"
+    tty: true
+    stdin_open: true
+    command: >
+      /bin/bash -c "
+      apt-get update -y &&
+      apt-get -y upgrade &&
+      apt install -y wget &&
+      wget https://www.php.net/distributions/php-8.1.28.tar.gz &&
+      tar -xzvf php-8.1.28.tar.gz &&
+      cd php-8.1.28 &&
+      apt-get install -y build-essential pkg-config libxml2-dev libsqlite3-dev libzip-dev libssl-dev libcurl4-openssl-dev dialog apt-utils php8.2-mysql &&
+      ./configure --with-curl --with-pdo-mysql --with-pdo-mysql=mysqlnd --with-openssl &&
+      make && make install &&
+      php -v &&
+      cp php.ini-production /usr/local/lib/php.ini &&
+      cd .. &&
+      rm php-8.1.28.tar.gz &&
+      rm -r php-8.1.28 &&
+      php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" &&
+      php -r \"if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;\" &&
+      php composer-setup.php --version=2.5.8 &&
+      php -r \"unlink('composer-setup.php');\" &&
+      mv composer.phar /usr/local/bin/composer &&
+      composer -v &&
+      apt-get install -y zip &&
+      /bin/bash
+      "

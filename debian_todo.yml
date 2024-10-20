@@ -1,0 +1,54 @@
+# Sistema operativo: Linux
+# Distribución: Debian
+# Versión: 12
+# Fecha: 24 de Septiembre del 2024
+# Proyecto: iasd
+# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
+
+services:
+  git_clone:
+    image: alpine/git
+    container_name: git_clone_iasd_api
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/api:/git
+    command: clone https://github.com/carlosjuanco/zeus-api.git
+    stdin_open: true
+    tty: true
+    restart: "no"
+  mysql:
+    image: mysql:8.0.34
+    container_name: iasd_bd
+    environment:
+      - MYSQL_ROOT_PASSWORD=juan
+      - MYSQL_ROOT_HOST=%
+    networks:
+      - mi_red
+    ports:
+      - "3307:3306"
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/bd:/var/lib/mysql
+      - /home/juan/Documentos/proyecto_iasd/api/zeus-api/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+  iasd_api:
+    image: juancholll/iasd_api  # La imagen que se va a utilizar
+    container_name: iasd_api  # Nombre del contenedor
+    networks:
+      - mi_red
+    ports:
+      - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
+    stdin_open: true  # Mantiene abierto el stdin
+    tty: true  # Habilita una terminal interactiva
+    command: /bin/bash -c "
+      cd /home/demo/zeus-api && 
+      composer require laravel/framework:9.52.15 && 
+      php artisan --version && 
+      cp .env.example .env && 
+      php artisan key:generate && 
+      composer require doctrine/dbal:3.8.4 && 
+      php artisan migrate:fresh --seed && 
+      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
+networks:
+  mi_red:
+    driver: bridge
