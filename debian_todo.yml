@@ -1,20 +1,11 @@
 # Sistema operativo: Linux
 # Distribución: Debian
-# Versión: 12
-# Fecha: 24 de Septiembre del 2024
+# Versión: 12.7
+# Fecha: 20 de Octubre del 2024
 # Proyecto: iasd
 # Descripción del proyecto: Proyecto iglesia adventista del séptimo día
 
 services:
-  git_clone:
-    image: alpine/git
-    container_name: git_clone_iasd_api
-    volumes:
-      - /home/juan/Documentos/proyecto_iasd/api:/git
-    command: clone https://github.com/carlosjuanco/zeus-api.git
-    stdin_open: true
-    tty: true
-    restart: "no"
   mysql:
     image: mysql:8.0.34
     container_name: iasd_bd
@@ -22,7 +13,8 @@ services:
       - MYSQL_ROOT_PASSWORD=juan
       - MYSQL_ROOT_HOST=%
     networks:
-      - mi_red
+      - mi_red:
+          ipv4_address: 192.168.1.10 # IP fija para el contenedor MySQL
     ports:
       - "3307:3306"
     volumes:
@@ -30,10 +22,11 @@ services:
       - /home/juan/Documentos/proyecto_iasd/api/zeus-api/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
   iasd_api:
-    image: juancholll/iasd_api  # La imagen que se va a utilizar
+    image: juancholll/laravel_api  # La imagen que se va a utilizar
     container_name: iasd_api  # Nombre del contenedor
     networks:
-      - mi_red
+      - mi_red:
+          ipv4_address: 192.168.1.11  # IP fija para el contenedor de la API
     ports:
       - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
     volumes:
@@ -52,3 +45,6 @@ services:
 networks:
   mi_red:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24  # Define un rango de IPs para la red personalizada
