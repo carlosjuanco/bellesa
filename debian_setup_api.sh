@@ -2,7 +2,7 @@
 
 # Variables
 REPO_URL="https://github.com/carlosjuanco/zeus-api.git"
-DEST_DIR="/home/juan/Documentos/proyecto_iasd/api"
+DEST_DIR="/home/juan/Documentos/proyecto_iasd/api/zeus-api"
 
 # Comando para clonar el repositorio
 git clone $REPO_URL $DEST_DIR

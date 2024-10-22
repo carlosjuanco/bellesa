@@ -13,8 +13,11 @@ services:
       - MYSQL_ROOT_PASSWORD=juan
       - MYSQL_ROOT_HOST=%
     networks:
-      - mi_red:
-          ipv4_address: 192.168.1.10 # IP fija para el contenedor MySQL
+      red_web:
+        ipv4_address: 192.168.10.10
+      red_interna:
+        ipv4_address: 192.168.20.10
+    hostname: servidor_web
     ports:
       - "3307:3306"
     volumes:
@@ -25,8 +28,9 @@ services:
     image: juancholll/laravel_api  # La imagen que se va a utilizar
     container_name: iasd_api  # Nombre del contenedor
     networks:
-      - mi_red:
-          ipv4_address: 192.168.1.11  # IP fija para el contenedor de la API
+      red_interna:
+        ipv4_address: 192.168.20.20
+    hostname: servidor_mariadb
     ports:
       - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
     volumes:
@@ -36,15 +40,17 @@ services:
     command: /bin/bash -c "
       cd /home/demo/zeus-api && 
       composer require laravel/framework:9.52.15 && 
-      php artisan --version && 
-      cp .env.example .env && 
+      php artisan --version &&  
       php artisan key:generate && 
       composer require doctrine/dbal:3.8.4 && 
       php artisan migrate:fresh --seed && 
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
-  mi_red:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.1.0/24  # Define un rango de IPs para la red personalizada
+    red_web:
+        ipam:
+            config:
+              - subnet: 192.168.10.0/24
+    red_interna:
+        ipam:
+            config:
+              - subnet: 192.168.20.0/24
