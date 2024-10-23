@@ -21,12 +21,14 @@ apt-get install libssl-dev
 apt-get install -y libcurl4-openssl-dev
 # Para el driver pdo_mysql
 apt-get install dialog apt-utils
-apt install -y php8.2-mysql
+apt-get install -y php8.2-mysql
+apt-get install -y libonig-dev
 # Instalar PHP
 ./configure --with-curl \
 --with-pdo-mysql \
 --with-pdo-mysql=mysqlnd \
---with-openssl
+--with-openssl \
+--enable-mbstring
 make && make install
 php -v
 cp php.ini-production /usr/local/lib/php.ini
