@@ -6,8 +6,14 @@
 # Descripción del proyecto: Proyecto iglesia adventista del séptimo día
 
 # Orden de ejecución
-docker-compose -f debian_setup_api.yml up -d
-docker-compose -f debian_bd.yml up -d
-docker-compose -f debian_api.yml up -d
-docker-compose -f debian_setup_app.yml up -d
-docker-compose -f debian_app.yml up -d
+./debian_setup_api.sh
+sudo docker-compose -f debian_todo.yml up -d
+sudo docker logs -f iasd_api
+sudo docker logs -f iasd_app
+
+# En caso de repetir el proceso
+sudo docker stop iasd_bd
+sudo docker stop iasd_app
+sudo docker rm iasd_bd
+sudo docker rm iasd_app
+sudo docker rm iasd_api

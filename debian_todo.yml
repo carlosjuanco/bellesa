@@ -45,6 +45,25 @@ services:
       composer require doctrine/dbal:3.8.4 && 
       php artisan migrate:fresh --seed && 
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
+  iasd_app:
+    image: node:20.14.0  # La imagen que se va a utilizar
+    container_name: iasd_app # Nombre del contenedor
+    networks:
+      red_interna:
+        ipv4_address: 192.168.20.21
+    hostname: servidor_mariadb
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/app:/home/demo # Mapea el volumen de tu directorio local
+    ports:
+      - "8081:81" # Mapea el puerto 8080 del host al puerto 80 del contenedor
+    stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
+    tty: true # Habilita una terminal interactiva
+    command: /bin/bash -c "
+      cd home/demo/meca-app && 
+      npm install &&
+      echo "VUE_APP_BASE_URL=/" > .env && 
+      npm run serve -- --port 81 &&
+      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor  
 networks:
     red_web:
         ipam:
