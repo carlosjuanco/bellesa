@@ -1,6 +1,60 @@
 #!/bin/bash
+directorio_carpeta_raiz="/home/juan/Documentos"
 
-# Variables para repositorio API
+carpeta_raiz="/home/juan/Documentos/proyecto_iasd"
+
+subcarpeta_bd="/home/juan/Documentos/proyecto_iasd/bd"
+subcarpeta_api="/home/juan/Documentos/proyecto_iasd/api"
+subcarpeta_app="/home/juan/Documentos/proyecto_iasd/app"
+carpeta_repositorio_api="/home/juan/Documentos/proyecto_iasd/api/zeus-api"
+carpeta_repositorio_app="/home/juan/Documentos/proyecto_iasd/app/meca-app"
+
+# Paramos todos los contenedores
+echo "Paramos todos los contenedores ...."
+
+sudo docker stop iasd_bd
+sudo docker stop iasd_app
+sudo docker stop instalar_dependencias_en_api
+sudo docker stop instalar_dependencias_en_app
+sudo docker stop iasd_api
+
+echo "Se pararon todos los contenedores"
+
+echo "Eliminar todos los contenedores, para que no haya problemas al momento de crear las carpetas ...."
+
+sudo docker rm iasd_bd
+sudo docker rm iasd_app
+sudo docker rm iasd_api
+sudo docker rm instalar_dependencias_en_api
+sudo docker rm instalar_dependencias_en_app
+
+echo "Se eliminaron todos los contenedores"
+
+echo "Verificamos que la carpeta proyecto_iasd no exista, si existe lo eliminamos"
+
+if [ -d "$carpeta_raiz" ]; then
+	echo "El archivo existe $carpeta_raiz, procedemos a borrar ...."
+	sudo rm -r $carpeta_raiz
+fi
+
+echo "Creando repositorio ....."
+
+mkdir $carpeta_raiz
+mkdir $subcarpeta_bd
+mkdir $subcarpeta_api
+mkdir $subcarpeta_app
+mkdir $carpeta_repositorio_api
+mkdir $carpeta_repositorio_app
+
+echo "Se crearon las carpetas"
+
+echo "Permisos de las carpetas"
+ls -al $directorio_carpeta_raiz
+ls -al $carpeta_raiz
+ls -al $subcarpeta_api
+ls -al $subcarpeta_app
+
+Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
 DEST_API_DIR="/home/juan/Documentos/proyecto_iasd/api/zeus-api"
 
