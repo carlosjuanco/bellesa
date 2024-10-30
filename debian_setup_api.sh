@@ -22,10 +22,30 @@ carpeta_repositorio_app="/home/juan/Documentos/proyecto_iasd/app/meca-app"
 echo "Comenzando a parar todos los contenedores ...."
 
 sudo docker stop iasd_bd
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_bd"
+fi
 sudo docker stop iasd_app
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_app"
+fi
 sudo docker stop instalar_dependencias_en_api
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_api"
+fi
 sudo docker stop instalar_dependencias_en_app
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_app"
+fi
 sudo docker stop iasd_api
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_api"
+fi
 
 echo "Se termino de parar todos los contenedores"
 
@@ -34,10 +54,35 @@ echo "......................................................................"
 echo "Comenzar a eliminar todos los contenedores ...."
 
 sudo docker rm iasd_bd
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_bd"
+fi
 sudo docker rm iasd_app
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_app"
+fi
 sudo docker rm iasd_api
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_api"
+fi
 sudo docker rm instalar_dependencias_en_api
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_api"
+fi
+sudo docker rm iasd_api
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor iasd_api"
+fi
 sudo docker rm instalar_dependencias_en_app
+if [ $? -ne 0 ]; then
+    echo ".....El Error response from daemon: No such container"
+    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_app"
+fi
 
 echo "Se termino de eliminar todos los contenedores"
 
