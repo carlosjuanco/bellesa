@@ -73,11 +73,6 @@ if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
     echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_api"
 fi
-sudo docker rm iasd_api
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor iasd_api"
-fi
 sudo docker rm instalar_dependencias_en_app
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
