@@ -182,3 +182,35 @@ do
 done < $input
 
 echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+echo "Comenzando a levantar los servicios ...."
+sudo docker-compose -f debian_up_servicios.yml up -d
+sudo docker logs -f instalar_dependencias_en_api
+
+echo "......................................................................"
+echo "Se termino de levantar el servicio instalar_dependencias_en_api, sí muestra el siguiente mensaje"
+echo "Database\Seeders\AddComponentNameInformationInVueSeeder ....... 2.00 ms DONE"
+echo "......................................................................"
+# echo -e "Desea ejecutar el siguiente comando"
+# read ejecutar_el_siguiente_comando
+
+# if [ $ejecutar_el_siguiente_comando = "si" ]; then
+sudo docker logs -f instalar_dependencias_en_app
+echo "......................................................................"
+echo "Se termino de levantar el servicio instalar_dependencias_en_app, sí muestra el siguiente mensaje"
+echo "npm notice"
+echo "......................................................................"
+echo "Parar el servicio instalar_dependencias_en_api ...."
+sudo docker stop instalar_dependencias_en_api
+echo "......................................................................"
+echo "Parar el servicio instalar_dependencias_en_app ...."
+sudo docker stop instalar_dependencias_en_app
+# else
+echo "......................................................................"
+echo "Corriendo servicios ...."
+sudo docker-compose -f debian_run_servicios.yml up -d
+echo "......................................................................"
+sudo docker logs -f iasd_api
+sudo docker logs -f iasd_app
+
