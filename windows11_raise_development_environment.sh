@@ -7,15 +7,17 @@ echo "Proyecto: iasd"
 echo "Descripción del proyecto: Proyecto iglesia adventista del séptimo día"
 echo "......................................................................"
 
-directorio_carpeta_raiz="/home/juan/Documentos"
+current_username=whoami
 
-carpeta_raiz="/home/juan/Documentos/proyecto_iasd"
+directorio_carpeta_raiz="/home/$current_username/Documentos"
 
-subcarpeta_bd="/home/juan/Documentos/proyecto_iasd/bd"
-subcarpeta_api="/home/juan/Documentos/proyecto_iasd/api"
-subcarpeta_app="/home/juan/Documentos/proyecto_iasd/app"
-carpeta_repositorio_api="/home/juan/Documentos/proyecto_iasd/api/zeus-api"
-carpeta_repositorio_app="/home/juan/Documentos/proyecto_iasd/app/meca-app"
+carpeta_raiz="/home/$current_username/Documentos/proyecto_iasd"
+
+subcarpeta_bd="/home/$current_username/Documentos/proyecto_iasd/bd"
+subcarpeta_api="/home/$current_username/Documentos/proyecto_iasd/api"
+subcarpeta_app="/home/$current_username/Documentos/proyecto_iasd/app"
+carpeta_repositorio_api="/home/$current_username/Documentos/proyecto_iasd/api/zeus-api"
+carpeta_repositorio_app="/home/$current_username/Documentos/proyecto_iasd/app/meca-app"
 
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
@@ -129,7 +131,7 @@ echo "Comenzando a clonar los repositorios ...."
 
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
-DEST_API_DIR="/home/juan/Documentos/proyecto_iasd/api/zeus-api"
+DEST_API_DIR="/home/$current_username/Documentos/proyecto_iasd/api/zeus-api"
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
@@ -139,7 +141,7 @@ echo "Repositorio clonado en $DEST_API_DIR"
 
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
-DEST_APP_DIR="/home/juan/Documentos/proyecto_iasd/app/meca-app"
+DEST_APP_DIR="/home/$current_username/Documentos/proyecto_iasd/app/meca-app"
 
 # Comando para clonar el repositorio
 git clone $REPO_APP_URL $DEST_APP_DIR
@@ -150,8 +152,8 @@ echo "Repositorio clonado en $DEST_APP_DIR"
 echo "......................................................................"
 echo "Comenzando a crear el archivo .env en zeus-api ...."
 
-input="/home/juan/Documentos/proyecto_iasd/api/zeus-api/.env.example"
-out="/home/juan/Documentos/proyecto_iasd/api/zeus-api/.env"
+input="/home/$current_username/Documentos/proyecto_iasd/api/zeus-api/.env.example"
+out="/home/$current_username/Documentos/proyecto_iasd/api/zeus-api/.env"
 touch $out
 db_host="DB_HOST=127.0.0.1"
 db_database="DB_DATABASE=laravel"
@@ -179,7 +181,7 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 echo "Comenzando a levantar los servicios ...."
-sudo docker-compose -f windows11_install_services.yml up -d
+sudo docker-compose -f windows11_install_services.yml -e CURRENT_USERNAME=$current_username up -d
 sudo docker logs -f instalar_dependencias_en_api
 
 echo "......................................................................"
