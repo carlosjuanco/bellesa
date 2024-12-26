@@ -7,7 +7,7 @@ echo "Proyecto: iasd"
 echo "Descripción del proyecto: Proyecto iglesia adventista del séptimo día"
 echo "......................................................................"
 
-current_username=whoami
+current_username=$(whoami)
 
 directorio_carpeta_raiz="/home/$current_username/Documentos"
 
@@ -181,7 +181,7 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 echo "Comenzando a levantar los servicios ...."
-sudo docker-compose -f windows11_install_services.yml -e CURRENT_USERNAME=$current_username up -d
+sudo docker-compose -f windows11_install_services.yml up -d
 sudo docker logs -f instalar_dependencias_en_api
 
 echo "......................................................................"
