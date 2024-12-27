@@ -185,21 +185,26 @@ done < $input
 
 echo "Se termino de crear el archivo .env en zeus-api"
 echo "......................................................................"
+# Objetivo: copiar el contenido del archivo (debian_up_servicios.yml) y 
+# reemplazar una cadena específica ("/home/juan/") con otra ("/home/$current_username/") 
+# luego escribir el resultado en un nuevo archivo (windows11_install_services.yml).
+
+# El comando "sed" utiliza la opción -i para editar el archivo de destino 
+# en lugar de imprimir el resultado en la consola.
+
+# La expresión regular s|/home/juan/|/home/$current_username/|g reemplaza la cadena "/home/juan/" 
+# con "/home/$current_username/" de manera global (g) en el archivo de destino.
+
 echo "Comenzando a crear el archivo windows11_install_services.yml ...."
-file_install_services_original="/home/$current_username/Documentos/bellesa/debian_up_servicios.yml"
-file_install_services="/home/$current_username/Documentos/bellesa/windows11_install_services.yml"
+echo "......................................................................"
+origen="/home/$current_username/Documentos/bellesa/debian_up_servicios.yml"
+destino="/home/$current_username/Documentos/bellesa/windows11_install_services.yml"
 
-touch $file_install_services
+# Copiar el contenido del archivo de origen al archivo de destino
+cp "$origen" "$destino"
 
-# Se puede asignar el contenido del archivo sin las comillas dobles, pero no se respetan los
-# saltos de lineas y tabulaciones.
-contenido_file_install_services_original="$(cat $file_install_services_original)"
-
-contenido_nuevo=${contenido_file_install_services_original//"/home/juan/"/"/home/$current_username/"}
-
-# Se puede asignar el contenido del archivo sin las comillas dobles, pero no se respetan los
-# saltos de lineas y tabulaciones.
-echo "$contenido_nuevo" >> "$file_install_services"
+# Reemplazar la cadena en el archivo de destino
+sed -i "s|/home/juan/|/home/$current_username/|g" "$destino"
 
 echo "Se termino de crear el archivo windows11_install_services.yml"
 echo "......................................................................"
