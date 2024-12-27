@@ -208,6 +208,22 @@ sed -i "s|/home/juan/|/home/$current_username/|g" "$destino"
 
 echo "Se termino de crear el archivo windows11_install_services.yml"
 echo "......................................................................"
+# Objetivo: copiar el contenido del archivo (debian_run_servicios.yml) y 
+# reemplazar una cadena específica ("/home/juan/") con otra ("/home/$current_username/") 
+# luego escribir el resultado en un nuevo archivo (windows11_run_services.yml).
+echo "Comenzando a crear el archivo windows11_run_services.yml ...."
+echo "......................................................................"
+origen="/home/$current_username/Documentos/bellesa/debian_run_servicios.yml"
+destino="/home/$current_username/Documentos/bellesa/windows11_run_services.yml"
+
+# Copiar el contenido del archivo de origen al archivo de destino
+cp "$origen" "$destino"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i "s|/home/juan/|/home/$current_username/|g" "$destino"
+
+echo "Se termino de crear el archivo windows11_run_services.yml"
+echo "......................................................................"
 echo "Comenzando a levantar los servicios ...."
 sudo docker-compose -f windows11_install_services.yml up -d
 sudo docker logs -f instalar_dependencias_en_api
@@ -229,7 +245,7 @@ echo "Parar el servicio instalar_dependencias_en_app ...."
 sudo docker stop instalar_dependencias_en_app
 echo "......................................................................"
 echo "Corriendo servicios ...."
-sudo docker-compose -f windows11_running_services.yml up -d
+sudo docker-compose -f windows11_run_services.yml up -d
 echo "......................................................................"
 sudo docker logs -f iasd_api
 sudo docker logs -f iasd_app
