@@ -1,10 +1,16 @@
 #!/bin/bash
 
-echo "Sistema operativo: Linux"
-echo "Versión: 11"
-echo "Fecha: 19 de diciembre del 2024"
-echo "Proyecto: iasd"
-echo "Descripción del proyecto: Proyecto iglesia adventista del séptimo día"
+sistema_operativo="Sistema operativo: Windows"
+version_so="Versión: 11"
+fecha="Fecha: 19 de diciembre del 2024"
+proyecto="Proyecto: iasd"
+descripcion_proyecto="Descripción del proyecto: Proyecto iglesia adventista del séptimo día"
+
+echo $sistema_operativo
+echo $version_so
+echo $fecha
+echo $proyecto
+echo $descripcion_proyecto
 echo "......................................................................"
 
 current_username=$(whoami)
@@ -178,7 +184,24 @@ do
 done < $input
 
 echo "Se termino de crear el archivo .env en zeus-api"
+echo "......................................................................"
+echo "Comenzando a crear el archivo windows11_install_services.yml ...."
+file_install_services_original="/home/$current_username/Documentos/bellesa/debian_up_servicios.yml"
+file_install_services="/home/$current_username/Documentos/bellesa/windows11_install_services.yml"
 
+touch $file_install_services
+
+# Se puede asignar el contenido del archivo sin las comillas dobles, pero no se respetan los
+# saltos de lineas y tabulaciones.
+contenido_file_install_services_original="$(cat $file_install_services_original)"
+
+contenido_nuevo=${contenido_file_install_services_original//"/home/juan/"/"/home/$current_username/"}
+
+# Se puede asignar el contenido del archivo sin las comillas dobles, pero no se respetan los
+# saltos de lineas y tabulaciones.
+echo "$contenido_nuevo" >> "$file_install_services"
+
+echo "Se termino de crear el archivo windows11_install_services.yml"
 echo "......................................................................"
 echo "Comenzando a levantar los servicios ...."
 sudo docker-compose -f windows11_install_services.yml up -d
@@ -188,10 +211,7 @@ echo "......................................................................"
 echo "Se termino de levantar el servicio instalar_dependencias_en_api, sí muestra el siguiente mensaje"
 echo "Database\Seeders\AddComponentNameInformationInVueSeeder ....... 2.00 ms DONE"
 echo "......................................................................"
-# echo -e "Desea ejecutar el siguiente comando"
-# read ejecutar_el_siguiente_comando
 
-# if [ $ejecutar_el_siguiente_comando = "si" ]; then
 sudo docker logs -f instalar_dependencias_en_app
 echo "......................................................................"
 echo "Se termino de levantar el servicio instalar_dependencias_en_app, sí muestra el siguiente mensaje"
@@ -202,7 +222,6 @@ sudo docker stop instalar_dependencias_en_api
 echo "......................................................................"
 echo "Parar el servicio instalar_dependencias_en_app ...."
 sudo docker stop instalar_dependencias_en_app
-# else
 echo "......................................................................"
 echo "Corriendo servicios ...."
 sudo docker-compose -f windows11_running_services.yml up -d
