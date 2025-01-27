@@ -1,15 +1,10 @@
-# Sistema operativo: Windows
-# Versión: 11
-# Fecha: 19 de diciembre del 2024
-# Proyecto: iasd
-# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
 
 services:
   proyecto_api:
     image: debian:12.7
     container_name: proyecto_api2
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/api:/home/demo
+      - /home/juan/Documentos/proyecto_main/api:/home/demo
     ports:
       - "8080:80"
     tty: true
