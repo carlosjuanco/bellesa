@@ -188,7 +188,7 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 
-# Objetivo: copiar el contenido del archivo (debian_up_servicios.yml) y 
+# Objetivo: copiar el contenido del archivo (install_services.yml) y 
 # reemplazar una cadena específica ("/Users/juan/") con otra ("/Users/$current_username/") 
 # luego escribir el resultado en un nuevo archivo (create_containers_for_services.yml).
 
@@ -200,7 +200,7 @@ echo "......................................................................"
 
 echo "Comenzando a crear el archivo create_containers_for_services.yml ...."
 echo "......................................................................"
-origen=$current_directory_of_the_bellesa_project"/debian_up_servicios.yml"
+origen=$current_directory_of_the_bellesa_project"/install_services.yml"
 destino=$current_directory_of_the_bellesa_project"/create_containers_for_services.yml"
 
 # Copiar el contenido del archivo de origen al archivo de destino
@@ -217,11 +217,11 @@ sed -i '' "s|image: juancholll/laravel_api|image: juancholll/iasd_api|g" "$desti
 echo "Se termino de crear el archivo create_containers_for_services.yml"
 echo "......................................................................"
 
-# Objetivo: copiar el contenido del archivo (debian_run_servicios.yml) y 
-echo "Comenzando a crear el archivo run_services.yml ...."
+# Objetivo: copiar el contenido del archivo (run_services.yml) y 
+echo "Comenzando a crear el archivo run_services2.yml ...."
 echo "......................................................................"
-origen=$current_directory_of_the_bellesa_project"/debian_run_servicios.yml"
-destino=$current_directory_of_the_bellesa_project"/run_services.yml"
+origen=$current_directory_of_the_bellesa_project"/run_services.yml"
+destino=$current_directory_of_the_bellesa_project"/run_services2.yml"
 
 # Copiar el contenido del archivo de origen al archivo de destino
 cp "$origen" "$destino"
@@ -238,7 +238,7 @@ sed -i '' "s|container_name: iasd_api|container_name: "$name_project"_api|g" "$d
 # Reemplazar la cadena en el archivo de destino
 sed -i '' "s|container_name: iasd_app|container_name: "$name_project"_app|g" "$destino"
 
-echo "Se termino de crear el archivo run_services.yml"
+echo "Se termino de crear el archivo run_services2.yml"
 echo "......................................................................"
 # Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
 echo "Comenzando a modificar nombre de la base de datos init.sql ...."
@@ -268,16 +268,16 @@ echo "Parar el servicio instalar_dependencias_en_app ...."
 sudo docker stop instalar_dependencias_en_app
 echo "......................................................................"
 echo "Corriendo servicios ...."
-sudo docker-compose -f run_services.yml up -d
+sudo docker-compose -f run_services2.yml up -d
 echo "......................................................................"
-sudo docker logs -f iasd_api
-sudo docker logs -f iasd_app
+sudo docker logs -f $name_project"_api"
+sudo docker logs -f $name_project"_app"
 echo "......................................................................"
 echo "Eliminar archivo create_containers_for_services.yml ...."
 sudo rm create_containers_for_services.yml
 echo "......................................................................"
-echo "Eliminar archivo run_services.yml ...."
-sudo rm run_services.yml
+echo "Eliminar archivo run_services2.yml ...."
+sudo rm run_services2.yml
 echo "......................................................................"
 echo "Eliminar contenedor instalar_dependencias_en_api ...."
 sudo docker rm instalar_dependencias_en_api

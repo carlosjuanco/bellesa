@@ -1,9 +1,3 @@
-# Sistema operativo: Linux
-# Distribución: Debian
-# Versión: 12.7
-# Fecha: 25 de Octubre del 2024
-# Proyecto: iasd
-# Descripción del proyecto: Proyecto iglesia adventista del séptimo día
 
 services:
   iasd_api:
