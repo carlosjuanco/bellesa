@@ -279,8 +279,3 @@ echo "......................................................................"
 echo "Eliminar archivo run_services2.yml ...."
 sudo rm run_services2.yml
 echo "......................................................................"
-echo "Eliminar contenedor instalar_dependencias_en_api ...."
-sudo docker rm instalar_dependencias_en_api
-echo "......................................................................"
-echo "Eliminar contenedor instalar_dependencias_en_app ...."
-sudo docker rm instalar_dependencias_en_app
