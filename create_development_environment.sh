@@ -240,12 +240,47 @@ sed -i '' "s|container_name: iasd_app|container_name: "$name_project"_app|g" "$d
 
 echo "Se termino de crear el archivo run_services.yml"
 echo "......................................................................"
+# Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
+echo "Comenzando a modificar nombre de la base de datos init.sql ...."
+echo "......................................................................"
+destino=$carpeta_repositorio_api"/database/init.sql"
 
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|iasd|$name_bd|g" "$destino"
+
+echo "......................................................................"
 echo "Comenzando a levantar los servicios ...."
 sudo docker-compose -f create_containers_for_services.yml up -d
 sudo docker logs -f instalar_dependencias_en_api
-
 echo "......................................................................"
 echo "Se termino de levantar el servicio instalar_dependencias_en_api, sí muestra el siguiente mensaje"
 echo "Database\Seeders\AddComponentNameInformationInVueSeeder ....... 2.00 ms DONE"
 echo "......................................................................"
+sudo docker logs -f instalar_dependencias_en_app
+echo "......................................................................"
+echo "Se termino de levantar el servicio instalar_dependencias_en_app, sí muestra el siguiente mensaje"
+echo "npm notice"
+echo "......................................................................"
+echo "Parar el servicio instalar_dependencias_en_api ...."
+sudo docker stop instalar_dependencias_en_api
+echo "......................................................................"
+echo "Parar el servicio instalar_dependencias_en_app ...."
+sudo docker stop instalar_dependencias_en_app
+echo "......................................................................"
+echo "Corriendo servicios ...."
+sudo docker-compose -f run_services.yml up -d
+echo "......................................................................"
+sudo docker logs -f iasd_api
+sudo docker logs -f iasd_app
+echo "......................................................................"
+echo "Eliminar archivo create_containers_for_services.yml ...."
+sudo rm create_containers_for_services.yml
+echo "......................................................................"
+echo "Eliminar archivo run_services.yml ...."
+sudo rm run_services.yml
+echo "......................................................................"
+echo "Eliminar contenedor instalar_dependencias_en_api ...."
+sudo docker rm instalar_dependencias_en_api
+echo "......................................................................"
+echo "Eliminar contenedor instalar_dependencias_en_app ...."
+sudo docker rm instalar_dependencias_en_app
