@@ -8,50 +8,33 @@ services:
       - MYSQL_ROOT_HOST=%
     networks:
       red_web:
-        ipv4_address: 192.168.10.10
+        ipv4_address: 192.168.10.20
       red_interna:
-        ipv4_address: 192.168.20.10
+        ipv4_address: 192.168.20.20
     hostname: servidor_web
     ports:
-      - "3307:3306"
+      - "3306:3309"
     volumes:
       - /home/juan/Documentos/proyecto_iasd/bd:/var/lib/mysql
-      - /home/juan/Documentos/proyecto_iasd/api/zeus-api/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /home/juan/Documentos/proyecto_iasd/all/laravelwithfilament/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
   instalar_dependencias_en_api:
     image: juancholll/laravel_api  # La imagen que se va a utilizar
     container_name: instalar_dependencias_en_api  # Nombre del contenedor
     networks:
       red_interna:
-        ipv4_address: 192.168.20.11
+        ipv4_address: 192.168.20.21
     hostname: servidor_mariadb    
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
+      - /home/juan/Documentos/proyecto_iasd/all:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "
-      cd /home/demo/zeus-api && 
-      composer require laravel/framework:9.52.15 && 
+      cd /home/demo/laravelwithfilament && 
+      composer install && 
       php artisan --version &&  
       php artisan key:generate && 
-      composer require doctrine/dbal:3.8.4 && 
       php artisan migrate:fresh --seed && 
-      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
-  instalar_dependencias_en_app:
-    image: node:20.14.0  # La imagen que se va a utilizar
-    container_name: instalar_dependencias_en_app # Nombre del contenedor
-    networks:
-      red_interna:
-        ipv4_address: 192.168.20.13
-    hostname: servidor_mariadb
-    volumes:
-      - /home/juan/Documentos/proyecto_iasd/app:/home/demo # Mapea el volumen de tu directorio local
-    stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
-    tty: true # Habilita una terminal interactiva
-    command: /bin/bash -c "
-      cd home/demo/meca-app && 
-      npm install &&
-      echo "VUE_APP_BASE_URL=/" > .env &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:
