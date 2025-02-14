@@ -233,9 +233,11 @@ sed -i "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$de
 sed -i "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
 sed -i "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
 sed -i "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.18|g" "$destino"
-sed -i "s|--host=192.168.20.12|--host=192.168.20.15|g" "$destino"
+sed -i "s|8080:80|8082:82|g" "$destino"
+sed -i "s|--host=192.168.20.12 --port=80|--host=192.168.20.18 --port=82|g" "$destino"
 sed -i "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
-sed -i "s|8081:81|8081:81|g" "$destino"
+sed -i "s|8081:81|8083:83|g" "$destino"
+sed -i "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
 echo "......................................................................"
