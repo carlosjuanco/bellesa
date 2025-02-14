@@ -204,6 +204,9 @@ destino=$current_directory_of_the_bellesa_project"/create_containers_for_service
 cp "$origen" "$destino"
 
 # Reemplazar la cadena en el archivo de destino
+sed -i "s|iasd_mysql:|"$name_project"_mysql:|g" "$destino"
+sed -i "s|instalar_dependencias_en_api:|"$name_project"_instalar_dependencias_en_api:|g" "$destino"
+sed -i "s|instalar_dependencias_en_app:|"$name_project"_instalar_dependencias_en_app:|g" "$destino"
 sed -i "s|container_name: iasd_bd|container_name: "$container_name_bd"|g" "$destino"
 sed -i "s|/home/juan/Documentos/proyecto_iasd|$carpeta_raiz|g" "$destino"
 sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
@@ -228,6 +231,8 @@ destino=$current_directory_of_the_bellesa_project"/run_services2.yml"
 cp "$origen" "$destino"
 
 # Reemplazar la cadena en el archivo de destino
+sed -i "s|iasd_api:|"$name_project"_api:|g" "$destino"
+sed -i "s|iasd_app:|"$name_project"_app:|g" "$destino"
 sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
 sed -i "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$destino"
 sed -i "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
