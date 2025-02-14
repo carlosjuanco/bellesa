@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name_project="main"
+name_project="sdac"
 
 version_so="Versión: 12.7"
 proyecto="Proyecto: "$name_project
@@ -13,7 +13,7 @@ echo "......................................................................"
 
 current_username=$(whoami)
 current_directory_of_the_bellesa_project=$(pwd)
-name_bd="main"
+name_bd="sdac"
 
 directorio_carpeta_raiz="/home/$current_username/Documentos"
 carpeta_raiz=$directorio_carpeta_raiz"/proyecto_"$name_project
@@ -180,7 +180,7 @@ do
 		echo $linea >> $out
 	else
 		if [ $linea = $db_host ]; then
-	  		echo "DB_HOST=192.168.20.10" >> $out
+	  		echo "DB_HOST=192.168.20.15" >> $out
 	  	elif [ $linea = $db_database ]; then
 	  		echo "DB_DATABASE="$name_bd >> $out
 	  	elif [ $linea = $db_password ]; then
@@ -209,6 +209,11 @@ sed -i "s|/home/juan/Documentos/proyecto_iasd|$carpeta_raiz|g" "$destino"
 sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
 sed -i "s|container_name: instalar_dependencias_en_api|container_name: "$container_name_install_dev_on_api"|g" "$destino"
 sed -i "s|container_name: instalar_dependencias_en_app|container_name: "$container_name_install_dev_on_app"|g" "$destino"
+sed -i "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" "$destino"
+sed -i "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" "$destino"
+sed -i "s|3307:3306|3308:3306|g" "$destino"
+sed -i "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" "$destino"
+sed -i "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" "$destino"
 
 echo "Se termino de crear el archivo create_containers_for_services_$name_project.yml"
 echo "......................................................................"
@@ -227,6 +232,10 @@ sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api
 sed -i "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$destino"
 sed -i "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
 sed -i "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
+sed -i "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.18|g" "$destino"
+sed -i "s|--host=192.168.20.12|--host=192.168.20.15|g" "$destino"
+sed -i "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
+sed -i "s|8081:81|8081:81|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
 echo "......................................................................"
