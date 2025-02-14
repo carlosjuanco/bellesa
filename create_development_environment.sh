@@ -31,6 +31,8 @@ container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
 
 docker_image_name_container_api="juancholll/laravel_api_debian"
 
+ip_red_internal_container_name_bd="192.168.20.10"
+
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
 
@@ -180,7 +182,7 @@ do
 		echo $linea >> $out
 	else
 		if [ $linea = $db_host ]; then
-	  		echo "DB_HOST=192.168.20.10" >> $out
+	  		echo "DB_HOST="$ip_red_internal_container_name_bd >> $out
 	  	elif [ $linea = $db_database ]; then
 	  		echo "DB_DATABASE="$name_bd >> $out
 	  	elif [ $linea = $db_password ]; then
