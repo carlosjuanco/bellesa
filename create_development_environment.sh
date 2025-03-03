@@ -1,7 +1,9 @@
 #!/bin/bash
 
+name_project="sdac"
+
 version_so="Versión: Sonoma 14.3"
-proyecto="Proyecto: main"
+proyecto="Proyecto: "$name_project
 descripcion_proyecto="Descripción del proyecto: Base para todos los proyectos."
 
 echo $version_so
@@ -10,47 +12,52 @@ echo $descripcion_proyecto
 echo "......................................................................"
 
 current_username=$(whoami)
-
-name_project="main"
-name_bd="main"
-directorio_carpeta_raiz="/Users/$current_username/Documents"
-carpeta_raiz="/Users/$current_username/Documents/proyecto_$name_project"
-
-subcarpeta_bd="/Users/$current_username/Documents/proyecto_$name_project/bd"
-subcarpeta_api="/Users/$current_username/Documents/proyecto_$name_project/api"
-subcarpeta_app="/Users/$current_username/Documents/proyecto_$name_project/app"
-carpeta_repositorio_api="/Users/$current_username/Documents/proyecto_$name_project/api/zeus-api"
-carpeta_repositorio_app="/Users/$current_username/Documents/proyecto_$name_project/app/meca-app"
-
 current_directory_of_the_bellesa_project=$(pwd)
+name_bd="sdac"
+
+directorio_carpeta_raiz="/Users/$current_username/Documents"
+carpeta_raiz=$directorio_carpeta_raiz"/proyecto_"$name_project
+subcarpeta_bd=$carpeta_raiz"/bd"
+subcarpeta_api=$carpeta_raiz"/api"
+subcarpeta_app=$carpeta_raiz"/app"
+carpeta_repositorio_api=$subcarpeta_api"/zeus-api"
+carpeta_repositorio_app=$subcarpeta_app"/meca-app"
+
+container_name_bd=$name_project"_bd"
+container_name_api=$name_project"_api"
+container_name_app=$name_project"_app"
+container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
+container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
+
+docker_image_name_container_api="juancholll/laravel_api_macos"
 
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
 
-sudo docker stop $name_project"_bd"
+sudo docker stop $container_name_bd
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_bd"
+    echo ".....Se debe a que no existe el contenedor "$container_name_bd
 fi
-sudo docker stop $name_project"_app"
+sudo docker stop $container_name_app
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_app"
+    echo ".....Se debe a que no existe el contenedor "$container_name_app
 fi
-sudo docker stop instalar_dependencias_en_api
+sudo docker stop $container_name_api
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_api"
+    echo ".....Se debe a que no existe el contenedor "$container_name_api
 fi
-sudo docker stop instalar_dependencias_en_app
+sudo docker stop $container_name_install_dev_on_api
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_app"
+    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_api
 fi
-sudo docker stop $name_project"_api"
+sudo docker stop $container_name_install_dev_on_app
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_api"
+    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_app
 fi
 
 echo "Se termino de parar todos los contenedores"
@@ -59,30 +66,30 @@ echo "......................................................................"
 
 echo "Comenzar a eliminar todos los contenedores ...."
 
-sudo docker rm $name_project"_bd"
+sudo docker rm $container_name_bd
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_bd"
+    echo ".....Se debe a que no existe el contenedor "$container_name_bd
 fi
-sudo docker rm $name_project"_app"
+sudo docker rm $container_name_app
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_app"
+    echo ".....Se debe a que no existe el contenedor "$container_name_app
 fi
-sudo docker rm $name_project"_api"
+sudo docker rm $container_name_api
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$name_project"_api"
+    echo ".....Se debe a que no existe el contenedor "$container_name_api
 fi
-sudo docker rm instalar_dependencias_en_api
+sudo docker rm $container_name_install_dev_on_api
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_api"
+    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_api
 fi
-sudo docker rm instalar_dependencias_en_app
+sudo docker rm $container_name_install_dev_on_app
 if [ $? -ne 0 ]; then
     echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor instalar_dependencias_en_app"
+    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_app
 fi
 
 echo "Se termino de eliminar todos los contenedores"
@@ -137,30 +144,59 @@ echo "Comenzando a clonar los repositorios ...."
 
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
-DEST_API_DIR="/Users/$current_username/Documents/proyecto_$name_project/api/zeus-api"
+DEST_API_DIR=$carpeta_repositorio_api
+BRANCH_NAME=$name_project
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_API_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_API_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_API_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
 
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
-DEST_APP_DIR="/Users/$current_username/Documents/proyecto_$name_project/app/meca-app"
+DEST_APP_DIR=$carpeta_repositorio_app
 
 # Comando para clonar el repositorio
 git clone $REPO_APP_URL $DEST_APP_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_APP_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_APP_DIR
 
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+# Volvemos a la carpeta de bellesa
+
+# Aprendizaje: Al momento de ejecutarse este archivo, realmente si cambiamos de ruta, ya que no encontró los archivos "create_containers_for_services_.yml"
+# y "run_services2.yml", pero en mi terminal me seguia mostrando que si estabamos en la ruta bellesa, entonces, para que pueda encontrar los archivos,
+# vuelvo a regresar
+
+cd $current_directory_of_the_bellesa_project
 echo "......................................................................"
 
 echo "Comenzando a crear el archivo .env en zeus-api ...."
 
-input="/Users/$current_username/Documents/proyecto_$name_project/api/zeus-api/.env.example"
-out="/Users/$current_username/Documents/proyecto_$name_project/api/zeus-api/.env"
+input=$carpeta_repositorio_api"/.env.example"
+out=$carpeta_repositorio_api"/.env"
 touch $out
 db_host="DB_HOST=127.0.0.1"
 db_database="DB_DATABASE=laravel"
@@ -173,7 +209,7 @@ do
 		echo $linea >> $out
 	else
 		if [ $linea = $db_host ]; then
-	  		echo "DB_HOST=192.168.20.10" >> $out
+	  		echo "DB_HOST=192.168.20.15" >> $out
 	  	elif [ $linea = $db_database ]; then
 	  		echo "DB_DATABASE="$name_bd >> $out
 	  	elif [ $linea = $db_password ]; then
@@ -188,33 +224,30 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 
-# Objetivo: copiar el contenido del archivo (install_services.yml) y 
-# reemplazar una cadena específica ("/Users/juan/") con otra ("/Users/$current_username/") 
-# luego escribir el resultado en un nuevo archivo (create_containers_for_services.yml).
-
-# El comando "sed" utiliza la opción -i para editar el archivo de destino 
-# en lugar de imprimir el resultado en la consola.
-
-# La expresión regular s|/Users/juan/Documentos/|/Users/$current_username/|g reemplaza la cadena "/Users/juan/Documents" 
-# con "/Users/$current_username/Documents" de manera global (g) en el archivo de destino.
-
-echo "Comenzando a crear el archivo create_containers_for_services.yml ...."
+echo "Comenzando a crear el archivo create_containers_for_services_$name_project.yml ...."
 echo "......................................................................"
 origen=$current_directory_of_the_bellesa_project"/install_services.yml"
-destino=$current_directory_of_the_bellesa_project"/create_containers_for_services.yml"
+destino=$current_directory_of_the_bellesa_project"/create_containers_for_services_"$name_project".yml"
 
 # Copiar el contenido del archivo de origen al archivo de destino
 cp "$origen" "$destino"
 
 # Reemplazar la cadena en el archivo de destino
-sed -i '' "s|/home/juan/Documentos/proyecto_iasd|/Users/$current_username/Documents/proyecto_$name_project|g" "$destino"
+sed -i '' "s|iasd_mysql:|"$name_project"_mysql:|g" "$destino"
+sed -i '' "s|instalar_dependencias_en_api:|"$name_project"_instalar_dependencias_en_api:|g" "$destino"
+sed -i '' "s|instalar_dependencias_en_app:|"$name_project"_instalar_dependencias_en_app:|g" "$destino"
+sed -i '' "s|container_name: iasd_bd|container_name: "$container_name_bd"|g" "$destino"
+sed -i '' "s|/home/juan/Documentos/proyecto_iasd|$carpeta_raiz|g" "$destino"
+sed -i '' "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
+sed -i '' "s|container_name: instalar_dependencias_en_api|container_name: "$container_name_install_dev_on_api"|g" "$destino"
+sed -i '' "s|container_name: instalar_dependencias_en_app|container_name: "$container_name_install_dev_on_app"|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" "$destino"
+sed -i '' "s|3307:3306|3308:3306|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" "$destino"
 
-# Reemplazar la cadena en el archivo de destino
-sed -i '' "s|container_name: iasd_bd|container_name: "$name_project"_bd|g" "$destino"
-
-sed -i '' "s|image: juancholll/laravel_api|image: juancholll/iasd_api|g" "$destino"
-
-echo "Se termino de crear el archivo create_containers_for_services.yml"
+echo "Se termino de crear el archivo create_containers_for_services_$name_project.yml"
 echo "......................................................................"
 
 # Objetivo: copiar el contenido del archivo (run_services.yml) y 
@@ -227,18 +260,28 @@ destino=$current_directory_of_the_bellesa_project"/run_services2.yml"
 cp "$origen" "$destino"
 
 # Reemplazar la cadena en el archivo de destino
-sed -i '' "s|/home/juan/Documentos/proyecto_iasd|/Users/$current_username/Documents/proyecto_$name_project|g" "$destino"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i '' "s|image: juancholll/laravel_api|image: juancholll/iasd_api|g" "$destino"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i '' "s|container_name: iasd_api|container_name: "$name_project"_api|g" "$destino"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i '' "s|container_name: iasd_app|container_name: "$name_project"_app|g" "$destino"
+sed -i '' "s|iasd_api:|"$name_project"_api:|g" "$destino"
+sed -i '' "s|iasd_app:|"$name_project"_app:|g" "$destino"
+sed -i '' "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
+sed -i '' "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$destino"
+sed -i '' "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
+sed -i '' "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.18|g" "$destino"
+sed -i '' "s|8080:80|8082:82|g" "$destino"
+sed -i '' "s|--host=192.168.20.12 --port=80|--host=192.168.20.18 --port=82|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
+sed -i '' "s|8081:81|8083:83|g" "$destino"
+sed -i '' "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
+echo "......................................................................"
+# Objetivo: cambiar el valor de baseURL para que apunte al puerto 8082
+echo "Comenzando ...."
+echo "..................|...................................................."
+destino=$carpeta_repositorio_app"/src/main.ts"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|localhost:8080/api|localhost:8082/api|g" "$destino"
 echo "......................................................................"
 # Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
 echo "Comenzando a modificar nombre de la base de datos init.sql ...."
@@ -249,32 +292,32 @@ destino=$carpeta_repositorio_api"/database/init.sql"
 sed -i '' "s|iasd|$name_bd|g" "$destino"
 
 echo "......................................................................"
-echo "Comenzando a levantar los servicios ...."
-sudo docker-compose -f create_containers_for_services.yml up -d
-sudo docker logs -f instalar_dependencias_en_api
+echo "Comenzando a instalar los servicios ...."
+sudo docker-compose -f "create_containers_for_services_"$name_project".yml" up -d
+sudo docker logs -f $container_name_install_dev_on_api
 echo "......................................................................"
-echo "Se termino de levantar el servicio instalar_dependencias_en_api, sí muestra el siguiente mensaje"
-echo "Database\Seeders\AddComponentNameInformationInVueSeeder ....... 2.00 ms DONE"
+echo "Se termino de instalar el servicio $container_name_install_dev_on_api, sí muestra el siguiente mensaje"
+echo "Database\Seeders\FillInTheValuesForThePermissionsFieldSeeder ....... 2.00 ms DONE"
 echo "......................................................................"
-sudo docker logs -f instalar_dependencias_en_app
+sudo docker logs -f $container_name_install_dev_on_app
 echo "......................................................................"
-echo "Se termino de levantar el servicio instalar_dependencias_en_app, sí muestra el siguiente mensaje"
+echo "Se termino de instalar el servicio $container_name_install_dev_on_app, sí muestra el siguiente mensaje"
 echo "npm notice"
 echo "......................................................................"
-echo "Parar el servicio instalar_dependencias_en_api ...."
-sudo docker stop instalar_dependencias_en_api
+echo "Parar el servicio $container_name_install_dev_on_api ...."
+sudo docker stop $container_name_install_dev_on_api
 echo "......................................................................"
-echo "Parar el servicio instalar_dependencias_en_app ...."
-sudo docker stop instalar_dependencias_en_app
+echo "Parar el servicio $container_name_install_dev_on_app ...."
+sudo docker stop $container_name_install_dev_on_app
 echo "......................................................................"
 echo "Corriendo servicios ...."
 sudo docker-compose -f run_services2.yml up -d
 echo "......................................................................"
-sudo docker logs -f $name_project"_api"
-sudo docker logs -f $name_project"_app"
+sudo docker logs -f $container_name_api
+sudo docker logs -f $container_name_app
 echo "......................................................................"
-echo "Eliminar archivo create_containers_for_services.yml ...."
-sudo rm create_containers_for_services.yml
+echo "Eliminar archivo create_containers_for_services_"$name_project".yml ...."
+sudo rm "create_containers_for_services_"$name_project".yml"
 echo "......................................................................"
 echo "Eliminar archivo run_services2.yml ...."
 sudo rm run_services2.yml

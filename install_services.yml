@@ -1,6 +1,6 @@
 
 services:
-  mysql:
+  iasd_mysql:
     image: mysql:8.0.34
     container_name: iasd_bd
     environment:
