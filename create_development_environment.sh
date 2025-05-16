@@ -145,12 +145,24 @@ echo "Comenzando a clonar los repositorios ...."
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
 DEST_API_DIR=$carpeta_repositorio_api
+BRANCH_NAME=$name_project
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_API_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_API_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_API_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
 
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
@@ -158,10 +170,27 @@ DEST_APP_DIR=$carpeta_repositorio_app
 
 # Comando para clonar el repositorio
 git clone $REPO_APP_URL $DEST_APP_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_APP_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_APP_DIR
 
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+# Volvemos a la carpeta de bellesa
+
+# Aprendizaje: Al momento de ejecutarse este archivo, realmente si cambiamos de ruta, ya que no encontró los archivos "create_containers_for_services_.yml"
+# y "run_services2.yml", pero en mi terminal me seguia mostrando que si estabamos en la ruta bellesa, entonces, para que pueda encontrar los archivos,
+# vuelvo a regresar
+
+cd $current_directory_of_the_bellesa_project
 echo "......................................................................"
 
 echo "Comenzando a crear el archivo .env en zeus-api ...."
@@ -245,6 +274,14 @@ sed -i "s|8081:81|8083:83|g" "$destino"
 sed -i "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
+echo "......................................................................"
+# Objetivo: cambiar el valor de baseURL para que apunte al puerto 8082
+echo "Comenzando ...."
+echo "..................|...................................................."
+destino=$carpeta_repositorio_app"/src/main.ts"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i "s|localhost:8080/api|localhost:8082/api|g" "$destino"
 echo "......................................................................"
 # Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
 echo "Comenzando a modificar nombre de la base de datos init.sql ...."
