@@ -30,6 +30,7 @@ container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
 container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
 
 docker_image_name_container_api="juancholll/laravel_api_debian"
+api_port_number=8080
 
 ip_red_internal_container_name_bd="192.168.20.10"
 
@@ -147,12 +148,24 @@ echo "Comenzando a clonar los repositorios ...."
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
 DEST_API_DIR=$carpeta_repositorio_api
+BRANCH_NAME=$name_project
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_API_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_API_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_API_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
 
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
@@ -160,9 +173,27 @@ DEST_APP_DIR=$carpeta_repositorio_app
 
 # Comando para clonar el repositorio
 git clone $REPO_APP_URL $DEST_APP_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
 
-# Mensaje de confirmación
-echo "Repositorio clonado en $DEST_APP_DIR"
+    # Cambiar al directorio del repositorio
+    cd $DEST_APP_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+# Volvemos a la carpeta de bellesa
+
+# Aprendizaje: Al momento de ejecutarse este archivo, realmente si cambiamos de ruta, ya que no encontró los archivos "create_containers_for_services_.yml"
+# y "run_services2.yml", pero en mi terminal me seguia mostrando que si estabamos en la ruta bellesa, entonces, para que pueda encontrar los archivos,
+# vuelvo a regresar
+
+cd $current_directory_of_the_bellesa_project
 
 echo "......................................................................"
 
@@ -192,6 +223,19 @@ do
 		fi
 	fi
 done < $input
+
+echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
+echo "Comenzando a crear el archivo .env en meca-app ...."
+
+input=$current_directory_of_the_bellesa_project"/env.env"
+out=$carpeta_repositorio_app"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|8081|"$api_port_number"|g" "$out"
 
 echo "Se termino de crear el archivo .env en zeus-api"
 
