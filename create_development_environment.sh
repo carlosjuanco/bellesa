@@ -145,7 +145,7 @@ echo "Comenzando a clonar los repositorios ...."
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
 DEST_API_DIR=$carpeta_repositorio_api
-BRANCH_NAME=$name_project
+BRANCH_NAME=$name_project"-dev"
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
@@ -219,6 +219,19 @@ do
 		fi
 	fi
 done < $input
+
+echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
+echo "Comenzando a crear el archivo .env en meca-app ...."
+
+input=$current_directory_of_the_bellesa_project"/env.env"
+out=$carpeta_repositorio_app"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|8081|8082|g" "$out"
 
 echo "Se termino de crear el archivo .env en zeus-api"
 
