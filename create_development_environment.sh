@@ -30,6 +30,7 @@ container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
 container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
 
 docker_image_name_container_api="juancholll/laravel_api_macos"
+api_port_number=8080
 
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
@@ -224,6 +225,19 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 
+echo "Comenzando a crear el archivo .env en meca-app ...."
+
+input=$current_directory_of_the_bellesa_project"/env.env"
+out=$carpeta_repositorio_app"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|8081|"$api_port_number"|g" "$out"
+
+echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
 echo "Comenzando a crear el archivo create_containers_for_services_$name_project.yml ...."
 echo "......................................................................"
 origen=$current_directory_of_the_bellesa_project"/install_services.yml"
@@ -267,21 +281,13 @@ sed -i '' "s|container_name: iasd_api|container_name: "$container_name_api"|g" "
 sed -i '' "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
 sed -i '' "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
 sed -i '' "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.12|g" "$destino"
-sed -i '' "s|8080:80|8080:80|g" "$destino"
+sed -i '' "s|8080:80|"$api_port_number":80|g" "$destino"
 sed -i '' "s|--host=192.168.20.12 --port=80|--host=192.168.20.12 --port=80|g" "$destino"
 sed -i '' "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.14|g" "$destino"
 sed -i '' "s|8081:81|8081:81|g" "$destino"
 sed -i '' "s|npm run serve -- --port 81|npm run serve -- --port 81|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
-echo "......................................................................"
-# Objetivo: cambiar el valor de baseURL para que apunte al puerto 8082
-echo "Comenzando ...."
-echo "..................|...................................................."
-destino=$carpeta_repositorio_app"/src/main.ts"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i '' "s|localhost:8080/api|localhost:8080/api|g" "$destino"
 echo "......................................................................"
 # Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y
 echo "Comenzando a modificar nombre de la base de datos init.sql ...."
