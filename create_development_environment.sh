@@ -30,6 +30,7 @@ container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
 container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
 
 docker_image_name_container_api="juancholll/laravel_api_debian"
+api_port_number=8082
 
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
@@ -145,7 +146,7 @@ echo "Comenzando a clonar los repositorios ...."
 # Variables para repositorio API
 REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
 DEST_API_DIR=$carpeta_repositorio_api
-BRANCH_NAME=$name_project
+BRANCH_NAME=$name_project"-dev"
 
 # Comando para clonar el repositorio
 git clone $REPO_API_URL $DEST_API_DIR
@@ -224,6 +225,19 @@ echo "Se termino de crear el archivo .env en zeus-api"
 
 echo "......................................................................"
 
+echo "Comenzando a crear el archivo .env en meca-app ...."
+
+input=$current_directory_of_the_bellesa_project"/env.env"
+out=$carpeta_repositorio_app"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i "s|8081|"$api_port_number"|g" "$out"
+
+echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
 echo "Comenzando a crear el archivo create_containers_for_services_$name_project.yml ...."
 echo "......................................................................"
 origen=$current_directory_of_the_bellesa_project"/install_services.yml"
@@ -274,14 +288,6 @@ sed -i "s|8081:81|8083:83|g" "$destino"
 sed -i "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
-echo "......................................................................"
-# Objetivo: cambiar el valor de baseURL para que apunte al puerto 8082
-echo "Comenzando ...."
-echo "..................|...................................................."
-destino=$carpeta_repositorio_app"/src/main.ts"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i "s|localhost:8080/api|localhost:8082/api|g" "$destino"
 echo "......................................................................"
 # Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
 echo "Comenzando a modificar nombre de la base de datos init.sql ...."

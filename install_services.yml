@@ -51,7 +51,6 @@ services:
     command: /bin/bash -c "
       cd home/demo/meca-app && 
       npm install &&
-      echo "VUE_APP_BASE_URL=/" > .env &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:
