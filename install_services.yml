@@ -36,6 +36,8 @@ services:
       php artisan key:generate && 
       composer require doctrine/dbal:3.8.4 && 
       php artisan migrate:fresh --seed && 
+      php artisan storage:link &&
+      composer require barryvdh/laravel-dompdf:2.2.0 &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
   instalar_dependencias_en_app:
     image: node:20.14.0  # La imagen que se va a utilizar
