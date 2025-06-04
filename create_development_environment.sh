@@ -4,7 +4,7 @@ name_project="sdac"
 
 version_so="Versión: Sonoma 14.3"
 proyecto="Proyecto: "$name_project
-descripcion_proyecto="Descripción del proyecto: Base para todos los proyectos."
+descripcion_proyecto="Descripción del proyecto: Crear un entorno de desarrollo para el proyecto Iglesia Adventista del Séptimo día."
 
 echo $version_so
 echo $proyecto
