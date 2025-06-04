@@ -235,7 +235,7 @@ out=$carpeta_repositorio_app"/.env"
 cp "$input" "$out"
 
 # Reemplazar la cadena en el archivo de destino
-sed -i '' "s|8081|"$api_port_number"|g" "$out"
+sed -i "s|8081|"$api_port_number"|g" "$out"
 
 echo "Se termino de crear el archivo .env en zeus-api"
 
