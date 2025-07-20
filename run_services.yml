@@ -28,6 +28,7 @@ services:
       - /home/juan/Documentos/proyecto_iasd/app:/home/demo # Mapea el volumen de tu directorio local
     ports:
       - "8081:81" # Mapea el puerto 8080 del host al puerto 80 del contenedor
+      - "8084:82" # Mapea el puerto 8084 del host al puerto 82 del contenedor
     stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
     tty: true # Habilita una terminal interactiva
     command: /bin/bash -c "

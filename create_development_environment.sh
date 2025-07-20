@@ -285,6 +285,9 @@ sed -i '' "s|8080:80|"$api_port_number":82|g" "$destino"
 sed -i '' "s|--host=192.168.20.12 --port=80|--host=192.168.20.18 --port=82|g" "$destino"
 sed -i '' "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
 sed -i '' "s|8081:81|8083:83|g" "$destino"
+# Dejar abierto el puerto 4321 y en el contenedor 4321, para abrir el navegador
+# y tener la documentación
+sed -i '' "s|8084:82|4321:4321|g" "$destino"
 sed -i '' "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
