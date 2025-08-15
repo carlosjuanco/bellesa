@@ -241,7 +241,7 @@ echo "......................................................................"
 destino=$repository_folder_laravelwithfilament"/database/init.sql"
 
 # Reemplazar la cadena en el archivo de destino
-sed -i '' "s|filament|$name_bd|g" "$destino"
+sed -i "s|filament|$name_bd|g" "$destino"
 
 echo "......................................................................"
 
