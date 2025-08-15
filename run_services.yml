@@ -10,7 +10,7 @@ services:
     ports:
       - "8082:82"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/all:/home/demo  # Mapea el volumen de tu directorio local
+      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "
