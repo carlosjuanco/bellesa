@@ -14,6 +14,7 @@ echo "......................................................................"
 current_username=$(whoami)
 current_directory_of_the_bellesa_project=$(pwd)
 name_bd="sdac"
+name_of_the_mockup_database=$name_project"_mockup"
 
 directorio_carpeta_raiz="/Users/$current_username/Documents"
 carpeta_raiz=$directorio_carpeta_raiz"/proyecto_"$name_project
@@ -22,15 +23,26 @@ subcarpeta_api=$carpeta_raiz"/api"
 subcarpeta_app=$carpeta_raiz"/app"
 carpeta_repositorio_api=$subcarpeta_api"/zeus-api"
 carpeta_repositorio_app=$subcarpeta_app"/meca-app"
+folder_to_host_the_app_repository_and_run_the_mockup=$subcarpeta_app"/mockup"
+folder_to_host_the_api_repository_and_run_the_mockup=$subcarpeta_api"/mockup"
 
 container_name_bd=$name_project"_bd"
+
 container_name_api=$name_project"_api"
+api_container_ip="192.168.20.18"
+
 container_name_app=$name_project"_app"
 container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
 container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
 
 docker_image_name_container_api="juancholll/laravel_api_macos"
 api_port_number=8082
+api_port_number_for_the_mockup=8083
+app_port_number=8084
+app_port_number_for_the_mockup=8085
+port_number_for_the_user_manual=4321
+database_container_ip="192.168.20.15"
+root_user_password="juan"
 
 # Paramos todos los contenedores
 echo "Comenzando a parar todos los contenedores ...."
@@ -114,6 +126,8 @@ mkdir $subcarpeta_api
 mkdir $subcarpeta_app
 mkdir $carpeta_repositorio_api
 mkdir $carpeta_repositorio_app
+mkdir $folder_to_host_the_app_repository_and_run_the_mockup
+mkdir $folder_to_host_the_api_repository_and_run_the_mockup
 
 echo "Se termino de crear las carpetas"
 
@@ -165,6 +179,27 @@ else
     echo "Error al clonar el repositorio"
 fi
 
+# Variables para repositorio API, pero para ejecutar la maqueta
+DEST_API_DIR=$folder_to_host_the_api_repository_and_run_the_mockup
+BRANCH_NAME=$name_project"-mockup"
+
+# Comando para clonar el repositorio
+git clone $REPO_API_URL $DEST_API_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_API_DIR"
+
+    # Cambiar al directorio del repositorio
+    cd $DEST_API_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
 DEST_APP_DIR=$carpeta_repositorio_app
@@ -185,6 +220,29 @@ if [ $? -eq 0 ]; then
 else
     echo "Error al clonar el repositorio"
 fi
+
+echo "......................................................................"
+# Variables para repositorio APP, pero para ejecutar la maqueta
+DEST_APP_DIR=$folder_to_host_the_app_repository_and_run_the_mockup
+BRANCH_NAME=$name_project"-mockup"
+
+# Comando para clonar el repositorio
+git clone $REPO_APP_URL $DEST_APP_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
+
+    # Cambiar al directorio del repositorio
+    cd $DEST_APP_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+echo "......................................................................"
 # Volvemos a la carpeta de bellesa
 
 # Aprendizaje: Al momento de ejecutarse este archivo, realmente si cambiamos de ruta, ya que no encontró los archivos "create_containers_for_services_.yml"
@@ -210,11 +268,11 @@ do
 		echo $linea >> $out
 	else
 		if [ $linea = $db_host ]; then
-	  		echo "DB_HOST=192.168.20.15" >> $out
+	  		echo "DB_HOST="$database_container_ip >> $out
 	  	elif [ $linea = $db_database ]; then
 	  		echo "DB_DATABASE="$name_bd >> $out
 	  	elif [ $linea = $db_password ]; then
-	  		echo "DB_PASSWORD=juan" >> $out
+	  		echo "DB_PASSWORD="$root_user_password >> $out
 		else
 			echo $linea >> $out
 		fi
@@ -222,6 +280,19 @@ do
 done < $input
 
 echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
+echo "Comenzando a crear el archivo .env en mockup ...."
+
+input=$folder_to_host_the_api_repository_and_run_the_mockup"/.env.example"
+out=$folder_to_host_the_api_repository_and_run_the_mockup"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|DB_HOST=127.0.0.1|DB_HOST="$database_container_ip"|g" "$out"
+sed -i '' "s|DB_DATABASE=laravel|DB_DATABASE="$name_of_the_mockup_database"|g" "$out"
+sed -i '' "s|DB_PASSWORD=|DB_PASSWORD="$root_user_password"|g" "$out"
 
 echo "......................................................................"
 
@@ -280,15 +351,19 @@ sed -i '' "s|image: juancholll/laravel_api|image: "$docker_image_name_container_
 sed -i '' "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$destino"
 sed -i '' "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
 sed -i '' "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
-sed -i '' "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.18|g" "$destino"
-sed -i '' "s|8080:80|"$api_port_number":82|g" "$destino"
-sed -i '' "s|--host=192.168.20.12 --port=80|--host=192.168.20.18 --port=82|g" "$destino"
+sed -i '' "s|ipv4_address: 192.168.20.12|ipv4_address: "$api_container_ip"|g" "$destino"
+sed -i '' "s|puertoAfueraAPI1:puertoAdentroAPI1|"$api_port_number":82|g" "$destino"
+sed -i '' "s|puertoAfueraAPI2:puertoAdentroAPI2|"$api_port_number_for_the_mockup":83|g" "$destino"
+sed -i '' "s|--host=192.168.20.12 --port=80|--host="$api_container_ip" --port=82|g" "$destino"
+sed -i '' "s|--host=192.168.20.12 --port=81|--host="$api_container_ip" --port=83|g" "$destino"
 sed -i '' "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
-sed -i '' "s|8081:81|8083:83|g" "$destino"
+sed -i '' "s|puertoAfueraAPP1:puertoAdentroAPP1|"$app_port_number":84|g" "$destino"
+sed -i '' "s|puertoAfueraAPP2:puertoAdentroAPP2|"$app_port_number_for_the_mockup":85|g" "$destino"
 # Dejar abierto el puerto 4321 y en el contenedor 4321, para abrir el navegador
 # y tener la documentación
-sed -i '' "s|8084:82|4321:4321|g" "$destino"
-sed -i '' "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
+sed -i '' "s|puertoAfueraAPP3:puertoAdentroAPP3|"$port_number_for_the_user_manual":4321|g" "$destino"
+sed -i '' "s|npm run serve -- --port 81|npm run serve -- --port 84|g" "$destino"
+sed -i '' "s|npm run serve -- --port 82|npm run serve -- --port 85|g" "$destino"
 
 echo "Se termino de crear el archivo run_services2.yml"
 
@@ -299,7 +374,8 @@ echo "......................................................................"
 destino=$carpeta_repositorio_api"/database/init.sql"
 
 # Reemplazar la cadena en el archivo de destino
-sed -i '' "s|iasd|$name_bd|g" "$destino"
+sed -i '' "s|nombreDeLaBaseDeDatosParaElDesarrollo|$name_bd|g" "$destino"
+sed -i '' "s|nombreDeLaBaseDeDatosParaLaMaqueta|$name_of_the_mockup_database|g" "$destino"
 
 echo "......................................................................"
 echo "Comenzando a instalar los servicios ...."
@@ -327,8 +403,8 @@ sudo docker logs -f $container_name_api
 sudo docker logs -f $container_name_app
 echo "......................................................................"
 echo "Eliminar archivo create_containers_for_services_"$name_project".yml ...."
-sudo rm "create_containers_for_services_"$name_project".yml"
+#sudo rm "create_containers_for_services_"$name_project".yml"
 echo "......................................................................"
 echo "Eliminar archivo run_services2.yml ...."
-sudo rm run_services2.yml
+#sudo rm run_services2.yml
 echo "......................................................................"

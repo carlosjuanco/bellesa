@@ -38,6 +38,13 @@ services:
       php artisan migrate:fresh --seed && 
       php artisan storage:link &&
       composer require barryvdh/laravel-dompdf:2.2.0 &&
+      cd /home/demo/mockup && 
+      composer require laravel/framework:9.52.15 && 
+      php artisan --version &&  
+      php artisan key:generate && 
+      # En el caso de la maqueta no es necesario instalar la libreria doctrine/dbal
+      # porque no la vamos a ocupar
+      php artisan migrate:fresh --seed && 
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
   instalar_dependencias_en_app:
     image: node:20.14.0  # La imagen que se va a utilizar
@@ -51,8 +58,9 @@ services:
     stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
     tty: true # Habilita una terminal interactiva
     command: /bin/bash -c "
-      cd home/demo/meca-app && 
-      npm install &&
+      cd /home/demo/meca-app && npm install &
+      cd /home/demo/mockup && npm install &
+      wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:
