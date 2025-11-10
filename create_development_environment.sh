@@ -403,8 +403,8 @@ sudo docker logs -f $container_name_api
 sudo docker logs -f $container_name_app
 echo "......................................................................"
 echo "Eliminar archivo create_containers_for_services_"$name_project".yml ...."
-#sudo rm "create_containers_for_services_"$name_project".yml"
+sudo rm "create_containers_for_services_"$name_project".yml"
 echo "......................................................................"
 echo "Eliminar archivo run_services2.yml ...."
-#sudo rm run_services2.yml
+sudo rm run_services2.yml
 echo "......................................................................"

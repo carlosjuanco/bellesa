@@ -42,8 +42,6 @@ services:
       composer require laravel/framework:9.52.15 && 
       php artisan --version &&  
       php artisan key:generate && 
-      # En el caso de la maqueta no es necesario instalar la libreria doctrine/dbal
-      # porque no la vamos a ocupar
       php artisan migrate:fresh --seed && 
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
   instalar_dependencias_en_app:
