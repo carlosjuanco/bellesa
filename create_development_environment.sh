@@ -203,6 +203,7 @@ fi
 # Variables para repositorio APP
 REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
 DEST_APP_DIR=$carpeta_repositorio_app
+BRANCH_NAME=$name_project"-dev"
 
 # Comando para clonar el repositorio
 git clone $REPO_APP_URL $DEST_APP_DIR
@@ -306,6 +307,19 @@ cp "$input" "$out"
 sed -i '' "s|8081|"$api_port_number"|g" "$out"
 
 echo "Se termino de crear el archivo .env en zeus-api"
+
+echo "......................................................................"
+
+echo "Comenzando a crear el archivo .env en mockup ...."
+
+input=$current_directory_of_the_bellesa_project"/env.env"
+out=$folder_to_host_the_app_repository_and_run_the_mockup"/.env"
+cp "$input" "$out"
+
+# Reemplazar la cadena en el archivo de destino
+sed -i '' "s|8081|"$api_port_number_for_the_mockup"|g" "$out"
+
+echo "Se termino de crear el archivo .env en mockup"
 
 echo "......................................................................"
 
