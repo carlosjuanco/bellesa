@@ -25,6 +25,7 @@ carpeta_repositorio_api=$subcarpeta_api"/zeus-api"
 carpeta_repositorio_app=$subcarpeta_app"/meca-app"
 folder_to_host_the_app_repository_and_run_the_mockup=$subcarpeta_app"/mockup"
 folder_to_host_the_api_repository_and_run_the_mockup=$subcarpeta_api"/mockup"
+folder_to_host_the_user_manual_with_starlight=$subcarpeta_app"/user-manual"
 
 container_name_bd=$name_project"_bd"
 
@@ -128,6 +129,7 @@ mkdir $carpeta_repositorio_api
 mkdir $carpeta_repositorio_app
 mkdir $folder_to_host_the_app_repository_and_run_the_mockup
 mkdir $folder_to_host_the_api_repository_and_run_the_mockup
+mkdir $folder_to_host_the_user_manual_with_starlight
 
 echo "Se termino de crear las carpetas"
 
@@ -243,6 +245,29 @@ if [ $? -eq 0 ]; then
 else
     echo "Error al clonar el repositorio"
 fi
+
+echo "......................................................................"
+# Variables para repositorio APP, pero para ejecutar el manual de usuario
+DEST_APP_DIR=$folder_to_host_the_user_manual_with_starlight
+BRANCH_NAME=$name_project"-user-manual-with-starlight"
+
+# Comando para clonar el repositorio
+git clone $REPO_APP_URL $DEST_APP_DIR
+# Verificar si el clon fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
+
+    # Cambiar al directorio del repositorio
+    cd $DEST_APP_DIR
+
+    # Cambiar a la rama especificada
+    git checkout $BRANCH_NAME
+
+    echo "Ahora estás en la rama $BRANCH_NAME"
+else
+    echo "Error al clonar el repositorio"
+fi
+
 echo "......................................................................"
 # Volvemos a la carpeta de bellesa
 
