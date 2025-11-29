@@ -1,13 +1,18 @@
-Versión: Sonoma 14.3
+Versión: Debian 12.12
 Proyecto: main.
 Descripción del proyecto: Base para todos los proyectos.
 
 Requisitos
--Docker desktop = 4.29.0
 -Docker engine = 26.0.0
 -Workbench ó
 -dbeaver >= 23.1.5.202308201919
 -git >= 2.39.2
+
+# -------------------------------------------------------------------
+# Si no tienes instalado Docker y docker-compose
+# -------------------------------------------------------------------
+
+# 1.-Ejecuta el archivo docker-installer.sh
 
 # -------------------------------------------------------------------
 # Clonar el repositorio bellesa
