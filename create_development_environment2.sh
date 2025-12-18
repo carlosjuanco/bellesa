@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ============================================================================
 # CONFIGURACIÓN
@@ -15,17 +15,18 @@ readonly CURRENT_DIR=$(pwd)
 readonly BASE_DIR="/Users/$CURRENT_USER/Documents/proyecto_$PROJECT_NAME"
 
 # Estructura de carpetas
-readonly DIRECTORIES=(
-    "$BASE_DIR"
-    "$BASE_DIR/bd"
-    "$BASE_DIR/api"
-    "$BASE_DIR/app"
-    "$BASE_DIR/api/zeus-api"
-    "$BASE_DIR/app/meca-app"
-    "$BASE_DIR/api/mockup"
-    "$BASE_DIR/app/mockup"
-    "$BASE_DIR/app/user-manual"
+readonly -A DIRECTORIES=(
+    ["base_dir"]="$BASE_DIR"
+    ["bd"]="$BASE_DIR/bd"
+    ["api"]="$BASE_DIR/api"
+    ["app"]="$BASE_DIR/app"
+    ["zeus_api"]="$BASE_DIR/api/zeus-api"
+    ["meca_app"]="$BASE_DIR/app/meca-app"
+    ["api_mockup"]="$BASE_DIR/api/mockup"
+    ["app_mockup"]="$BASE_DIR/app/mockup"
+    ["user_manual"]="$BASE_DIR/app/user-manual"
 )
+declare -r DIRECTORIES
 
 # Base de datos
 readonly DB_NAME="sdac"
@@ -34,23 +35,24 @@ readonly DB_ROOT_PASSWORD="juan"
 readonly DB_CONTAINER_IP="192.168.20.15"
 
 # Contenedores Docker
-readonly CONTAINERS=(
-    "${PROJECT_NAME}_bd"
-    "${PROJECT_NAME}_api"
-    "${PROJECT_NAME}_app"
-    "${PROJECT_NAME}_instalar_dependencias_en_api"
-    "${PROJECT_NAME}_instalar_dependencias_en_app"
+declare -A CONTAINERS=(
+    ["bd"]="${PROJECT_NAME}_bd"
+    ["api"]="${PROJECT_NAME}_api"
+    ["app"]="${PROJECT_NAME}_app"
+    ["instalar_dependencias_en_api"]="${PROJECT_NAME}_instalar_dependencias_en_api"
+    ["instalar_dependencias_en_app"]="${PROJECT_NAME}_instalar_dependencias_en_app"
 )
+declare -r CONTAINERS
 
 # Configuración de API
-readonly API_CONTAINER_NAME="${PROJECT_NAME}_api"
-readonly API_IMAGE="juancholll/laravel_api_macos"
+readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
+readonly API_IMAGE="juancholll/laravel_api_macos:1.0.0"
 readonly API_CONTAINER_IP="192.168.20.18"
 readonly API_PORT=8082
 readonly API_MOCKUP_PORT=8083
 
 # Configuración de APP
-readonly APP_CONTAINER_NAME="${PROJECT_NAME}_app"
+readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
 readonly APP_PORT=8084
 readonly APP_MOCKUP_PORT=8085
 readonly USER_MANUAL_PORT=4321
@@ -119,22 +121,27 @@ show_project_info() {
 stop_and_remove_containers() {
     print_section "DETENIENDO Y ELIMINANDO CONTENEDORES"
     
-    for container in "${CONTAINERS[@]}"; do
-        print_info "Procesando contenedor: $container"
+    # Iterar sobre todas las CLAVES del array asociativo
+    for clave in "${!CONTAINERS[@]}"; do
+        local nombre_contenedor="${CONTAINERS[$clave]}"
+        
+        print_info "Procesando contenedor [$clave]: $nombre_contenedor"
         
         # Detener contenedor
-        if sudo docker stop "$container" 2>/dev/null; then
-            print_success "Contenedor $container detenido"
+        if sudo docker stop "$nombre_contenedor" 2>/dev/null; then
+            print_success "Contenedor $nombre_contenedor detenido"
         else
-            print_info "El contenedor $container no existe o ya está detenido"
+            print_info "El contenedor $nombre_contenedor no existe o ya está detenido"
         fi
         
         # Eliminar contenedor
-        if sudo docker rm "$container" 2>/dev/null; then
-            print_success "Contenedor $container eliminado"
+        if sudo docker rm "$nombre_contenedor" 2>/dev/null; then
+            print_success "Contenedor $nombre_contenedor eliminado"
         else
-            print_info "El contenedor $container no existe"
+            print_info "El contenedor $nombre_contenedor no existe"
         fi
+        
+        echo ""  # Línea en blanco para separar
     done
 }
 
@@ -153,10 +160,10 @@ cleanup_project_directory() {
 create_project_structure() {
     print_section "CREANDO ESTRUCTURA DEL PROYECTO"
     
-    for dir in "${DIRECTORIES[@]}"; do
-        mkdir -p "$dir"
-        check_command "No se pudo crear el directorio: $dir"
-        print_success "Creado: $dir"
+    for clave in "${!DIRECTORIES[@]}"; do
+        mkdir -p "${DIRECTORIES[$clave]}"
+        check_command "No se pudo crear el directorio: $clave"
+        print_success "Creado: $clave"
     done
     
     # Mostrar estructura
@@ -175,44 +182,38 @@ clone_repositories() {
     print_section "CLONANDO REPOSITORIOS"
     
     # Clonar repositorios de API
-    clone_repo "$REPO_API" "$BASE_DIR/api/zeus-api" "${GIT_BRANCHES[api_dev]}"
-    # clone_repo "$REPO_API" "$BASE_DIR/api/mockup" "${GIT_BRANCHES[api_mockup]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
     
-    # # Clonar repositorios de APP
-    # clone_repo "$REPO_APP" "$BASE_DIR/app/meca-app" "${GIT_BRANCHES[app_dev]}"
-    # clone_repo "$REPO_APP" "$BASE_DIR/app/mockup" "${GIT_BRANCHES[app_mockup]}"
-    # clone_repo "$REPO_APP" "$BASE_DIR/app/user-manual" "${GIT_BRANCHES[app_manual]}"
+    # Clonar repositorios de APP
+    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[user_manual]}" "${GIT_BRANCHES[app_manual]}"
 }
 
 clone_repo() {
     local repo_url="$1"
     local dest_dir="$2"
     local branch="$3"
-
-     # DEPURACIÓN: Mostrar parámetros recibidos
-    echo "=== DEBUG ==="
-    echo "Parámetro 1 (URL): $repo_url"
-    echo "Parámetro 2 (Destino): $dest_dir"
-    echo "Parámetro 3 (Rama): $branch"
-    echo "=============="
     
     print_info "Clonando $repo_url en $dest_dir (rama: $branch)"
     
-    # if git clone "$repo_url" "$dest_dir"; then
-    #     cd "$dest_dir" || return 1
+    if git clone "$repo_url" "$dest_dir"; then
+        cd "$dest_dir" || return 1
         
-    #     if git checkout "$branch" 2>/dev/null; then
-    #         print_success "Repositorio clonado en $dest_dir (rama: $branch)"
-    #     else
-    #         print_error "No se pudo cambiar a la rama $branch"
-    #         return 1
-    #     fi
+        if git checkout "$branch" 2>/dev/null; then
+            print_success "Repositorio clonado en $dest_dir (rama: $branch)"
+            echo ""  # Línea en blanco para separar
+        else
+            print_error "No se pudo cambiar a la rama $branch"
+            return 1
+        fi
         
-    #     cd - > /dev/null || return 1
-    # else
-    #     print_error "Error al clonar el repositorio en $dest_dir"
-    #     return 1
-    # fi
+        cd - > /dev/null || return 1
+    else
+        print_error "Error al clonar el repositorio en $dest_dir"
+        return 1
+    fi
 }
 
 create_env_files() {
@@ -220,26 +221,26 @@ create_env_files() {
     
     # API - Desarrollo
     create_api_env_file \
-        "$BASE_DIR/api/zeus-api/.env.example" \
-        "$BASE_DIR/api/zeus-api/.env" \
+        "${DIRECTORIES[zeus_api]}/.env.example" \
+        "${DIRECTORIES[zeus_api]}/.env" \
         "$DB_NAME"
     
     # API - Mockup
     create_api_env_file \
-        "$BASE_DIR/api/mockup/.env.example" \
-        "$BASE_DIR/api/mockup/.env" \
+        "${DIRECTORIES[api_mockup]}/.env.example" \
+        "${DIRECTORIES[api_mockup]}/.env" \
         "$MOCKUP_DB_NAME"
     
     # APP - Desarrollo
     create_app_env_file \
         "$CURRENT_DIR/env.env" \
-        "$BASE_DIR/app/meca-app/.env" \
+        "${DIRECTORIES[meca_app]}/.env" \
         "$API_PORT"
     
     # APP - Mockup
     create_app_env_file \
         "$CURRENT_DIR/env.env" \
-        "$BASE_DIR/app/mockup/.env" \
+        "${DIRECTORIES[app_mockup]}/.env" \
         "$API_MOCKUP_PORT"
 }
 
@@ -284,7 +285,7 @@ create_app_env_file() {
 update_database_init_file() {
     print_section "ACTUALIZANDO ARCHIVO DE INICIALIZACIÓN DE BD"
     
-    local init_file="$BASE_DIR/api/zeus-api/database/init.sql"
+    local init_file="${DIRECTORIES[zeus_api]}/database/init.sql"
     
     if [ -f "$init_file" ]; then
         sed -i '' \
@@ -321,11 +322,11 @@ generate_install_services_file() {
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
         -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
-        -e "s|container_name: iasd_bd|container_name: ${PROJECT_NAME}_bd|g" \
+        -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
-        -e "s|container_name: instalar_dependencias_en_api|container_name: ${PROJECT_NAME}_instalar_dependencias_en_api|g" \
-        -e "s|container_name: instalar_dependencias_en_app|container_name: ${PROJECT_NAME}_instalar_dependencias_en_app|g" \
+        -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
+        -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
         -e "s|3307:3306|3308:3306|g" \
@@ -503,12 +504,12 @@ main() {
     
     # Fase 2: Configuración
     clone_repositories
-    # create_env_files
-    # update_database_init_file
-    # generate_docker_compose_files
+    create_env_files
+    update_database_init_file
+    generate_docker_compose_files
     
     # Fase 3: Ejecución
-    # run_services
+    run_services
     
     # Fase 4: Resumen final
     # show_final_summary
