@@ -1,6 +1,39 @@
 #!/usr/bin/env bash
 
 # ============================================================================
+# VERIFICANDO AUTENTICACIÓN DE DOCKER
+# ============================================================================
+
+# IMPORTANTE: Para autenticación en Docker Hub
+# --------------------------------------------
+# 1. Ejecutar SIN sudo: docker login
+# 2. Ingresar credenciales de Docker Hub
+# 3. Las credenciales se guardan en: ~/.docker/config.json
+# 4. NO usar sudo con docker login
+# --------------------------------------------
+check_docker_auth() {
+    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
+    
+    # Verificar si hay credenciales guardadas
+    if [ ! -f ~/.docker/config.json ]; then
+        print_warning "No hay credenciales de Docker guardadas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    # Verificar que las credenciales sean válidas
+    # También me sirve para indicar que no he iniciado docker
+    if ! docker pull hello-world > /dev/null 2>&1; then
+        print_warning "Credenciales de Docker expiradas o inválidas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    print_success "Autenticación de Docker verificada"
+    return 0
+}
+
+# ============================================================================
 # CONFIGURACIÓN
 # ============================================================================
 
@@ -379,7 +412,7 @@ run_services() {
     local run_file="$CURRENT_DIR/run_services2.yml"
     
     # Instalar dependencias
-    print_info "Instalando servicios..."
+    
     if sudo docker-compose -f "$install_file" up -d; then
         print_success "Servicios instalados"
         
@@ -394,34 +427,46 @@ run_services() {
     fi
     
     # Ejecutar servicios principales
-    print_info "Iniciando servicios principales..."
-    if sudo docker-compose -f "$run_file" up -d; then
-        print_success "Servicios iniciados"
+    # print_info "Iniciando servicios principales..."
+    # if sudo docker-compose -f "$run_file" up -d; then
+    #     print_success "Servicios iniciados"
         
-        # Monitorear logs iniciales
-        monitor_initial_logs
-    else
-        print_error "Error al iniciar servicios"
-        return 1
-    fi
+    #     # Monitorear logs iniciales
+    #     monitor_initial_logs
+    # else
+    #     print_error "Error al iniciar servicios"
+    #     return 1
+    # fi
     
-    # Limpiar archivos temporales
-    cleanup_temp_files "$install_file" "$run_file"
+    # # Limpiar archivos temporales
+    # cleanup_temp_files "$install_file" "$run_file"
 }
 
-monitor_installation_logs() {
-    local api_install_container="${PROJECT_NAME}_instalar_dependencias_en_api"
-    local app_install_container="${PROJECT_NAME}_instalar_dependencias_en_app"
-    
+monitor_installation_logs() {    
     print_info "Monitoreando instalación de API..."
-    if sudo docker logs -f "$api_install_container" 2>&1 | grep -q "Database\\\\Seeders\\\\FillInTheValuesForThePermissionsFieldSeeder.*DONE"; then
+    if sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1 | 
+        tee /dev/tty | 
+        grep -q "Database\\\\Seeders\\\\addAllPermissionsToTheSystemCreatorsRoleSeeder.*DONE"; then
         print_success "Instalación de API completada"
     fi
     
     print_info "Monitoreando instalación de APP..."
-    if sudo docker logs -f "$app_install_container" 2>&1 | grep -q "npm notice"; then
-        print_success "Instalación de APP completada"
-    fi
+
+    npm_count=0
+
+    # Leer línea por línea
+    print_section "Mostrar línea"
+    while IFS= read -r line; do
+        echo "$line" # Mostrar
+        
+        if grep -q "npm.*notice" <<< "$line"; then
+            ((npm_count++))
+            if [ "$npm_count" -eq 15 ]; then
+                print_success "¡15 npm notices encontrados! APP completada"
+                break
+            fi
+        fi
+    done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
 }
 
 stop_installation_containers() {
@@ -495,6 +540,11 @@ show_final_summary() {
 # ============================================================================
 
 main() {
+    if ! check_docker_auth; then
+        print_error "Problema con autenticación de Docker"
+        exit 1
+    fi
+
     show_project_info
     
     # Fase 1: Preparación
