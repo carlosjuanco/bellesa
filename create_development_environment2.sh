@@ -427,16 +427,16 @@ run_services() {
     fi
     
     # Ejecutar servicios principales
-    # print_info "Iniciando servicios principales..."
-    # if sudo docker-compose -f "$run_file" up -d; then
-    #     print_success "Servicios iniciados"
+    print_info "Iniciando servicios principales..."
+    if sudo docker-compose -f "$run_file" up -d; then
+        print_success "Servicios iniciados"
         
-    #     # Monitorear logs iniciales
-    #     monitor_initial_logs
-    # else
-    #     print_error "Error al iniciar servicios"
-    #     return 1
-    # fi
+        # Monitorear logs iniciales
+        monitor_initial_logs
+    else
+        print_error "Error al iniciar servicios"
+        return 1
+    fi
     
     # # Limpiar archivos temporales
     # cleanup_temp_files "$install_file" "$run_file"
@@ -483,11 +483,51 @@ monitor_initial_logs() {
     
     # Mostrar logs iniciales de API
     print_section "LOGS INICIALES - API"
-    timeout 10s sudo docker logs -f "$API_CONTAINER_NAME" 2>&1 | head -20
+
+    npm_count=0
+
+    # Leer línea por línea
+    print_section "Mostrar línea"
+    while IFS= read -r line; do
+        echo "$line" # Mostrar
+        
+        if grep -q "Press.*Ctrl+C to stop the server" <<< "$line"; then
+            ((npm_count++))
+            if [ "$npm_count" -eq 2 ]; then
+                print_success "¡2 Press Ctrl+C to stop the server encontrados!"
+                print_success "¡Servicios de la API levantados!"
+                break
+            fi
+        fi
+    done < <(sudo docker logs -f "${$API_CONTAINER_NAME}" 2>&1)
     
     # Mostrar logs iniciales de APP
     print_section "LOGS INICIALES - APP"
-    timeout 10s sudo docker logs -f "$APP_CONTAINER_NAME" 2>&1 | head -20
+
+    npm_count=0
+
+    # Leer línea por línea
+    print_section "Mostrar línea"
+    while IFS= read -r line; do
+        echo "$line" # Mostrar
+        
+        if grep -q "astro dev --host --port.*4321" <<< "$line"; then
+            ((npm_count++))
+        fi
+
+        if grep -q "Local:.*http://localhost:84/" <<< "$line"; then
+            ((npm_count++))
+        fi
+
+        if grep -q "Local:.*http://localhost:85/" <<< "$line"; then
+            ((npm_count++))
+        fi
+
+        if [ "$npm_count" -eq 3 ]; then
+            print_success "¡3 Se levantaron los servicios en la APP!"
+            break
+        fi
+    done < <(sudo docker logs -f "${$APP_CONTAINER_NAME}" 2>&1)
 }
 
 cleanup_temp_files() {
