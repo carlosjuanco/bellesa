@@ -486,8 +486,6 @@ monitor_initial_logs() {
 
     npm_count=0
 
-    # Leer línea por línea
-    print_section "Mostrar línea"
     while IFS= read -r line; do
         echo "$line" # Mostrar
         
@@ -499,35 +497,38 @@ monitor_initial_logs() {
                 break
             fi
         fi
-    done < <(sudo docker logs -f "${$API_CONTAINER_NAME}" 2>&1)
+    done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
     
     # Mostrar logs iniciales de APP
     print_section "LOGS INICIALES - APP"
 
     npm_count=0
 
-    # Leer línea por línea
-    print_section "Mostrar línea"
     while IFS= read -r line; do
         echo "$line" # Mostrar
         
-        if grep -q "astro dev --host --port.*4321" <<< "$line"; then
+        # Debe de mostrarse "astro dev --host --port 4321"
+        if grep -q "--port.*4321" <<< "$line"; then
             ((npm_count++))
+            print_info "Fifa contador 1"
         fi
 
+        # Debe de mostrarse ""
         if grep -q "Local:.*http://localhost:84/" <<< "$line"; then
             ((npm_count++))
+            print_info "Fifa contador 2"
         fi
 
         if grep -q "Local:.*http://localhost:85/" <<< "$line"; then
             ((npm_count++))
+            print_info "Fifa contador 3"
         fi
 
         if [ "$npm_count" -eq 3 ]; then
             print_success "¡3 Se levantaron los servicios en la APP!"
             break
         fi
-    done < <(sudo docker logs -f "${$APP_CONTAINER_NAME}" 2>&1)
+    done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
 }
 
 cleanup_temp_files() {
