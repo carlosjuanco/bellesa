@@ -119,6 +119,10 @@ print_section() {
     echo "----------------------------------------"
 }
 
+print_warning() {
+    echo "[WARNING] $1"
+}
+
 print_info() {
     echo "[INFO] $1"
 }
