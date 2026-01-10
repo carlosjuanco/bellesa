@@ -444,18 +444,22 @@ run_services() {
 
 monitor_installation_logs() {    
     print_info "Monitoreando instalación de API..."
-    if sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1 | 
-        tee /dev/tty | 
-        grep -q "Database\\\\Seeders\\\\addAllPermissionsToTheSystemCreatorsRoleSeeder.*DONE"; then
-        print_success "Instalación de API completada"
-    fi
+    
+    # Leer línea por línea
+    while IFS= read -r line; do
+        echo "$line" # Mostrar
+        
+        if grep -q "LinkThedistricUserWithTheVolcanesChurchSeeder.*DONE" <<< "$line"; then
+            print_success "Instalación de API completada"
+            break
+        fi
+    done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)
     
     print_info "Monitoreando instalación de APP..."
 
     npm_count=0
 
     # Leer línea por línea
-    print_section "Mostrar línea"
     while IFS= read -r line; do
         echo "$line" # Mostrar
         
@@ -501,6 +505,7 @@ monitor_initial_logs() {
     
     # Mostrar logs iniciales de APP
     print_section "LOGS INICIALES - APP"
+    # sudo docker logs -f "${APP_CONTAINER_NAME}"
 
     npm_count=0
 
@@ -508,23 +513,16 @@ monitor_initial_logs() {
         echo "$line" # Mostrar
         
         # Debe de mostrarse "astro dev --host --port 4321"
-        if grep -q "--port.*4321" <<< "$line"; then
+        if grep -q "port.*4321" <<< "$line"; then
             ((npm_count++))
             print_info "Fifa contador 1"
-        fi
-
-        # Debe de mostrarse ""
-        if grep -q "Local:.*http://localhost:84/" <<< "$line"; then
+        elif grep -q "http://localhost:84/" <<< "$line"; then
             ((npm_count++))
             print_info "Fifa contador 2"
-        fi
-
-        if grep -q "Local:.*http://localhost:85/" <<< "$line"; then
+        elif grep -q "http://localhost:85/" <<< "$line"; then
             ((npm_count++))
             print_info "Fifa contador 3"
-        fi
-
-        if [ "$npm_count" -eq 3 ]; then
+        elif [ "$npm_count" -eq 3 ]; then
             print_success "¡3 Se levantaron los servicios en la APP!"
             break
         fi

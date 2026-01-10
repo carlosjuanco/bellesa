@@ -17,7 +17,7 @@ services:
     command: /bin/bash -c "
       cd /home/demo/zeus-api && php artisan serve --host=192.168.20.12 --port=80 &
       cd /home/demo/mockup && php artisan serve --host=192.168.20.12 --port=81 &
-      tail -f /dev/null
+      wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
   iasd_app:
     image: node:20.14.0  # La imagen que se va a utilizar
@@ -38,7 +38,7 @@ services:
       cd /home/demo/meca-app && npm run serve -- --port 81 &
       cd /home/demo/mockup && npm run serve -- --port 82 &
       cd /home/demo/user-manual/former-filament && npm run dev -- --port 4321 &
-      tail -f /dev/null
+      wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:
