@@ -1,51 +1,19 @@
 #!/usr/bin/env bash
 
 # ============================================================================
-# VERIFICANDO AUTENTICACIÓN DE DOCKER
-# ============================================================================
-
-# IMPORTANTE: Para autenticación en Docker Hub
-# --------------------------------------------
-# 1. Ejecutar SIN sudo: docker login
-# 2. Ingresar credenciales de Docker Hub
-# 3. Las credenciales se guardan en: ~/.docker/config.json
-# 4. NO usar sudo con docker login
-# --------------------------------------------
-check_docker_auth() {
-    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
-    
-    # Verificar si hay credenciales guardadas
-    if [ ! -f ~/.docker/config.json ]; then
-        print_warning "No hay credenciales de Docker guardadas"
-        print_info "Ejecuta: docker login"
-        return 1
-    fi
-    
-    # Verificar que las credenciales sean válidas
-    # También me sirve para indicar que no he iniciado docker
-    if ! docker pull hello-world > /dev/null 2>&1; then
-        print_warning "Credenciales de Docker expiradas o inválidas"
-        print_info "Ejecuta: docker login"
-        return 1
-    fi
-    
-    print_success "Autenticación de Docker verificada"
-    return 0
-}
-
-# ============================================================================
 # CONFIGURACIÓN
 # ============================================================================
 
 # Variables principales del proyecto
 readonly PROJECT_NAME="sdac"
 readonly PROJECT_DESCRIPTION="Crear un entorno de desarrollo para el proyecto Iglesia Adventista del Séptimo día."
-readonly OS_VERSION="Sonoma 14.3"
+readonly OS_VERSION="Debian: 12.7"
 
 # Rutas del sistema
 readonly CURRENT_USER=$(whoami)
 readonly CURRENT_DIR=$(pwd)
 readonly BASE_DIR="/home/$CURRENT_USER/Documentos/proyecto_$PROJECT_NAME"
+readonly DOCKER_CONFIGURATION_FILE="/home/${CURRENT_USER}/.docker/config.json"
 
 # Estructura de carpetas
 readonly -A DIRECTORIES=(
@@ -102,6 +70,39 @@ declare -A GIT_BRANCHES=(
     ["app_mockup"]="${PROJECT_NAME}-mockup"
     ["app_manual"]="${PROJECT_NAME}-user-manual-with-starlight"
 )
+
+# ============================================================================
+# VERIFICANDO AUTENTICACIÓN DE DOCKER
+# ============================================================================
+
+# IMPORTANTE: Para autenticación en Docker Hub
+# --------------------------------------------
+# 1. Ejecutar SIN sudo: docker login
+# 2. Ingresar credenciales de Docker Hub
+# 3. Las credenciales se guardan en: ~/.docker/config.json
+# 4. NO usar sudo con docker login
+# --------------------------------------------
+check_docker_auth() {
+    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
+    
+    # Verificar si hay credenciales guardadas
+    if [ ! -f ${DOCKER_CONFIGURATION_FILE} ]; then
+        print_warning "No hay credenciales de Docker guardadas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    # Verificar que las credenciales sean válidas
+    # También me sirve para indicar que no he iniciado docker
+    if ! sudo docker pull hello-world > /dev/null 2>&1; then
+        print_warning "Credenciales de Docker expiradas o inválidas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    print_success "Autenticación de Docker verificada"
+    return 0
+}
 
 # ============================================================================
 # FUNCIONES DE UTILIDAD
@@ -293,7 +294,7 @@ create_api_env_file() {
     
     cp "$input_file" "$output_file"
     
-    sed -i '' \
+    sed -i \
         -e "s|DB_HOST=127.0.0.1|DB_HOST=$DB_CONTAINER_IP|g" \
         -e "s|DB_DATABASE=laravel|DB_DATABASE=$db_name|g" \
         -e "s|DB_PASSWORD=|DB_PASSWORD=$DB_ROOT_PASSWORD|g" \
@@ -314,7 +315,7 @@ create_app_env_file() {
     
     cp "$input_file" "$output_file"
     
-    sed -i '' "s|8081|$api_port|g" "$output_file"
+    sed -i "s|8081|$api_port|g" "$output_file"
     
     print_success "Archivo .env creado: $output_file"
 }
@@ -325,7 +326,7 @@ update_database_init_file() {
     local init_file="${DIRECTORIES[zeus_api]}/database/init.sql"
     
     if [ -f "$init_file" ]; then
-        sed -i '' \
+        sed -i \
             -e "s|nombreDeLaBaseDeDatosParaElDesarrollo|$DB_NAME|g" \
             -e "s|nombreDeLaBaseDeDatosParaLaMaqueta|$MOCKUP_DB_NAME|g" \
             "$init_file"
@@ -355,7 +356,7 @@ generate_install_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i '' \
+    sed -i \
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
         -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
@@ -386,7 +387,7 @@ generate_run_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i '' \
+    sed -i \
         -e "s|iasd_api:|${PROJECT_NAME}_api:|g" \
         -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
