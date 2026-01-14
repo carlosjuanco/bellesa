@@ -45,7 +45,7 @@ readonly OS_VERSION="Sonoma 14.3"
 # Rutas del sistema
 readonly CURRENT_USER=$(whoami)
 readonly CURRENT_DIR=$(pwd)
-readonly BASE_DIR="/Users/$CURRENT_USER/Documents/proyecto_$PROJECT_NAME"
+readonly BASE_DIR="/home/$CURRENT_USER/Documentos/proyecto_$PROJECT_NAME"
 
 # Estructura de carpetas
 readonly -A DIRECTORIES=(
