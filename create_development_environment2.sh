@@ -345,8 +345,10 @@ generate_docker_compose_files() {
 }
 
 generate_install_services_file() {
-    local source_file="$CURRENT_DIR/install_services.yml"
-    local dest_file="$CURRENT_DIR/create_containers_for_services_${PROJECT_NAME}.yml"
+    # Generar archivo de instalación para la API
+
+    local source_file="$CURRENT_DIR/install_dependencies_in_api.yml"
+    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -359,16 +361,35 @@ generate_install_services_file() {
     sed -i \
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
         -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
-        -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
         -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
         -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
-        -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
         -e "s|3307:3306|3308:3306|g" \
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" \
+        "$dest_file"
+    
+    print_success "Archivo de instalación generado: $dest_file"
+
+    # Generar archivo de instalación para la APP
+
+    source_file="$CURRENT_DIR/install_dependencies_in_app.yml"
+    dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
         -e "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" \
         "$dest_file"
     
@@ -376,8 +397,10 @@ generate_install_services_file() {
 }
 
 generate_run_services_file() {
-    local source_file="$CURRENT_DIR/run_services.yml"
-    local dest_file="$CURRENT_DIR/run_services2.yml"
+    # Generar archivo de ejecución para la API
+
+    local source_file="$CURRENT_DIR/run_services_in_the_api.yml"
+    local dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -389,16 +412,35 @@ generate_run_services_file() {
     # Reemplazos en el archivo YML
     sed -i \
         -e "s|iasd_api:|${PROJECT_NAME}_api:|g" \
-        -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
         -e "s|container_name: iasd_api|container_name: $API_CONTAINER_NAME|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
-        -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
         -e "s|ipv4_address: 192.168.20.12|ipv4_address: $API_CONTAINER_IP|g" \
         -e "s|puertoAfueraAPI1:puertoAdentroAPI1|${API_PORT}:82|g" \
         -e "s|puertoAfueraAPI2:puertoAdentroAPI2|${API_MOCKUP_PORT}:83|g" \
         -e "s|--host=192.168.20.12 --port=80|--host=$API_CONTAINER_IP --port=82|g" \
         -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
+        "$dest_file"
+    
+    print_success "Archivo de ejecución generado: $dest_file"
+
+    # Generar archivo de ejecución para la APP
+
+    source_file="$CURRENT_DIR/run_services_in_the_app.yml"
+    dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
         -e "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" \
         -e "s|puertoAfueraAPP1:puertoAdentroAPP1|${APP_PORT}:84|g" \
         -e "s|puertoAfueraAPP2:puertoAdentroAPP2|${APP_MOCKUP_PORT}:85|g" \
@@ -413,19 +455,34 @@ generate_run_services_file() {
 run_services() {
     print_section "INSTALANDO Y EJECUTANDO SERVICIOS"
     
-    local install_file="$CURRENT_DIR/create_containers_for_services_${PROJECT_NAME}.yml"
-    local run_file="$CURRENT_DIR/run_services2.yml"
+    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
+    local installation_file_for_the_app="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
+    local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
+    local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
     
     # Instalar dependencias
     
-    if sudo docker-compose -f "$install_file" up -d; then
-        print_success "Servicios instalados"
+    if sudo docker-compose -f "$installation_file_for_the_api" up -d; then
+        print_success "Servicios instalados en la API"
         
         # Monitorear logs de instalación
-        monitor_installation_logs
+        monitor_installation_logs "API"
         
         # Detener contenedores de instalación
-        stop_installation_containers
+        stop_installation_containers "API"
+    else
+        print_error "Error al instalar servicios"
+        return 1
+    fi
+
+    if sudo docker-compose -f "$installation_file_for_the_app" up -d; then
+        print_success "Servicios instalados en la APP"
+        
+        # Monitorear logs de instalación
+        monitor_installation_logs "APP"
+        
+        # Detener contenedores de instalación
+        stop_installation_containers "APP"
     else
         print_error "Error al instalar servicios"
         return 1
@@ -433,11 +490,21 @@ run_services() {
     
     # Ejecutar servicios principales
     print_info "Iniciando servicios principales..."
-    if sudo docker-compose -f "$run_file" up -d; then
+    if sudo docker-compose -f "$execution_file_for_the_api" up -d; then
         print_success "Servicios iniciados"
         
         # Monitorear logs iniciales
-        monitor_initial_logs
+        monitor_initial_logs "API"
+    else
+        print_error "Error al iniciar servicios"
+        return 1
+    fi
+
+    if sudo docker-compose -f "$execution_file_for_the_app" up -d; then
+        print_success "Servicios iniciados"
+        
+        # Monitorear logs iniciales
+        monitor_initial_logs "APP"
     else
         print_error "Error al iniciar servicios"
         return 1
@@ -447,91 +514,103 @@ run_services() {
     # cleanup_temp_files "$install_file" "$run_file"
 }
 
-monitor_installation_logs() {    
-    print_info "Monitoreando instalación de API..."
-    
-    # Leer línea por línea
-    while IFS= read -r line; do
-        echo "$line" # Mostrar
+monitor_installation_logs() {
+    if [ "$1" = "API" ]; then
+        print_info "Monitoreando instalación de API..."
         
-        if grep -q "LinkThedistricUserWithTheVolcanesChurchSeeder.*DONE" <<< "$line"; then
-            print_success "Instalación de API completada"
-            break
-        fi
-    done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)
-    
-    print_info "Monitoreando instalación de APP..."
-
-    npm_count=0
-
-    # Leer línea por línea
-    while IFS= read -r line; do
-        echo "$line" # Mostrar
-        
-        if grep -q "npm.*notice" <<< "$line"; then
-            ((npm_count++))
-            if [ "$npm_count" -eq 15 ]; then
-                print_success "¡15 npm notices encontrados! APP completada"
+        # Leer línea por línea
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "LinkThedistricUserWithTheVolcanesChurchSeeder.*DONE" <<< "$line"; then
+                print_success "Instalación de API completada"
                 break
             fi
-        fi
-    done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)
+        
+        print_info "Monitoreando instalación de APP..."
+    elif [ "$1" = "APP" ]; then
+        npm_count=0
+
+        # Leer línea por línea
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "npm.*notice" <<< "$line"; then
+                ((npm_count++))
+                if [ "$npm_count" -eq 15 ]; then
+                    print_success "¡15 npm notices encontrados! APP completada"
+                    break
+                fi
+            fi
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
+    fi
+
 }
 
 stop_installation_containers() {
-    local api_install_container="${PROJECT_NAME}_instalar_dependencias_en_api"
-    local app_install_container="${PROJECT_NAME}_instalar_dependencias_en_app"
-    
-    print_info "Deteniendo contenedores de instalación..."
-    sudo docker stop "$api_install_container" "$app_install_container"
-    print_success "Contenedores de instalación detenidos"
+    if [ "$1" = "API" ]; then
+        local api_install_container="${CONTAINERS[instalar_dependencias_en_api]}"
+        
+        print_info "Deteniendo contenedores de instalación..."
+        sudo docker stop "$api_install_container"
+        print_success "Contenedores de instalación detenidos"
+    elif [ "$1" = "APP" ]; then
+        local app_install_container="${CONTAINERS[instalar_dependencias_en_app]}"
+        
+        print_info "Deteniendo contenedores de instalación..."
+        sudo docker stop "$app_install_container"
+        print_success "Contenedores de instalación detenidos"
+    fi
 }
 
 monitor_initial_logs() {
-    print_info "Monitoreando inicio de servicios..."
-    
-    # Mostrar logs iniciales de API
-    print_section "LOGS INICIALES - API"
-
-    npm_count=0
-
-    while IFS= read -r line; do
-        echo "$line" # Mostrar
+    if [ "$1" = "API" ]; then
+        print_info "Monitoreando inicio de servicios..."
         
-        if grep -q "Press.*Ctrl+C to stop the server" <<< "$line"; then
-            ((npm_count++))
-            if [ "$npm_count" -eq 2 ]; then
-                print_success "¡2 Press Ctrl+C to stop the server encontrados!"
-                print_success "¡Servicios de la API levantados!"
+        # Mostrar logs iniciales de API
+        print_section "LOGS INICIALES - API"
+
+        npm_count=0
+
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "Press.*Ctrl+C to stop the server" <<< "$line"; then
+                ((npm_count++))
+                if [ "$npm_count" -eq 2 ]; then
+                    print_success "¡2 Press Ctrl+C to stop the server encontrados!"
+                    print_success "¡Servicios de la API levantados!"
+                    break
+                fi
+            fi
+        done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
+    elif [ "$1" = "APP" ]; then
+        # Mostrar logs iniciales de APP
+        print_section "LOGS INICIALES - APP"
+        # sudo docker logs -f "${APP_CONTAINER_NAME}"
+
+        npm_count=0
+
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            # Debe de mostrarse "astro dev --host --port 4321"
+            if grep -q "port.*4321" <<< "$line"; then
+                ((npm_count++))
+                print_info "Fifa contador 1"
+            elif grep -q "http://localhost:84/" <<< "$line"; then
+                ((npm_count++))
+                print_info "Fifa contador 2"
+            elif grep -q "http://localhost:85/" <<< "$line"; then
+                ((npm_count++))
+                print_info "Fifa contador 3"
+            elif [ "$npm_count" -eq 3 ]; then
+                print_success "¡3 Se levantaron los servicios en la APP!"
                 break
             fi
-        fi
-    done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
-    
-    # Mostrar logs iniciales de APP
-    print_section "LOGS INICIALES - APP"
-    # sudo docker logs -f "${APP_CONTAINER_NAME}"
-
-    npm_count=0
-
-    while IFS= read -r line; do
-        echo "$line" # Mostrar
-        
-        # Debe de mostrarse "astro dev --host --port 4321"
-        if grep -q "port.*4321" <<< "$line"; then
-            ((npm_count++))
-            print_info "Fifa contador 1"
-        elif grep -q "http://localhost:84/" <<< "$line"; then
-            ((npm_count++))
-            print_info "Fifa contador 2"
-        elif grep -q "http://localhost:85/" <<< "$line"; then
-            ((npm_count++))
-            print_info "Fifa contador 3"
-        elif [ "$npm_count" -eq 3 ]; then
-            print_success "¡3 Se levantaron los servicios en la APP!"
-            break
-        fi
-    done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
+        done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
+    fi
 }
 
 cleanup_temp_files() {
