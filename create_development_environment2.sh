@@ -387,6 +387,7 @@ generate_install_services_file() {
     
     # Reemplazos en el archivo YML
     sed -i \
+        -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
@@ -455,8 +456,8 @@ generate_run_services_file() {
 run_services() {
     print_section "INSTALANDO Y EJECUTANDO SERVICIOS"
     
-    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
     local installation_file_for_the_app="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
+    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
     local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
     local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
     
@@ -536,12 +537,15 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            if grep -q "npm.*notice" <<< "$line"; then
+            if grep -q "added 987 packages" <<< "$line"; then
                 ((npm_count++))
-                if [ "$npm_count" -eq 15 ]; then
-                    print_success "¡15 npm notices encontrados! APP completada"
-                    break
-                fi
+            elif grep -q "added 387 packages" <<< "$line"; then
+                ((npm_count++))
+            fi
+            
+            if [ "$npm_count" -eq 3 ]; then
+                print_success "¡Added packages! APP completada"
+                break
             fi
         done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
     fi
@@ -598,13 +602,10 @@ monitor_initial_logs() {
             # Debe de mostrarse "astro dev --host --port 4321"
             if grep -q "port.*4321" <<< "$line"; then
                 ((npm_count++))
-                print_info "Fifa contador 1"
             elif grep -q "http://localhost:84/" <<< "$line"; then
                 ((npm_count++))
-                print_info "Fifa contador 2"
             elif grep -q "http://localhost:85/" <<< "$line"; then
                 ((npm_count++))
-                print_info "Fifa contador 3"
             elif [ "$npm_count" -eq 3 ]; then
                 print_success "¡3 Se levantaron los servicios en la APP!"
                 break
@@ -631,7 +632,7 @@ cleanup_temp_files() {
 }
 
 show_final_summary() {
-    print_header "INSTALACIÓN COMPLETADA"
+    print_header "INSTALACIÓN COMPLETA"
     echo ""
     echo "RESUMEN:"
     echo "----------------------------------------"
@@ -685,7 +686,7 @@ main() {
     run_services
     
     # Fase 4: Resumen final
-    # show_final_summary
+    show_final_summary
 }
 
 # Ejecutar script principal
