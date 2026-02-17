@@ -1,6 +1,12 @@
 
 services:
   instalar_dependencias_en_app:
+    environment:
+    - CI=true
+    - npm_config_loglevel=error
+    - npm_config_progress=false
+    - npm_config_fund=false
+    - npm_config_audit=false
     image: node:20.14.0  # La imagen que se va a utilizar
     container_name: instalar_dependencias_en_app # Nombre del contenedor
     networks:
@@ -12,10 +18,9 @@ services:
     stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
     tty: true # Habilita una terminal interactiva
     command: /bin/bash -c "
-      cd /home/demo/meca-app && npm install &
-      cd /home/demo/mockup && npm install &
+      cd /home/demo/meca-app && npm ci &
+      cd /home/demo/mockup && npm ci &
       cd /home/demo/user-manual/former-filament && npm install &
-      wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:
