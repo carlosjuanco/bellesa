@@ -1,330 +1,687 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-name_project="sdac"
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
 
-version_so="Versión: 12.7"
-proyecto="Proyecto: "$name_project
-descripcion_proyecto="Descripción del proyecto: Base para todos los proyectos."
+# Variables principales del proyecto
+readonly PROJECT_NAME="sdac"
+readonly PROJECT_DESCRIPTION="Crear un entorno de desarrollo para el proyecto Iglesia Adventista del Séptimo día."
+readonly OS_VERSION="Debian: 12.7"
 
-echo $version_so
-echo $proyecto
-echo $descripcion_proyecto
-echo "......................................................................"
+# Rutas del sistema
+readonly CURRENT_USER=$(whoami)
+readonly CURRENT_DIR=$(pwd)
+readonly BASE_DIR="/home/$CURRENT_USER/Documentos/proyecto_$PROJECT_NAME"
+readonly DOCKER_CONFIGURATION_FILE="/home/${CURRENT_USER}/.docker/config.json"
 
-current_username=$(whoami)
-current_directory_of_the_bellesa_project=$(pwd)
-name_bd="sdac"
+# Estructura de carpetas
+readonly -A DIRECTORIES=(
+    ["base_dir"]="$BASE_DIR"
+    ["bd"]="$BASE_DIR/bd"
+    ["api"]="$BASE_DIR/api"
+    ["app"]="$BASE_DIR/app"
+    ["zeus_api"]="$BASE_DIR/api/zeus-api"
+    ["meca_app"]="$BASE_DIR/app/meca-app"
+    ["api_mockup"]="$BASE_DIR/api/mockup"
+    ["app_mockup"]="$BASE_DIR/app/mockup"
+    ["user_manual"]="$BASE_DIR/app/user-manual"
+)
+declare -r DIRECTORIES
 
-directorio_carpeta_raiz="/home/$current_username/Documentos"
-carpeta_raiz=$directorio_carpeta_raiz"/proyecto_"$name_project
-subcarpeta_bd=$carpeta_raiz"/bd"
-subcarpeta_api=$carpeta_raiz"/api"
-subcarpeta_app=$carpeta_raiz"/app"
-carpeta_repositorio_api=$subcarpeta_api"/zeus-api"
-carpeta_repositorio_app=$subcarpeta_app"/meca-app"
+# Base de datos
+readonly DB_NAME="sdac"
+readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
+readonly DB_ROOT_PASSWORD="juan"
+readonly DB_CONTAINER_IP="192.168.20.15"
 
-container_name_bd=$name_project"_bd"
-container_name_api=$name_project"_api"
-container_name_app=$name_project"_app"
-container_name_install_dev_on_api=$name_project"_instalar_dependencias_en_api"
-container_name_install_dev_on_app=$name_project"_instalar_dependencias_en_app"
+# Contenedores Docker
+declare -A CONTAINERS=(
+    ["bd"]="${PROJECT_NAME}_bd"
+    ["api"]="${PROJECT_NAME}_api"
+    ["app"]="${PROJECT_NAME}_app"
+    ["instalar_dependencias_en_api"]="${PROJECT_NAME}_instalar_dependencias_en_api"
+    ["instalar_dependencias_en_app"]="${PROJECT_NAME}_instalar_dependencias_en_app"
+)
+declare -r CONTAINERS
 
-docker_image_name_container_api="juancholll/laravel_api_debian"
-api_port_number=8082
+# Configuración de API
+readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
+readonly API_IMAGE="juancholll/laravel_api_debian:1.0.0"
+readonly API_CONTAINER_IP="192.168.20.18"
+readonly API_PORT=8082
+readonly API_MOCKUP_PORT=8083
 
-# Paramos todos los contenedores
-echo "Comenzando a parar todos los contenedores ...."
+# Configuración de APP
+readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
+readonly APP_PORT=8084
+readonly APP_MOCKUP_PORT=8085
+readonly USER_MANUAL_PORT=4321
 
-sudo docker stop $container_name_bd
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_bd
-fi
-sudo docker stop $container_name_app
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_app
-fi
-sudo docker stop $container_name_api
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_api
-fi
-sudo docker stop $container_name_install_dev_on_api
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_api
-fi
-sudo docker stop $container_name_install_dev_on_app
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_app
-fi
+# Repositorios Git
+readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
+readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 
-echo "Se termino de parar todos los contenedores"
+# Ramas Git por entorno
+declare -A GIT_BRANCHES=(
+    ["api_dev"]="${PROJECT_NAME}-dev"
+    ["api_mockup"]="${PROJECT_NAME}-mockup"
+    ["app_dev"]="${PROJECT_NAME}-dev"
+    ["app_mockup"]="${PROJECT_NAME}-mockup"
+    ["app_manual"]="${PROJECT_NAME}-user-manual-with-starlight"
+)
 
-echo "......................................................................"
+# ============================================================================
+# VERIFICANDO AUTENTICACIÓN DE DOCKER
+# ============================================================================
 
-echo "Comenzar a eliminar todos los contenedores ...."
+# IMPORTANTE: Para autenticación en Docker Hub
+# --------------------------------------------
+# 1. Ejecutar SIN sudo: docker login
+# 2. Ingresar credenciales de Docker Hub
+# 3. Las credenciales se guardan en: ~/.docker/config.json
+# 4. NO usar sudo con docker login
+# --------------------------------------------
+check_docker_auth() {
+    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
+    
+    # Verificar si hay credenciales guardadas
+    if [ ! -f ${DOCKER_CONFIGURATION_FILE} ]; then
+        print_warning "No hay credenciales de Docker guardadas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    # Verificar que las credenciales sean válidas
+    # También me sirve para indicar que no he iniciado docker
+    if ! sudo docker pull hello-world > /dev/null 2>&1; then
+        print_warning "Credenciales de Docker expiradas o inválidas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    print_success "Autenticación de Docker verificada"
+    return 0
+}
 
-sudo docker rm $container_name_bd
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_bd
-fi
-sudo docker rm $container_name_app
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_app
-fi
-sudo docker rm $container_name_api
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_api
-fi
-sudo docker rm $container_name_install_dev_on_api
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_api
-fi
-sudo docker rm $container_name_install_dev_on_app
-if [ $? -ne 0 ]; then
-    echo ".....El Error response from daemon: No such container"
-    echo ".....Se debe a que no existe el contenedor "$container_name_install_dev_on_app
-fi
+# ============================================================================
+# FUNCIONES DE UTILIDAD
+# ============================================================================
 
-echo "Se termino de eliminar todos los contenedores"
+print_header() {
+    echo "========================================"
+    echo "$1"
+    echo "========================================"
+}
 
-echo "......................................................................"
+print_section() {
+    echo "----------------------------------------"
+    echo "$1"
+    echo "----------------------------------------"
+}
 
-echo "Verificando que la carpeta proyecto_"$name_project" no exista ...."
+print_warning() {
+    echo "[WARNING] $1"
+}
 
-if [ -d "$carpeta_raiz" ]; then
-	echo "La carpeta existe $carpeta_raiz, comenzando a borrar ...."
-	sudo rm -r $carpeta_raiz
-fi
+print_info() {
+    echo "[INFO] $1"
+}
 
-echo "......................................................................"
+print_success() {
+    echo "[✓] $1"
+}
 
-echo "Comenzando a crear las carpetas ...."
+print_error() {
+    echo "[ERROR] $1" >&2
+}
 
-mkdir $carpeta_raiz
-mkdir $subcarpeta_bd
-mkdir $subcarpeta_api
-mkdir $subcarpeta_app
-mkdir $carpeta_repositorio_api
-mkdir $carpeta_repositorio_app
+check_command() {
+    if [ $? -ne 0 ]; then
+        print_error "$2"
+        return 1
+    fi
+    return 0
+}
 
-echo "Se termino de crear las carpetas"
+# ============================================================================
+# FUNCIONES PRINCIPALES
+# ============================================================================
 
-tree $carpeta_raiz
+show_project_info() {
+    print_header "INFORMACIÓN DEL PROYECTO"
+    echo "Versión del SO: $OS_VERSION"
+    echo "Nombre del proyecto: $PROJECT_NAME"
+    echo "Descripción: $PROJECT_DESCRIPTION"
+    echo ""
+}
 
-echo "......................................................................"
+stop_and_remove_containers() {
+    print_section "DETENIENDO Y ELIMINANDO CONTENEDORES"
+    
+    # Iterar sobre todas las CLAVES del array asociativo
+    for clave in "${!CONTAINERS[@]}"; do
+        local nombre_contenedor="${CONTAINERS[$clave]}"
+        
+        print_info "Procesando contenedor [$clave]: $nombre_contenedor"
+        
+        # Detener contenedor
+        if sudo docker stop "$nombre_contenedor" 2>/dev/null; then
+            print_success "Contenedor $nombre_contenedor detenido"
+        else
+            print_info "El contenedor $nombre_contenedor no existe o ya está detenido"
+        fi
+        
+        # Eliminar contenedor
+        if sudo docker rm "$nombre_contenedor" 2>/dev/null; then
+            print_success "Contenedor $nombre_contenedor eliminado"
+        else
+            print_info "El contenedor $nombre_contenedor no existe"
+        fi
+        
+        echo ""  # Línea en blanco para separar
+    done
+}
 
-echo "Estos eran los permisos cuando creaba las carpetas en el explorador de archivo ...."
+cleanup_project_directory() {
+    print_section "LIMPIANDO DIRECTORIO DEL PROYECTO"
+    
+    if [ -d "$BASE_DIR" ]; then
+        print_info "Eliminando directorio existente: $BASE_DIR"
+        sudo rm -rf "$BASE_DIR"
+        print_success "Directorio eliminado"
+    else
+        print_info "El directorio $BASE_DIR no existe"
+    fi
+}
 
-echo "drwxr-xr-x  5 juan juan 4096 oct 26 11:02 proyecto_"$name_project
-echo "drwxr-xr-x 3 juan juan 4096 oct 26 11:02 api"
-echo "drwxr-xr-x 3 juan juan 4096 oct 26 11:02 app"
-echo "drwxr-xr-x 8  999 juan 4096 oct 26 11:07 bd"
-echo "drwxr-xr-x 14 juan juan 4096 oct 26 11:03 zeus-api"
-echo "drwxr-xr-x 6 juan juan 4096 oct 26 11:04 meca-app"
-echo "Lo importante es drwxr-xr-x"
+create_project_structure() {
+    print_section "CREANDO ESTRUCTURA DEL PROYECTO"
+    
+    for clave in "${!DIRECTORIES[@]}"; do
+        mkdir -p "${DIRECTORIES[$clave]}"
+        check_command "No se pudo crear el directorio: $clave"
+        print_success "Creado: $clave"
+    done
+    
+    # Mostrar estructura
+    if command -v tree &> /dev/null; then
+        tree "$BASE_DIR"
+    else
+        find "$BASE_DIR" -type d | sed 's|[^/]*/|- |g'
+    fi
+    
+    # Mostrar permisos
+    print_section "PERMISOS DE CARPETAS"
+    ls -la "$BASE_DIR"
+}
 
-echo "......................................................................"
+clone_repositories() {
+    print_section "CLONANDO REPOSITORIOS"
+    
+    # Clonar repositorios de API
+    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
+    
+    # Clonar repositorios de APP
+    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[user_manual]}" "${GIT_BRANCHES[app_manual]}"
+}
 
-echo "Los permisos de las carpetas creadas son ...."
-ls -al $directorio_carpeta_raiz
-ls -al $carpeta_raiz
-ls -al $subcarpeta_api
-ls -al $subcarpeta_app
+clone_repo() {
+    local repo_url="$1"
+    local dest_dir="$2"
+    local branch="$3"
+    
+    print_info "Clonando $repo_url en $dest_dir (rama: $branch)"
+    
+    if git clone "$repo_url" "$dest_dir"; then
+        cd "$dest_dir" || return 1
+        
+        if git checkout "$branch" 2>/dev/null; then
+            print_success "Repositorio clonado en $dest_dir (rama: $branch)"
+            echo ""  # Línea en blanco para separar
+        else
+            print_error "No se pudo cambiar a la rama $branch"
+            return 1
+        fi
+        
+        cd - > /dev/null || return 1
+    else
+        print_error "Error al clonar el repositorio en $dest_dir"
+        return 1
+    fi
+}
 
-echo "......................................................................"
+create_env_files() {
+    print_section "CREANDO ARCHIVOS DE CONFIGURACIÓN .env"
+    
+    # API - Desarrollo
+    create_api_env_file \
+        "${DIRECTORIES[zeus_api]}/.env.example" \
+        "${DIRECTORIES[zeus_api]}/.env" \
+        "$DB_NAME"
+    
+    # API - Mockup
+    create_api_env_file \
+        "${DIRECTORIES[api_mockup]}/.env.example" \
+        "${DIRECTORIES[api_mockup]}/.env" \
+        "$MOCKUP_DB_NAME"
+    
+    # APP - Desarrollo
+    create_app_env_file \
+        "$CURRENT_DIR/env.env" \
+        "${DIRECTORIES[meca_app]}/.env" \
+        "$API_PORT"
+    
+    # APP - Mockup
+    create_app_env_file \
+        "$CURRENT_DIR/env.env" \
+        "${DIRECTORIES[app_mockup]}/.env" \
+        "$API_MOCKUP_PORT"
+}
 
-echo "Comenzando a clonar los repositorios ...."
+create_api_env_file() {
+    local input_file="$1"
+    local output_file="$2"
+    local db_name="$3"
+    
+    if [ ! -f "$input_file" ]; then
+        print_error "Archivo de entrada no encontrado: $input_file"
+        return 1
+    fi
+    
+    cp "$input_file" "$output_file"
+    
+    sed -i \
+        -e "s|DB_HOST=127.0.0.1|DB_HOST=$DB_CONTAINER_IP|g" \
+        -e "s|DB_DATABASE=laravel|DB_DATABASE=$db_name|g" \
+        -e "s|DB_PASSWORD=|DB_PASSWORD=$DB_ROOT_PASSWORD|g" \
+        "$output_file"
+    
+    print_success "Archivo .env creado: $output_file"
+}
 
-# Variables para repositorio API
-REPO_API_URL="https://github.com/carlosjuanco/zeus-api.git"
-DEST_API_DIR=$carpeta_repositorio_api
-BRANCH_NAME=$name_project"-dev"
+create_app_env_file() {
+    local input_file="$1"
+    local output_file="$2"
+    local api_port="$3"
+    
+    if [ ! -f "$input_file" ]; then
+        print_error "Archivo de entrada no encontrado: $input_file"
+        return 1
+    fi
+    
+    cp "$input_file" "$output_file"
+    
+    sed -i "s|8081|$api_port|g" "$output_file"
+    
+    print_success "Archivo .env creado: $output_file"
+}
 
-# Comando para clonar el repositorio
-git clone $REPO_API_URL $DEST_API_DIR
-# Verificar si el clon fue exitoso
-if [ $? -eq 0 ]; then
-    echo "Repositorio clonado correctamente en $DEST_API_DIR"
+update_database_init_file() {
+    print_section "ACTUALIZANDO ARCHIVO DE INICIALIZACIÓN DE BD"
+    
+    local init_file="${DIRECTORIES[zeus_api]}/database/init.sql"
+    
+    if [ -f "$init_file" ]; then
+        sed -i \
+            -e "s|nombreDeLaBaseDeDatosParaElDesarrollo|$DB_NAME|g" \
+            -e "s|nombreDeLaBaseDeDatosParaLaMaqueta|$MOCKUP_DB_NAME|g" \
+            "$init_file"
+        
+        print_success "Archivo init.sql actualizado"
+    else
+        print_error "Archivo init.sql no encontrado: $init_file"
+    fi
+}
 
-    # Cambiar al directorio del repositorio
-    cd $DEST_API_DIR
+generate_docker_compose_files() {
+    print_section "GENERANDO ARCHIVOS DOCKER COMPOSE"
+    
+    generate_install_services_file
+    generate_run_services_file
+}
 
-    # Cambiar a la rama especificada
-    git checkout $BRANCH_NAME
+generate_install_services_file() {
+    # Generar archivo de instalación para la API
 
-    echo "Ahora estás en la rama $BRANCH_NAME"
-else
-    echo "Error al clonar el repositorio"
-fi
+    local source_file="$CURRENT_DIR/install_dependencies_in_api.yml"
+    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
+        -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
+        -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
+        -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
+        -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
+        -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
+        -e "s|3307:3306|3308:3306|g" \
+        -e "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" \
+        "$dest_file"
+    
+    print_success "Archivo de instalación generado: $dest_file"
 
-# Variables para repositorio APP
-REPO_APP_URL="https://github.com/carlosjuanco/meca-app.git"
-DEST_APP_DIR=$carpeta_repositorio_app
+    # Generar archivo de instalación para la APP
 
-# Comando para clonar el repositorio
-git clone $REPO_APP_URL $DEST_APP_DIR
-# Verificar si el clon fue exitoso
-if [ $? -eq 0 ]; then
-    echo "Repositorio clonado correctamente en $DEST_APP_DIR"
+    source_file="$CURRENT_DIR/install_dependencies_in_app.yml"
+    dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
+        -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
+        -e "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" \
+        "$dest_file"
+    
+    print_success "Archivo de instalación generado: $dest_file"
+}
 
-    # Cambiar al directorio del repositorio
-    cd $DEST_APP_DIR
+generate_run_services_file() {
+    # Generar archivo de ejecución para la API
 
-    # Cambiar a la rama especificada
-    git checkout $BRANCH_NAME
+    local source_file="$CURRENT_DIR/run_services_in_the_api.yml"
+    local dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|iasd_api:|${PROJECT_NAME}_api:|g" \
+        -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
+        -e "s|container_name: iasd_api|container_name: $API_CONTAINER_NAME|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|ipv4_address: 192.168.20.12|ipv4_address: $API_CONTAINER_IP|g" \
+        -e "s|puertoAfueraAPI1:puertoAdentroAPI1|${API_PORT}:82|g" \
+        -e "s|puertoAfueraAPI2:puertoAdentroAPI2|${API_MOCKUP_PORT}:83|g" \
+        -e "s|--host=192.168.20.12 --port=80|--host=$API_CONTAINER_IP --port=82|g" \
+        -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
+        "$dest_file"
+    
+    print_success "Archivo de ejecución generado: $dest_file"
 
-    echo "Ahora estás en la rama $BRANCH_NAME"
-else
-    echo "Error al clonar el repositorio"
-fi
-# Volvemos a la carpeta de bellesa
+    # Generar archivo de ejecución para la APP
 
-# Aprendizaje: Al momento de ejecutarse este archivo, realmente si cambiamos de ruta, ya que no encontró los archivos "create_containers_for_services_.yml"
-# y "run_services2.yml", pero en mi terminal me seguia mostrando que si estabamos en la ruta bellesa, entonces, para que pueda encontrar los archivos,
-# vuelvo a regresar
+    source_file="$CURRENT_DIR/run_services_in_the_app.yml"
+    dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
+    
+    if [ ! -f "$source_file" ]; then
+        print_error "Archivo fuente no encontrado: $source_file"
+        return 1
+    fi
+    
+    cp "$source_file" "$dest_file"
+    
+    # Reemplazos en el archivo YML
+    sed -i \
+        -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
+        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
+        -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
+        -e "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" \
+        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|${APP_PORT}:84|g" \
+        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|${APP_MOCKUP_PORT}:85|g" \
+        -e "s|puertoAfueraAPP3:puertoAdentroAPP3|${USER_MANUAL_PORT}:4321|g" \
+        -e "s|npm run serve -- --port 81|npm run serve -- --port 84|g" \
+        -e "s|npm run serve -- --port 82|npm run serve -- --port 85|g" \
+        "$dest_file"
+    
+    print_success "Archivo de ejecución generado: $dest_file"
+}
 
-cd $current_directory_of_the_bellesa_project
-echo "......................................................................"
+run_services() {
+    print_section "INSTALANDO Y EJECUTANDO SERVICIOS"
+    
+    local installation_file_for_the_app="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
+    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
+    local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
+    local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
+    
+    # Instalar dependencias
+    
+    if sudo docker-compose -f "$installation_file_for_the_api" up -d; then
+        print_success "Servicios instalados en la API"
+        
+        # Monitorear logs de instalación
+        monitor_installation_logs "API"
+        
+        # Detener contenedores de instalación
+        stop_installation_containers "API"
+    else
+        print_error "Error al instalar servicios"
+        return 1
+    fi
 
-echo "Comenzando a crear el archivo .env en zeus-api ...."
+    if sudo docker-compose -f "$installation_file_for_the_app" up -d; then
+        print_success "Servicios instalados en la APP"
+        
+        # Monitorear logs de instalación
+        monitor_installation_logs "APP"
+        
+        # Detener contenedores de instalación
+        stop_installation_containers "APP"
+    else
+        print_error "Error al instalar servicios"
+        return 1
+    fi
+    
+    # Ejecutar servicios principales
+    print_info "Iniciando servicios principales..."
+    if sudo docker-compose -f "$execution_file_for_the_api" up -d; then
+        print_success "Servicios iniciados"
+        
+        # Monitorear logs iniciales
+        monitor_initial_logs "API"
+    else
+        print_error "Error al iniciar servicios"
+        return 1
+    fi
 
-input=$carpeta_repositorio_api"/.env.example"
-out=$carpeta_repositorio_api"/.env"
-touch $out
-db_host="DB_HOST=127.0.0.1"
-db_database="DB_DATABASE=laravel"
-db_password="DB_PASSWORD="
+    if sudo docker-compose -f "$execution_file_for_the_app" up -d; then
+        print_success "Servicios iniciados"
+        
+        # Monitorear logs iniciales
+        monitor_initial_logs "APP"
+    else
+        print_error "Error al iniciar servicios"
+        return 1
+    fi
+    
+    # Limpiar archivos temporales
+    print_section "LIMPIANDO ARCHIVOS TEMPORALES"
+    cleanup_temp_files "$installation_file_for_the_api"
+    cleanup_temp_files "$installation_file_for_the_app"
+    cleanup_temp_files "$execution_file_for_the_api"
+    cleanup_temp_files "$execution_file_for_the_app"
+}
 
-while read linea
-do
-	# echo $linea
-	if [ -z "$linea" ]; then
-		echo $linea >> $out
-	else
-		if [ $linea = $db_host ]; then
-	  		echo "DB_HOST=192.168.20.15" >> $out
-	  	elif [ $linea = $db_database ]; then
-	  		echo "DB_DATABASE="$name_bd >> $out
-	  	elif [ $linea = $db_password ]; then
-	  		echo "DB_PASSWORD=juan" >> $out
-		else
-			echo $linea >> $out
-		fi
-	fi
-done < $input
+monitor_installation_logs() {
+    if [ "$1" = "API" ]; then
+        print_info "Monitoreando instalación de API..."
+        
+        # Leer línea por línea
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "LinkThedistricUserWithTheVolcanesChurchSeeder.*DONE" <<< "$line"; then
+                print_success "Instalación de API completada"
+                break
+            fi
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)
+        
+        print_info "Monitoreando instalación de APP..."
+    elif [ "$1" = "APP" ]; then
+        npm_count=0
 
-echo "Se termino de crear el archivo .env en zeus-api"
+        # Leer línea por línea
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "added 987 packages" <<< "$line"; then
+                ((npm_count++))
+            elif grep -q "added 387 packages" <<< "$line"; then
+                ((npm_count++))
+            fi
+            
+            if [ "$npm_count" -eq 3 ]; then
+                print_success "¡Added packages! APP completada"
+                break
+            fi
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
+    fi
 
-echo "......................................................................"
+}
 
-echo "Comenzando a crear el archivo .env en meca-app ...."
+stop_installation_containers() {
+    if [ "$1" = "API" ]; then
+        local api_install_container="${CONTAINERS[instalar_dependencias_en_api]}"
+        
+        print_info "Deteniendo contenedores de instalación..."
+        sudo docker stop "$api_install_container"
+        print_success "Contenedores de instalación detenidos"
+    elif [ "$1" = "APP" ]; then
+        local app_install_container="${CONTAINERS[instalar_dependencias_en_app]}"
+        
+        print_info "Deteniendo contenedores de instalación..."
+        sudo docker stop "$app_install_container"
+        print_success "Contenedores de instalación detenidos"
+    fi
+}
 
-input=$current_directory_of_the_bellesa_project"/env.env"
-out=$carpeta_repositorio_app"/.env"
-cp "$input" "$out"
+monitor_initial_logs() {
+    if [ "$1" = "API" ]; then
+        print_info "Monitoreando inicio de servicios..."
+        
+        # Mostrar logs iniciales de API
+        print_section "LOGS INICIALES - API"
 
-# Reemplazar la cadena en el archivo de destino
-sed -i "s|8081|"$api_port_number"|g" "$out"
+        npm_count=0
 
-echo "Se termino de crear el archivo .env en zeus-api"
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            if grep -q "Press.*Ctrl+C to stop the server" <<< "$line"; then
+                ((npm_count++))
+                if [ "$npm_count" -eq 2 ]; then
+                    print_success "¡2 Press Ctrl+C to stop the server encontrados!"
+                    print_success "¡Servicios de la API levantados!"
+                    break
+                fi
+            fi
+        done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
+    elif [ "$1" = "APP" ]; then
+        # Mostrar logs iniciales de APP
+        print_section "LOGS INICIALES - APP"
+        # sudo docker logs -f "${APP_CONTAINER_NAME}"
 
-echo "......................................................................"
+        npm_count=0
 
-echo "Comenzando a crear el archivo create_containers_for_services_$name_project.yml ...."
-echo "......................................................................"
-origen=$current_directory_of_the_bellesa_project"/install_services.yml"
-destino=$current_directory_of_the_bellesa_project"/create_containers_for_services_"$name_project".yml"
+        while IFS= read -r line; do
+            echo "$line" # Mostrar
+            
+            # Debe de mostrarse "astro dev --host --port 4321"
+            if grep -q "port.*4321" <<< "$line"; then
+                ((npm_count++))
+            elif grep -q "http://localhost:84/" <<< "$line"; then
+                ((npm_count++))
+            elif grep -q "http://localhost:85/" <<< "$line"; then
+                ((npm_count++))
+            elif [ "$npm_count" -eq 3 ]; then
+                print_success "¡3 Se levantaron los servicios en la APP!"
+                break
+            fi
+        done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
+    fi
+}
 
-# Copiar el contenido del archivo de origen al archivo de destino
-cp "$origen" "$destino"
+cleanup_temp_files() {
+    local file="$1"
+    
+    if [ -f "$file" ]; then
+        rm -f "$file"
+        print_success "Archivo eliminado: $file"
+    fi    
+}
 
-# Reemplazar la cadena en el archivo de destino
-sed -i "s|iasd_mysql:|"$name_project"_mysql:|g" "$destino"
-sed -i "s|instalar_dependencias_en_api:|"$name_project"_instalar_dependencias_en_api:|g" "$destino"
-sed -i "s|instalar_dependencias_en_app:|"$name_project"_instalar_dependencias_en_app:|g" "$destino"
-sed -i "s|container_name: iasd_bd|container_name: "$container_name_bd"|g" "$destino"
-sed -i "s|/home/juan/Documentos/proyecto_iasd|$carpeta_raiz|g" "$destino"
-sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
-sed -i "s|container_name: instalar_dependencias_en_api|container_name: "$container_name_install_dev_on_api"|g" "$destino"
-sed -i "s|container_name: instalar_dependencias_en_app|container_name: "$container_name_install_dev_on_app"|g" "$destino"
-sed -i "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" "$destino"
-sed -i "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" "$destino"
-sed -i "s|3307:3306|3308:3306|g" "$destino"
-sed -i "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" "$destino"
-sed -i "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" "$destino"
+show_final_summary() {
+    print_header "INSTALACIÓN COMPLETA"
+    echo ""
+    echo "RESUMEN:"
+    echo "----------------------------------------"
+    echo "• Proyecto: $PROJECT_NAME"
+    echo "• Directorio base: $BASE_DIR"
+    echo ""
+    echo "SERVICIOS DISPONIBLES:"
+    echo "----------------------------------------"
+    echo "• API Desarrollo:      http://localhost:$API_PORT"
+    echo "• API Mockup:          http://localhost:$API_MOCKUP_PORT"
+    echo "• APP Desarrollo:      http://localhost:$APP_PORT"
+    echo "• APP Mockup:          http://localhost:$APP_MOCKUP_PORT"
+    echo "• Manual de usuario:   http://localhost:$USER_MANUAL_PORT"
+    echo ""
+    echo "CONTENEDORES ACTIVOS:"
+    echo "----------------------------------------"
+    sudo docker ps --filter "name=$PROJECT_NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    echo ""
+    echo "Para ver los logs en tiempo real:"
+    echo "  sudo docker logs -f ${PROJECT_NAME}_api"
+    echo "  sudo docker logs -f ${PROJECT_NAME}_app"
+    echo ""
+}
 
-echo "Se termino de crear el archivo create_containers_for_services_$name_project.yml"
-echo "......................................................................"
+# ============================================================================
+# FLUJO PRINCIPAL
+# ============================================================================
 
-# Objetivo: copiar el contenido del archivo (run_services.yml) y 
-echo "Comenzando a crear el archivo run_services2.yml ...."
-echo "......................................................................"
-origen=$current_directory_of_the_bellesa_project"/run_services.yml"
-destino=$current_directory_of_the_bellesa_project"/run_services2.yml"
+main() {
+    if ! check_docker_auth; then
+        print_error "Problema con autenticación de Docker"
+        exit 1
+    fi
 
-# Copiar el contenido del archivo de origen al archivo de destino
-cp "$origen" "$destino"
+    show_project_info
+    
+    # Fase 1: Preparación
+    stop_and_remove_containers
+    cleanup_project_directory
+    create_project_structure
+    
+    # Fase 2: Configuración
+    clone_repositories
+    create_env_files
+    update_database_init_file
+    generate_docker_compose_files
+    
+    # Fase 3: Ejecución
+    run_services
+    
+    # Fase 4: Resumen final
+    show_final_summary
+}
 
-# Reemplazar la cadena en el archivo de destino
-sed -i "s|iasd_api:|"$name_project"_api:|g" "$destino"
-sed -i "s|iasd_app:|"$name_project"_app:|g" "$destino"
-sed -i "s|image: juancholll/laravel_api|image: "$docker_image_name_container_api"|g" "$destino"
-sed -i "s|container_name: iasd_api|container_name: "$container_name_api"|g" "$destino"
-sed -i "s|/home/juan/Documentos/proyecto_iasd|"$carpeta_raiz"|g" "$destino"
-sed -i "s|container_name: iasd_app|container_name: "$container_name_app"|g" "$destino"
-sed -i "s|ipv4_address: 192.168.20.12|ipv4_address: 192.168.20.18|g" "$destino"
-sed -i "s|8080:80|8082:82|g" "$destino"
-sed -i "s|--host=192.168.20.12 --port=80|--host=192.168.20.18 --port=82|g" "$destino"
-sed -i "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" "$destino"
-sed -i "s|8081:81|8083:83|g" "$destino"
-sed -i "s|npm run serve -- --port 81|npm run serve -- --port 83|g" "$destino"
-
-echo "Se termino de crear el archivo run_services2.yml"
-echo "......................................................................"
-# Objetivo: copiar cambiar el nombre de la base de datos (init.sql) y 
-echo "Comenzando a modificar nombre de la base de datos init.sql ...."
-echo "......................................................................"
-destino=$carpeta_repositorio_api"/database/init.sql"
-
-# Reemplazar la cadena en el archivo de destino
-sed -i "s|iasd|$name_bd|g" "$destino"
-
-echo "......................................................................"
-echo "Comenzando a instalar los servicios ...."
-sudo docker-compose -f "create_containers_for_services_"$name_project".yml" up -d
-sudo docker logs -f $container_name_install_dev_on_api
-echo "......................................................................"
-echo "Se termino de instalar el servicio $container_name_install_dev_on_api, sí muestra el siguiente mensaje"
-echo "Database\Seeders\AddComponentNameInformationInVueSeeder ....... 2.00 ms DONE"
-echo "......................................................................"
-sudo docker logs -f $container_name_install_dev_on_app
-echo "......................................................................"
-echo "Se termino de instalar el servicio $container_name_install_dev_on_app, sí muestra el siguiente mensaje"
-echo "npm notice"
-echo "......................................................................"
-echo "Parar el servicio $container_name_install_dev_on_api ...."
-sudo docker stop $container_name_install_dev_on_api
-echo "......................................................................"
-echo "Parar el servicio $container_name_install_dev_on_app ...."
-sudo docker stop $container_name_install_dev_on_app
-echo "......................................................................"
-echo "Corriendo servicios ...."
-sudo docker-compose -f run_services2.yml up -d
-echo "......................................................................"
-sudo docker logs -f $container_name_api
-sudo docker logs -f $container_name_app
-echo "......................................................................"
-echo "Eliminar archivo create_containers_for_services_"$name_project".yml ...."
-sudo rm "create_containers_for_services_"$name_project".yml"
-echo "......................................................................"
-echo "Eliminar archivo run_services2.yml ...."
-sudo rm run_services2.yml
-echo "......................................................................"
+# Ejecutar script principal
+main
