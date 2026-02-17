@@ -1,0 +1,33 @@
+
+services:
+  instalar_dependencias_en_app:
+    environment:
+    - CI=true
+    - npm_config_loglevel=error
+    - npm_config_progress=false
+    - npm_config_fund=false
+    - npm_config_audit=false
+    image: node:20.14.0  # La imagen que se va a utilizar
+    container_name: instalar_dependencias_en_app # Nombre del contenedor
+    networks:
+      red_interna:
+        ipv4_address: 192.168.20.13
+    hostname: servidor_mariadb
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/app:/home/demo # Mapea el volumen de tu directorio local
+    stdin_open: true  # Equivalente a `-it` para tener un contenedor interactivo
+    tty: true # Habilita una terminal interactiva
+    command: /bin/bash -c "
+      cd /home/demo/meca-app && npm ci &
+      cd /home/demo/mockup && npm ci &
+      cd /home/demo/user-manual/former-filament && npm install &
+      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
+networks:
+    red_web:
+        ipam:
+            config:
+              - subnet: 192.168.10.0/24
+    red_interna:
+        ipam:
+            config:
+              - subnet: 192.168.20.0/24
