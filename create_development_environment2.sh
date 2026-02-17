@@ -1,39 +1,6 @@
 #!/usr/bin/env bash
 
 # ============================================================================
-# VERIFICANDO AUTENTICACIÓN DE DOCKER
-# ============================================================================
-
-# IMPORTANTE: Para autenticación en Docker Hub
-# --------------------------------------------
-# 1. Ejecutar SIN sudo: docker login
-# 2. Ingresar credenciales de Docker Hub
-# 3. Las credenciales se guardan en: ~/.docker/config.json
-# 4. NO usar sudo con docker login
-# --------------------------------------------
-check_docker_auth() {
-    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
-    
-    # Verificar si hay credenciales guardadas
-    if [ ! -f ~/.docker/config.json ]; then
-        print_warning "No hay credenciales de Docker guardadas"
-        print_info "Ejecuta: docker login"
-        return 1
-    fi
-    
-    # Verificar que las credenciales sean válidas
-    # También me sirve para indicar que no he iniciado docker
-    if ! docker pull hello-world > /dev/null 2>&1; then
-        print_warning "Credenciales de Docker expiradas o inválidas"
-        print_info "Ejecuta: docker login"
-        return 1
-    fi
-    
-    print_success "Autenticación de Docker verificada"
-    return 0
-}
-
-# ============================================================================
 # CONFIGURACIÓN
 # ============================================================================
 
@@ -46,6 +13,7 @@ readonly OS_VERSION="Sonoma 14.3"
 readonly CURRENT_USER=$(whoami)
 readonly CURRENT_DIR=$(pwd)
 readonly BASE_DIR="/Users/$CURRENT_USER/Documents/proyecto_$PROJECT_NAME"
+readonly DOCKER_CONFIGURATION_FILE="/Users/${CURRENT_USER}/.docker/config.json"
 
 # Estructura de carpetas
 readonly -A DIRECTORIES=(
@@ -104,6 +72,39 @@ declare -A GIT_BRANCHES=(
 )
 
 # ============================================================================
+# VERIFICANDO AUTENTICACIÓN DE DOCKER
+# ============================================================================
+
+# IMPORTANTE: Para autenticación en Docker Hub
+# --------------------------------------------
+# 1. Ejecutar SIN sudo: docker login
+# 2. Ingresar credenciales de Docker Hub
+# 3. Las credenciales se guardan en: ~/.docker/config.json
+# 4. NO usar sudo con docker login
+# --------------------------------------------
+check_docker_auth() {
+    print_section "VERIFICANDO AUTENTICACIÓN DE DOCKER"
+    
+    # Verificar si hay credenciales guardadas
+    if [ ! -f ${DOCKER_CONFIGURATION_FILE} ]; then
+        print_warning "No hay credenciales de Docker guardadas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    # Verificar que las credenciales sean válidas
+    # También me sirve para indicar que no he iniciado docker
+    if ! docker pull hello-world > /dev/null 2>&1; then
+        print_warning "Credenciales de Docker expiradas o inválidas"
+        print_info "Ejecuta: docker login"
+        return 1
+    fi
+    
+    print_success "Autenticación de Docker verificada"
+    return 0
+}
+
+# ============================================================================
 # FUNCIONES DE UTILIDAD
 # ============================================================================
 
@@ -117,6 +118,10 @@ print_section() {
     echo "----------------------------------------"
     echo "$1"
     echo "----------------------------------------"
+}
+
+print_warning() {
+    echo "[WARNING] $1"
 }
 
 print_info() {
@@ -340,8 +345,10 @@ generate_docker_compose_files() {
 }
 
 generate_install_services_file() {
-    local source_file="$CURRENT_DIR/install_services.yml"
-    local dest_file="$CURRENT_DIR/create_containers_for_services_${PROJECT_NAME}.yml"
+    # Generar archivo de instalación para la API
+    
+    local source_file="$CURRENT_DIR/install_dependencies_in_api.yml"
+    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
