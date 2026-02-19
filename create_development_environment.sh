@@ -511,8 +511,12 @@ run_services() {
         return 1
     fi
     
-    # # Limpiar archivos temporales
-    # cleanup_temp_files "$install_file" "$run_file"
+    # Limpiar archivos temporales
+    print_section "LIMPIANDO ARCHIVOS TEMPORALES"
+    cleanup_temp_files "$installation_file_for_the_api"
+    cleanup_temp_files "$installation_file_for_the_app"
+    cleanup_temp_files "$execution_file_for_the_api"
+    cleanup_temp_files "$execution_file_for_the_app"
 }
 
 monitor_installation_logs() {
@@ -615,20 +619,12 @@ monitor_initial_logs() {
 }
 
 cleanup_temp_files() {
-    local install_file="$1"
-    local run_file="$2"
+    local file="$1"
     
-    print_section "LIMPIANDO ARCHIVOS TEMPORALES"
-    
-    if [ -f "$install_file" ]; then
-        rm -f "$install_file"
-        print_success "Archivo eliminado: $install_file"
-    fi
-    
-    if [ -f "$run_file" ]; then
-        rm -f "$run_file"
-        print_success "Archivo eliminado: $run_file"
-    fi
+    if [ -f "$file" ]; then
+        rm -f "$file"
+        print_success "Archivo eliminado: $file"
+    fi    
 }
 
 show_final_summary() {
@@ -655,8 +651,6 @@ show_final_summary() {
     echo "  sudo docker logs -f ${PROJECT_NAME}_api"
     echo "  sudo docker logs -f ${PROJECT_NAME}_app"
     echo ""
-    echo "Para detener todos los servicios:"
-    echo "  sudo docker-compose -f run_services2.yml down"
 }
 
 # ============================================================================
