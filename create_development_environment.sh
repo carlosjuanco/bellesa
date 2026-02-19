@@ -386,7 +386,7 @@ generate_install_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i \
+    sed -i '' \
         -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
@@ -438,7 +438,7 @@ generate_run_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i \
+    sed -i '' \
         -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
