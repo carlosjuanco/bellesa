@@ -105,6 +105,32 @@ check_docker_auth() {
 }
 
 # ============================================================================
+# VERIFICANDO QUE EXISTE LA IMAGEN juancholll/laravel_api_macos:1.0.0
+# ============================================================================
+
+create_image_if_not_exists() {
+    local IMAGE="${API_IMAGE}"
+    
+    print_section "VERIFICANDO SI LA IMAGEN $IMAGEN EXISTE LOCALMENTE..."
+    
+    if sudo docker image inspect "$IMAGE" >/dev/null 2>&1; then
+        print_success "La imagen $IMAGE ya existe localmente."
+        return 0
+    else
+        print_warning "La imagen $IMAGE no existe localmente."
+        print_info "Construyendo la imagen..."
+        
+        if sudo docker build -t "$IMAGE" .; then
+            print_success "La imagen $IMAGE creada existosamente."
+            return 0
+        else
+            print_error "Error al crear la imagen $IMAGE."
+            return 1
+        fi
+    fi
+}
+
+# ============================================================================
 # FUNCIONES DE UTILIDAD
 # ============================================================================
 
@@ -660,6 +686,11 @@ show_final_summary() {
 main() {
     if ! check_docker_auth; then
         print_error "Problema con autenticación de Docker"
+        exit 1
+    fi
+
+    if ! create_image_if_not_exists; then
+        print_error "Problema al contruir la imagen ${API_IMAGE}"
         exit 1
     fi
 
