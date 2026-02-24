@@ -33,9 +33,9 @@ declare -r DIRECTORIES
 readonly DB_NAME="${PROJECT_NAME}"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
-readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.10"
-readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.10"
-readonly DB_PORT="3307"
+readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.15"
+readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.15"
+readonly DB_PORT="3308"
 
 # Contenedores Docker
 declare -A CONTAINERS=(
@@ -63,6 +63,7 @@ readonly APP_PORT=8086
 readonly APP_PORT_INTERNAL=86
 readonly APP_MOCKUP_PORT=8087
 readonly APP_MOCKUP_PORT_INTERNAL=87
+readonly USER_MANUAL_PORT=4321
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
