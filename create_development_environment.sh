@@ -29,7 +29,7 @@ readonly -A DIRECTORIES=(
 declare -r DIRECTORIES
 
 # Base de datos
-readonly DB_NAME="sdac"
+readonly DB_NAME="${main}"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
 readonly DB_CONTAINER_IP="192.168.20.15"
@@ -390,7 +390,7 @@ generate_install_services_file() {
         -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
-        -e "s|3307:3306|${$DB_PORT}:3306|g" \
+        -e "s|3307:3306|${DB_PORT}:3306|g" \
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" \
         "$dest_file"
     

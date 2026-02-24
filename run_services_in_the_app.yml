@@ -24,7 +24,6 @@ services:
     command: /bin/bash -c "
       cd /home/demo/meca-app && npm run serve -- --port 81 &
       cd /home/demo/mockup && npm run serve -- --port 82 &
-      cd /home/demo/user-manual/former-filament && npm run dev -- --port 4321 &
       wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
