@@ -5,8 +5,8 @@
 # ============================================================================
 
 # Variables principales del proyecto
-readonly PROJECT_NAME="sdac"
-readonly PROJECT_DESCRIPTION="Crear un entorno de desarrollo para el proyecto Iglesia Adventista del Séptimo día."
+readonly PROJECT_NAME="main"
+readonly PROJECT_DESCRIPTION="Base para todos los proyectos."
 readonly OS_VERSION="Sonoma 14.3"
 
 # Rutas del sistema
@@ -25,7 +25,6 @@ readonly -A DIRECTORIES=(
     ["meca_app"]="$BASE_DIR/app/meca-app"
     ["api_mockup"]="$BASE_DIR/api/mockup"
     ["app_mockup"]="$BASE_DIR/app/mockup"
-    ["user_manual"]="$BASE_DIR/app/user-manual"
 )
 declare -r DIRECTORIES
 
@@ -56,7 +55,6 @@ readonly API_MOCKUP_PORT=8083
 readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
 readonly APP_PORT=8084
 readonly APP_MOCKUP_PORT=8085
-readonly USER_MANUAL_PORT=4321
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
@@ -64,11 +62,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
-    ["api_dev"]="${PROJECT_NAME}-dev"
-    ["api_mockup"]="${PROJECT_NAME}-mockup"
-    ["app_dev"]="${PROJECT_NAME}-dev"
-    ["app_mockup"]="${PROJECT_NAME}-mockup"
-    ["app_manual"]="${PROJECT_NAME}-user-manual-with-starlight"
+    ["api_dev"]="${PROJECT_NAME}"
+    ["api_mockup"]="mockup"
+    ["app_dev"]="${PROJECT_NAME}"
+    ["app_mockup"]="mockup"
 )
 
 # ============================================================================
@@ -252,7 +249,6 @@ clone_repositories() {
     # Clonar repositorios de APP
     clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
     clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
-    clone_repo "$REPO_APP" "${DIRECTORIES[user_manual]}" "${GIT_BRANCHES[app_manual]}"
 }
 
 clone_repo() {
@@ -471,7 +467,6 @@ generate_run_services_file() {
         -e "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" \
         -e "s|puertoAfueraAPP1:puertoAdentroAPP1|${APP_PORT}:84|g" \
         -e "s|puertoAfueraAPP2:puertoAdentroAPP2|${APP_MOCKUP_PORT}:85|g" \
-        -e "s|puertoAfueraAPP3:puertoAdentroAPP3|${USER_MANUAL_PORT}:4321|g" \
         -e "s|npm run serve -- --port 81|npm run serve -- --port 84|g" \
         -e "s|npm run serve -- --port 82|npm run serve -- --port 85|g" \
         "$dest_file"
@@ -569,11 +564,9 @@ monitor_installation_logs() {
             
             if grep -q "added 987 packages" <<< "$line"; then
                 ((npm_count++))
-            elif grep -q "added 387 packages" <<< "$line"; then
-                ((npm_count++))
             fi
             
-            if [ "$npm_count" -eq 3 ]; then
+            if [ "$npm_count" -eq 2 ]; then
                 print_success "¡Added packages! APP completada"
                 break
             fi
@@ -667,7 +660,6 @@ show_final_summary() {
     echo "• API Mockup:          http://localhost:$API_MOCKUP_PORT"
     echo "• APP Desarrollo:      http://localhost:$APP_PORT"
     echo "• APP Mockup:          http://localhost:$APP_MOCKUP_PORT"
-    echo "• Manual de usuario:   http://localhost:$USER_MANUAL_PORT"
     echo ""
     echo "CONTENEDORES ACTIVOS:"
     echo "----------------------------------------"
