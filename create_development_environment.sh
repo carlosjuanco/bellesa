@@ -29,10 +29,11 @@ readonly -A DIRECTORIES=(
 declare -r DIRECTORIES
 
 # Base de datos
-readonly DB_NAME="${main}"
+readonly DB_NAME="${PROJECT_NAME}"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
-readonly DB_CONTAINER_IP="192.168.20.15"
+readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.10"
+readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.10"
 readonly DB_PORT="3307"
 
 # Contenedores Docker
@@ -48,14 +49,19 @@ declare -r CONTAINERS
 # Configuración de API
 readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
 readonly API_IMAGE="juancholll/laravel_api_macos:1.0.0"
-readonly API_CONTAINER_IP="192.168.20.18"
+readonly API_CONTAINER_IP="192.168.20.12"
+readonly API_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.11"
 readonly API_PORT=8080
 readonly API_MOCKUP_PORT=8081
 
 # Configuración de APP
 readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
+readonly APP_CONTAINER_IP="192.168.20.14"
+readonly APP_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.13"
 readonly APP_PORT=8082
+readonly APP_PORT_INTERNAL=82
 readonly APP_MOCKUP_PORT=8083
+readonly APP_MOCKUP_PORT_INTERNAL=83
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
@@ -318,7 +324,7 @@ create_api_env_file() {
     cp "$input_file" "$output_file"
     
     sed -i '' \
-        -e "s|DB_HOST=127.0.0.1|DB_HOST=$DB_CONTAINER_IP|g" \
+        -e "s|DB_HOST=127.0.0.1|DB_HOST=$DB_CONTAINER_IP_INTERNAL_NETWORK|g" \
         -e "s|DB_DATABASE=laravel|DB_DATABASE=$db_name|g" \
         -e "s|DB_PASSWORD=|DB_PASSWORD=$DB_ROOT_PASSWORD|g" \
         "$output_file"
@@ -388,10 +394,10 @@ generate_install_services_file() {
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
         -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
-        -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
-        -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
+        -e "s|ipv4_address: 192.168.10.10|ipv4_address: ${DB_CONTAINER_IP_WEB_NETWORK}|g" \
+        -e "s|ipv4_address: 192.168.20.10|ipv4_address: ${DB_CONTAINER_IP_INTERNAL_NETWORK}|g" \
         -e "s|3307:3306|${DB_PORT}:3306|g" \
-        -e "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" \
+        -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${API_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
     
     print_success "Archivo de instalación generado: $dest_file"
@@ -414,7 +420,7 @@ generate_install_services_file() {
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
-        -e "s|ipv4_address: 192.168.20.13|ipv4_address: 192.168.20.17|g" \
+        -e "s|ipv4_address: 192.168.20.13|ipv4_address: ${APP_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
     
     print_success "Archivo de instalación generado: $dest_file"
@@ -465,11 +471,11 @@ generate_run_services_file() {
         -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
-        -e "s|ipv4_address: 192.168.20.14|ipv4_address: 192.168.20.19|g" \
-        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|${APP_PORT}:84|g" \
-        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|${APP_MOCKUP_PORT}:85|g" \
-        -e "s|npm run serve -- --port 81|npm run serve -- --port 84|g" \
-        -e "s|npm run serve -- --port 82|npm run serve -- --port 85|g" \
+        -e "s|ipv4_address: 192.168.20.14|ipv4_address: $APP_CONTAINER_IP|g" \
+        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|$APP_PORT:$APP_PORT_INTERNAL|g" \
+        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|$APP_MOCKUP_PORT:$APP_MOCKUP_PORT_INTERNAL|g" \
+        -e "s|npm run serve -- --port 82|npm run serve -- --port $APP_MOCKUP_PORT_INTERNAL|g" \
+        -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
         "$dest_file"
     
     print_success "Archivo de ejecución generado: $dest_file"
@@ -545,11 +551,16 @@ monitor_installation_logs() {
     if [ "$1" = "API" ]; then
         print_info "Monitoreando instalación de API..."
         
+        npm_count=0
         # Leer línea por línea
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            if grep -q "LinkThedistricUserWithTheVolcanesChurchSeeder.*DONE" <<< "$line"; then
+            if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
+                ((npm_count++))
+            fi
+
+            if [ "$npm_count" -eq 2 ]; then
                 print_success "Instalación de API completada"
                 break
             fi
@@ -623,15 +634,12 @@ monitor_initial_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            # Debe de mostrarse "astro dev --host --port 4321"
-            if grep -q "port.*4321" <<< "$line"; then
+            if grep -q "http://localhost:${APP_PORT_INTERNAL}/" <<< "$line"; then
                 ((npm_count++))
-            elif grep -q "http://localhost:84/" <<< "$line"; then
+            elif grep -q "http://localhost:${APP_MOCKUP_PORT_INTERNAL}/" <<< "$line"; then
                 ((npm_count++))
-            elif grep -q "http://localhost:85/" <<< "$line"; then
-                ((npm_count++))
-            elif [ "$npm_count" -eq 3 ]; then
-                print_success "¡3 Se levantaron los servicios en la APP!"
+            elif [ "$npm_count" -eq 2 ]; then
+                print_success "¡Se levantaron los servicios en la APP!"
                 break
             fi
         done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
