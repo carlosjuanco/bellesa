@@ -33,6 +33,7 @@ readonly DB_NAME="sdac"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
 readonly DB_CONTAINER_IP="192.168.20.15"
+readonly DB_PORT="3307"
 
 # Contenedores Docker
 declare -A CONTAINERS=(
@@ -48,13 +49,13 @@ declare -r CONTAINERS
 readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
 readonly API_IMAGE="juancholll/laravel_api_macos:1.0.0"
 readonly API_CONTAINER_IP="192.168.20.18"
-readonly API_PORT=8082
-readonly API_MOCKUP_PORT=8083
+readonly API_PORT=8080
+readonly API_MOCKUP_PORT=8081
 
 # Configuración de APP
 readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
-readonly APP_PORT=8084
-readonly APP_MOCKUP_PORT=8085
+readonly APP_PORT=8082
+readonly APP_MOCKUP_PORT=8083
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
@@ -389,7 +390,7 @@ generate_install_services_file() {
         -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: 192.168.10.15|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: 192.168.20.15|g" \
-        -e "s|3307:3306|3308:3306|g" \
+        -e "s|3307:3306|${$DB_PORT}:3306|g" \
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: 192.168.20.16|g" \
         "$dest_file"
     
