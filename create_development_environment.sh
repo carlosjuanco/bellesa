@@ -69,10 +69,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
-    ["api_dev"]="${PROJECT_NAME}"
-    ["api_mockup"]="${PROJECT_NAME}-mockup"
-    ["app_dev"]="${PROJECT_NAME}"
-    ["app_mockup"]="${PROJECT_NAME}-mockup"
+    ["api"]="${PROJECT_NAME}"
+    ["api_mockup"]="mockup"
+    ["app"]="${PROJECT_NAME}"
+    ["app_mockup"]="mockup"
 )
 
 # ============================================================================
@@ -250,11 +250,11 @@ clone_repositories() {
     print_section "CLONANDO REPOSITORIOS"
     
     # Clonar repositorios de API
-    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api]}"
     clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
     
     # Clonar repositorios de APP
-    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app]}"
     clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
 }
 
