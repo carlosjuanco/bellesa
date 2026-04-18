@@ -71,8 +71,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
+    ["api"]="${PROJECT_NAME}"
     ["api_dev"]="${PROJECT_NAME}-dev"
     ["api_mockup"]="${PROJECT_NAME}-mockup"
+    ["app"]="${PROJECT_NAME}"
     ["app_dev"]="${PROJECT_NAME}-dev"
     ["app_mockup"]="${PROJECT_NAME}-mockup"
     ["app_manual"]="${PROJECT_NAME}-user-manual-with-starlight"
