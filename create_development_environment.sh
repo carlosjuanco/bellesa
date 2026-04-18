@@ -29,7 +29,7 @@ readonly -A DIRECTORIES=(
 declare -r DIRECTORIES
 
 # Base de datos
-readonly DB_NAME="${PROJECT_NAME}"
+readonly DB_NAME="${PROJECT_NAME}_dev"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
 readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.23"
@@ -70,8 +70,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
     ["api"]="${PROJECT_NAME}"
+    ["api_dev"]="${PROJECT_NAME}-dev"
     ["api_mockup"]="mockup"
     ["app"]="${PROJECT_NAME}"
+    ["app_dev"]="${PROJECT_NAME}-dev"
     ["app_mockup"]="mockup"
 )
 
@@ -250,11 +252,11 @@ clone_repositories() {
     print_section "CLONANDO REPOSITORIOS"
     
     # Clonar repositorios de API
-    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
     clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
     
     # Clonar repositorios de APP
-    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
     clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
 }
 
