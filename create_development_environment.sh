@@ -15,16 +15,24 @@ readonly CURRENT_DIR=$(pwd)
 readonly BASE_DIR="/Users/$CURRENT_USER/Documents/proyecto_$PROJECT_NAME"
 readonly DOCKER_CONFIGURATION_FILE="/Users/${CURRENT_USER}/.docker/config.json"
 
+# Renombrar carpetas repositorio API
+RENAME_API_REPOSITORY_FOLDER=$PROJECT_NAME"-api"
+RENAME_API_REPOSITORY_MOCKUP_FOLDER=$PROJECT_NAME"-mockup-api"
+
+# Renombrar carpetas repositorio APP
+RENAME_APP_REPOSITORY_FOLDER=$PROJECT_NAME"-app"
+RENAME_APP_REPOSITORY_MOCKUP_FOLDER=$PROJECT_NAME"-mockup-app"
+
 # Estructura de carpetas
 readonly -A DIRECTORIES=(
     ["base_dir"]="$BASE_DIR"
     ["bd"]="$BASE_DIR/bd"
     ["api"]="$BASE_DIR/api"
     ["app"]="$BASE_DIR/app"
-    ["zeus_api"]="$BASE_DIR/api/zeus-api"
-    ["meca_app"]="$BASE_DIR/app/meca-app"
-    ["api_mockup"]="$BASE_DIR/api/mockup"
-    ["app_mockup"]="$BASE_DIR/app/mockup"
+    ["zeus_api"]="$BASE_DIR/api/$RENAME_API_REPOSITORY_FOLDER"
+    ["meca_app"]="$BASE_DIR/app/$RENAME_APP_REPOSITORY_FOLDER"
+    ["api_mockup"]="$BASE_DIR/api/$RENAME_API_REPOSITORY_MOCKUP_FOLDER"
+    ["app_mockup"]="$BASE_DIR/app/$RENAME_APP_REPOSITORY_MOCKUP_FOLDER"
 )
 declare -r DIRECTORIES
 
@@ -397,9 +405,11 @@ generate_install_services_file() {
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: ${DB_CONTAINER_IP_WEB_NETWORK}|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: ${DB_CONTAINER_IP_INTERNAL_NETWORK}|g" \
         -e "s|3307:3306|${DB_PORT}:3306|g" \
+        -e "s|/zeus-api|/${RENAME_API_REPOSITORY_FOLDER}|g" \
+        -e "s|/mockup|/${RENAME_API_REPOSITORY_MOCKUP_FOLDER}|g" \
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${API_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
-    
+
     print_success "Archivo de instalación generado: $dest_file"
 
     # Generar archivo de instalación para la APP
@@ -420,6 +430,8 @@ generate_install_services_file() {
         -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
+        -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
+        -e "s|/mockup|/${RENAME_APP_REPOSITORY_MOCKUP_FOLDER}|g" \
         -e "s|ipv4_address: 192.168.20.13|ipv4_address: ${APP_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
     
@@ -448,6 +460,8 @@ generate_run_services_file() {
         -e "s|ipv4_address: 192.168.20.12|ipv4_address: $API_CONTAINER_IP|g" \
         -e "s|puertoAfueraAPI1:puertoAdentroAPI1|${API_PORT}:82|g" \
         -e "s|puertoAfueraAPI2:puertoAdentroAPI2|${API_MOCKUP_PORT}:83|g" \
+        -e "s|/zeus-api|/${RENAME_API_REPOSITORY_FOLDER}|g" \
+        -e "s|/mockup|/${RENAME_API_REPOSITORY_MOCKUP_FOLDER}|g" \
         -e "s|--host=192.168.20.12 --port=80|--host=$API_CONTAINER_IP --port=82|g" \
         -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
         "$dest_file"
@@ -474,6 +488,8 @@ generate_run_services_file() {
         -e "s|ipv4_address: 192.168.20.14|ipv4_address: $APP_CONTAINER_IP|g" \
         -e "s|puertoAfueraAPP1:puertoAdentroAPP1|$APP_PORT:$APP_PORT_INTERNAL|g" \
         -e "s|puertoAfueraAPP2:puertoAdentroAPP2|$APP_MOCKUP_PORT:$APP_MOCKUP_PORT_INTERNAL|g" \
+        -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
+        -e "s|/mockup|/${RENAME_APP_REPOSITORY_MOCKUP_FOLDER}|g" \
         -e "s|npm run serve -- --port 82|npm run serve -- --port $APP_MOCKUP_PORT_INTERNAL|g" \
         -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
         "$dest_file"
