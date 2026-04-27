@@ -26,7 +26,7 @@ services:
         ipv4_address: 192.168.20.11
     hostname: servidor_mariadb    
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/zeus-api:/home/demo  # Mapea el volumen de tu directorio local
+      - /home/juan/Documentos/proyecto_iasd:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "

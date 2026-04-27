@@ -416,26 +416,16 @@ run_services() {
         print_error "Error al iniciar servicios"
         return 1
     fi
-
-    if sudo docker-compose -f "$execution_file_for_the_app" up -d; then
-        print_success "Servicios iniciados"
-        
-        # Monitorear logs iniciales
-        monitor_initial_logs "APP"
-    else
-        print_error "Error al iniciar servicios"
-        return 1
-    fi
     
     # Limpiar archivos temporales
     print_section "LIMPIANDO ARCHIVOS TEMPORALES"
-    cleanup_temp_files "$installation_file_for_the_api"
-    cleanup_temp_files "$execution_file_for_the_api"
+    # cleanup_temp_files "$installation_file_for_the_api"
+    # cleanup_temp_files "$execution_file_for_the_api"
 }
 
 monitor_installation_logs() {
     if [ "$1" = "API" ]; then
-        print_info "Monitoreando instalación de API..."
+        print_info "Monitoreando instalación de FULL STACK..."
         
         npm_count=0
         # Leer línea por línea
@@ -450,25 +440,7 @@ monitor_installation_logs() {
                 print_success "Instalación de API completada"
                 break
             fi
-        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)
-        
-        print_info "Monitoreando instalación de APP..."
-    elif [ "$1" = "APP" ]; then
-        npm_count=0
-
-        # Leer línea por línea
-        while IFS= read -r line; do
-            echo "$line" # Mostrar
-            
-            if grep -q "added 987 packages" <<< "$line"; then
-                ((npm_count++))
-            fi
-            
-            if [ "$npm_count" -eq 2 ]; then
-                print_success "¡Added packages! APP completada"
-                break
-            fi
-        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_app]}" 2>&1)
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)        
     fi
 
 }
@@ -479,12 +451,6 @@ stop_installation_containers() {
         
         print_info "Deteniendo contenedores de instalación..."
         sudo docker stop "$api_install_container"
-        print_success "Contenedores de instalación detenidos"
-    elif [ "$1" = "APP" ]; then
-        local app_install_container="${CONTAINERS[instalar_dependencias_en_app]}"
-        
-        print_info "Deteniendo contenedores de instalación..."
-        sudo docker stop "$app_install_container"
         print_success "Contenedores de instalación detenidos"
     fi
 }
@@ -510,25 +476,6 @@ monitor_initial_logs() {
                 fi
             fi
         done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
-    elif [ "$1" = "APP" ]; then
-        # Mostrar logs iniciales de APP
-        print_section "LOGS INICIALES - APP"
-        # sudo docker logs -f "${APP_CONTAINER_NAME}"
-
-        npm_count=0
-
-        while IFS= read -r line; do
-            echo "$line" # Mostrar
-            
-            if grep -q "http://localhost:${APP_PORT_INTERNAL}/" <<< "$line"; then
-                ((npm_count++))
-            elif grep -q "http://localhost:${APP_MOCKUP_PORT_INTERNAL}/" <<< "$line"; then
-                ((npm_count++))
-            elif [ "$npm_count" -eq 2 ]; then
-                print_success "¡Se levantaron los servicios en la APP!"
-                break
-            fi
-        done < <(sudo docker logs -f "${APP_CONTAINER_NAME}" 2>&1)
     fi
 }
 
