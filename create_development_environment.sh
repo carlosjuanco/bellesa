@@ -317,7 +317,7 @@ generate_install_services_file() {
     # Generar archivo de instalación para la API
 
     local source_file="$CURRENT_DIR/install_dependencies_in_api.yml"
-    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
+    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_fullstack.yml"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -329,44 +329,18 @@ generate_install_services_file() {
     # Reemplazos en el archivo YML
     sed -i '' \
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
-        -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
+        -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_fullstack:|g" \
         -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
-        -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_api]}|g" \
+        -e "s|container_name: instalar_dependencias_en_api|container_name: ${CONTAINERS[instalar_dependencias_en_fullstack]}|g" \
         -e "s|ipv4_address: 192.168.10.10|ipv4_address: ${DB_CONTAINER_IP_WEB_NETWORK}|g" \
         -e "s|ipv4_address: 192.168.20.10|ipv4_address: ${DB_CONTAINER_IP_INTERNAL_NETWORK}|g" \
         -e "s|3307:3306|${DB_PORT}:3306|g" \
-        -e "s|/zeus-api|/${RENAME_API_REPOSITORY_FOLDER}|g" \
-        -e "s|/mockup|/${RENAME_API_REPOSITORY_MOCKUP_FOLDER}|g" \
-        -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${API_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
+        -e "s|/zeus-api|/${RENAME_FULLSTACK_REPOSITORY_FOLDER}|g" \
+        -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${FULLSTACK_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
 
-    print_success "Archivo de instalación generado: $dest_file"
-
-    # Generar archivo de instalación para la APP
-
-    source_file="$CURRENT_DIR/install_dependencies_in_app.yml"
-    dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
-    
-    if [ ! -f "$source_file" ]; then
-        print_error "Archivo fuente no encontrado: $source_file"
-        return 1
-    fi
-    
-    cp "$source_file" "$dest_file"
-    
-    # Reemplazos en el archivo YML
-    sed -i '' \
-        -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
-        -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
-        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
-        -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
-        -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
-        -e "s|/mockup|/${RENAME_APP_REPOSITORY_MOCKUP_FOLDER}|g" \
-        -e "s|ipv4_address: 192.168.20.13|ipv4_address: ${APP_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
-        "$dest_file"
-    
     print_success "Archivo de instalación generado: $dest_file"
 }
 
@@ -374,7 +348,7 @@ generate_run_services_file() {
     # Generar archivo de ejecución para la API
 
     local source_file="$CURRENT_DIR/run_services_in_the_api.yml"
-    local dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
+    local dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_fullstack.yml"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -387,43 +361,12 @@ generate_run_services_file() {
     sed -i '' \
         -e "s|iasd_api:|${PROJECT_NAME}_api:|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
-        -e "s|container_name: iasd_api|container_name: $API_CONTAINER_NAME|g" \
+        -e "s|container_name: iasd_api|container_name: $FULLSTACK_CONTAINER_NAME|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
-        -e "s|ipv4_address: 192.168.20.12|ipv4_address: $API_CONTAINER_IP|g" \
-        -e "s|puertoAfueraAPI1:puertoAdentroAPI1|${API_PORT}:82|g" \
-        -e "s|puertoAfueraAPI2:puertoAdentroAPI2|${API_MOCKUP_PORT}:83|g" \
-        -e "s|/zeus-api|/${RENAME_API_REPOSITORY_FOLDER}|g" \
-        -e "s|/mockup|/${RENAME_API_REPOSITORY_MOCKUP_FOLDER}|g" \
-        -e "s|--host=192.168.20.12 --port=80|--host=$API_CONTAINER_IP --port=82|g" \
-        -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
-        "$dest_file"
-    
-    print_success "Archivo de ejecución generado: $dest_file"
-
-    # Generar archivo de ejecución para la APP
-
-    source_file="$CURRENT_DIR/run_services_in_the_app.yml"
-    dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
-    
-    if [ ! -f "$source_file" ]; then
-        print_error "Archivo fuente no encontrado: $source_file"
-        return 1
-    fi
-    
-    cp "$source_file" "$dest_file"
-    
-    # Reemplazos en el archivo YML
-    sed -i '' \
-        -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
-        -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
-        -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
-        -e "s|ipv4_address: 192.168.20.14|ipv4_address: $APP_CONTAINER_IP|g" \
-        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|$APP_PORT:$APP_PORT_INTERNAL|g" \
-        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|$APP_MOCKUP_PORT:$APP_MOCKUP_PORT_INTERNAL|g" \
-        -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
-        -e "s|/mockup|/${RENAME_APP_REPOSITORY_MOCKUP_FOLDER}|g" \
-        -e "s|npm run serve -- --port 82|npm run serve -- --port $APP_MOCKUP_PORT_INTERNAL|g" \
-        -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
+        -e "s|ipv4_address: 192.168.20.12|ipv4_address: $FULLSTACK_CONTAINER_IP|g" \
+        -e "s|puertoAfueraAPI1:puertoAdentroAPI1|${FULLSTACK_PORT}:82|g" \
+        -e "s|/zeus-api|/${RENAME_FULLSTACK_REPOSITORY_FOLDER}|g" \
+        -e "s|--host=192.168.20.12 --port=80|--host=$FULLSTACK_CONTAINER_IP --port=82|g" \
         "$dest_file"
     
     print_success "Archivo de ejecución generado: $dest_file"
@@ -432,34 +375,19 @@ generate_run_services_file() {
 run_services() {
     print_section "INSTALANDO Y EJECUTANDO SERVICIOS"
     
-    local installation_file_for_the_app="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_app.yml"
-    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
-    local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
-    local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
+    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_fullstack.yml"
+    local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_fullstack.yml"
     
     # Instalar dependencias
     
     if sudo docker-compose -f "$installation_file_for_the_api" up -d; then
-        print_success "Servicios instalados en la API"
+        print_success "Servicios instalados en la Full Stack"
         
         # Monitorear logs de instalación
         monitor_installation_logs "API"
         
         # Detener contenedores de instalación
         stop_installation_containers "API"
-    else
-        print_error "Error al instalar servicios"
-        return 1
-    fi
-
-    if sudo docker-compose -f "$installation_file_for_the_app" up -d; then
-        print_success "Servicios instalados en la APP"
-        
-        # Monitorear logs de instalación
-        monitor_installation_logs "APP"
-        
-        # Detener contenedores de instalación
-        stop_installation_containers "APP"
     else
         print_error "Error al instalar servicios"
         return 1
@@ -490,9 +418,7 @@ run_services() {
     # Limpiar archivos temporales
     print_section "LIMPIANDO ARCHIVOS TEMPORALES"
     cleanup_temp_files "$installation_file_for_the_api"
-    cleanup_temp_files "$installation_file_for_the_app"
     cleanup_temp_files "$execution_file_for_the_api"
-    cleanup_temp_files "$execution_file_for_the_app"
 }
 
 monitor_installation_logs() {

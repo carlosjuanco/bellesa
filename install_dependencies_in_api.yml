@@ -13,10 +13,10 @@ services:
         ipv4_address: 192.168.20.10
     hostname: servidor_web
     ports:
-      - "3306:3309"
+      - "3307:3306"
     volumes:
       - /home/juan/Documentos/proyecto_iasd/bd:/var/lib/mysql
-      - /home/juan/Documentos/proyecto_iasd/filament-fullstack/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /home/juan/Documentos/proyecto_iasd/zeus-api/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
   instalar_dependencias_en_api:
     image: juancholll/laravel_api  # La imagen que se va a utilizar
@@ -26,7 +26,7 @@ services:
         ipv4_address: 192.168.20.11
     hostname: servidor_mariadb    
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/filament-fullstack:/home/demo  # Mapea el volumen de tu directorio local
+      - /home/juan/Documentos/proyecto_iasd/zeus-api:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "

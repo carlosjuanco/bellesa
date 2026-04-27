@@ -9,14 +9,12 @@ services:
     hostname: servidor_mariadb
     ports:
       - "puertoAfueraAPI1:puertoAdentroAPI1"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
-      - "puertoAfueraAPI2:puertoAdentroAPI2"
     volumes:
-      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
+      - /home/juan/Documentos/proyecto_iasd:/home/demo  # Mapea el volumen de tu directorio local
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "
       cd /home/demo/zeus-api && php artisan serve --host=192.168.20.12 --port=80 &
-      cd /home/demo/mockup && php artisan serve --host=192.168.20.12 --port=81 &
       wait &&
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
