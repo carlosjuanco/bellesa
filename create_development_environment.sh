@@ -29,8 +29,8 @@ declare -r DIRECTORIES
 # Base de datos
 readonly DB_NAME="${PROJECT_NAME}_dev"
 readonly DB_ROOT_PASSWORD="juan"
-readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.10"
-readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.10"
+readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.20"
+readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.20"
 readonly DB_PORT="3309"
 
 # Contenedores Docker
@@ -41,7 +41,7 @@ declare -A CONTAINERS=(
 )
 declare -r CONTAINERS
 
-# Configuración de API
+# Configuración de FULL STACK
 readonly FULLSTACK_CONTAINER_NAME="${CONTAINERS[fullstack]}"
 readonly FULLSTACK_IMAGE="juancholll/laravel_api_macos:1.0.0"
 readonly FULLSTACK_CONTAINER_IP="192.168.20.22"
@@ -55,6 +55,18 @@ readonly REPO_FULLSTACK="https://github.com/carlosjuanco/laravelwithfilament.git
 declare -A GIT_BRANCHES=(
     ["fullstack"]="main"
 )
+
+declare -r GIT_BRANCHES
+
+declare -A YAML_FILENAMES=(
+    # Archivos yaml para instalar
+    ["source_file_install_dependencies_in_api"]="$CURRENT_DIR/install_dependencies_in_api.yml"
+    ["dest_file_install_dependencies_in_fullstack"]="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_fullstack.yml"
+    # Archivos yaml para correr
+    ["source_file_run_services_in_the_api"]="$CURRENT_DIR/run_services_in_the_api.yml"
+    ["dest_file_run_services_in_the_fullstack"]="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_fullstack.yml"
+)
+declare -r YAML_FILENAMES
 
 # ============================================================================
 # VERIFICANDO AUTENTICACIÓN DE DOCKER
@@ -316,8 +328,8 @@ generate_docker_compose_files() {
 generate_install_services_file() {
     # Generar archivo de instalación para la API
 
-    local source_file="$CURRENT_DIR/install_dependencies_in_api.yml"
-    local dest_file="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_fullstack.yml"
+    local source_file="${YAML_FILENAMES[source_file_install_dependencies_in_api]}"
+    local dest_file="${YAML_FILENAMES[dest_file_install_dependencies_in_fullstack]}"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -347,8 +359,8 @@ generate_install_services_file() {
 generate_run_services_file() {
     # Generar archivo de ejecución para la API
 
-    local source_file="$CURRENT_DIR/run_services_in_the_api.yml"
-    local dest_file="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_fullstack.yml"
+    local source_file="${YAML_FILENAMES[source_file_run_services_in_the_api]}"
+    local dest_file="${YAML_FILENAMES[dest_file_run_services_in_the_fullstack]}"
     
     if [ ! -f "$source_file" ]; then
         print_error "Archivo fuente no encontrado: $source_file"
@@ -375,8 +387,8 @@ generate_run_services_file() {
 run_services() {
     print_section "INSTALANDO Y EJECUTANDO SERVICIOS"
     
-    local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_fullstack.yml"
-    local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_fullstack.yml"
+    local installation_file_for_the_api="${YAML_FILENAMES[dest_file_install_dependencies_in_fullstack]}"
+    local execution_file_for_the_api="${YAML_FILENAMES[dest_file_run_services_in_the_fullstack]}"
     
     # Instalar dependencias
     
