@@ -43,7 +43,7 @@ declare -r CONTAINERS
 
 # Configuración de FULL STACK
 readonly FULLSTACK_CONTAINER_NAME="${CONTAINERS[fullstack]}"
-readonly API_IMAGE="juancholll/laravel_api_macos:1.0.0"
+readonly API_IMAGE="juancholll/laravel_fullstack_macos:1.0.0"
 readonly FULLSTACK_CONTAINER_IP="192.168.20.22"
 readonly FULLSTACK_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.21"
 readonly FULLSTACK_PORT=8088
