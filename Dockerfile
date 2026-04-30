@@ -33,10 +33,10 @@ RUN wget https://www.php.net/distributions/php-8.1.28.tar.gz && \
         --with-pdo-mysql \
         --with-pdo-mysql=mysqlnd \
         --with-openssl \
-        --enable-mbstring && \
-        --with-gmp && \
-        --enable-ftp && \
-        --enable-intl && \
+        --enable-mbstring \
+        --with-gmp \
+        --enable-ftp \
+        --enable-intl \
         --with-zip && \
     make && \
     make install && \
@@ -46,7 +46,7 @@ RUN wget https://www.php.net/distributions/php-8.1.28.tar.gz && \
 
 # Instalar Composer 2.5.8
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
+    php -r "if (hash_file('sha384', 'composer-setup.php') === 'c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
     php composer-setup.php --version=2.5.8 && \
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer

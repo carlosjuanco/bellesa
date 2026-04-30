@@ -419,8 +419,8 @@ run_services() {
     
     # Limpiar archivos temporales
     print_section "LIMPIANDO ARCHIVOS TEMPORALES"
-    # cleanup_temp_files "$installation_file_for_the_api"
-    # cleanup_temp_files "$execution_file_for_the_api"
+    cleanup_temp_files "$installation_file_for_the_api"
+    cleanup_temp_files "$execution_file_for_the_api"
 }
 
 monitor_installation_logs() {
@@ -432,22 +432,22 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
+            if grep -q "2019_12_14_000001_create_personal_access_tokens_table.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
 
-            if [ "$npm_count" -eq 2 ]; then
-                print_success "Instalación de API completada"
+            if [ "$npm_count" -eq 1 ]; then
+                print_success "Instalación de FULL STACK completada"
                 break
             fi
-        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_api]}" 2>&1)        
+        done < <(sudo docker logs -f "${CONTAINERS[instalar_dependencias_en_fullstack]}" 2>&1)        
     fi
 
 }
 
 stop_installation_containers() {
     if [ "$1" = "API" ]; then
-        local api_install_container="${CONTAINERS[instalar_dependencias_en_api]}"
+        local api_install_container="${CONTAINERS[instalar_dependencias_en_fullstack]}"
         
         print_info "Deteniendo contenedores de instalación..."
         sudo docker stop "$api_install_container"
@@ -459,8 +459,8 @@ monitor_initial_logs() {
     if [ "$1" = "API" ]; then
         print_info "Monitoreando inicio de servicios..."
         
-        # Mostrar logs iniciales de API
-        print_section "LOGS INICIALES - API"
+        # Mostrar logs iniciales de FULL STACK
+        print_section "LOGS INICIALES - FULL STACK"
 
         npm_count=0
 
@@ -469,13 +469,13 @@ monitor_initial_logs() {
             
             if grep -q "Press.*Ctrl+C to stop the server" <<< "$line"; then
                 ((npm_count++))
-                if [ "$npm_count" -eq 2 ]; then
+                if [ "$npm_count" -eq 1 ]; then
                     print_success "¡2 Press Ctrl+C to stop the server encontrados!"
-                    print_success "¡Servicios de la API levantados!"
+                    print_success "¡Servicios de la FULL STACK levantados!"
                     break
                 fi
             fi
-        done < <(sudo docker logs -f "${API_CONTAINER_NAME}" 2>&1)
+        done < <(sudo docker logs -f "${FULLSTACK_CONTAINER_NAME}" 2>&1)
     fi
 }
 
@@ -498,18 +498,14 @@ show_final_summary() {
     echo ""
     echo "SERVICIOS DISPONIBLES:"
     echo "----------------------------------------"
-    echo "• API Desarrollo:      http://localhost:$API_PORT"
-    echo "• API Mockup:          http://localhost:$API_MOCKUP_PORT"
-    echo "• APP Desarrollo:      http://localhost:$APP_PORT"
-    echo "• APP Mockup:          http://localhost:$APP_MOCKUP_PORT"
+    echo "• FULL STACK Desarrollo:      http://localhost:$FULLSTACK_PORT"
     echo ""
     echo "CONTENEDORES ACTIVOS:"
     echo "----------------------------------------"
     sudo docker ps --filter "name=$PROJECT_NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
     echo ""
     echo "Para ver los logs en tiempo real:"
-    echo "  sudo docker logs -f ${PROJECT_NAME}_api"
-    echo "  sudo docker logs -f ${PROJECT_NAME}_app"
+    echo "  sudo docker logs -f ${PROJECT_NAME}_fullstack"
     echo ""
 }
 
