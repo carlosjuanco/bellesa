@@ -53,7 +53,7 @@ readonly REPO_FULLSTACK="https://github.com/carlosjuanco/laravelwithfilament.git
 
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
-    ["fullstack"]="main"
+    ["fullstack"]="dev"
 )
 
 declare -r GIT_BRANCHES
@@ -432,7 +432,7 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            if grep -q "2019_12_14_000001_create_personal_access_tokens_table.*DONE" <<< "$line"; then
+            if grep -q "UserSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
 
