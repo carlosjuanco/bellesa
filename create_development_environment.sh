@@ -574,7 +574,13 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
+            // Para la instalación en la maqueta
             if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
+                ((npm_count++))
+            fi
+
+            // Para la instalacion en DEV
+            if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
 
