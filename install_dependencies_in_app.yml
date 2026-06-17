@@ -20,7 +20,6 @@ services:
     command: /bin/bash -c "
       cd /home/demo/meca-app && npm ci &
       cd /home/demo/mockup && npm ci &
-      cd /home/demo/user-manual/former-filament && npm install &
       /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
 networks:
     red_web:

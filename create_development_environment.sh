@@ -5,7 +5,7 @@
 # ============================================================================
 
 # Variables principales del proyecto
-readonly PROJECT_NAME="sdac"
+readonly PROJECT_NAME="main"
 readonly PROJECT_DESCRIPTION="Base para todos los proyectos"
 readonly OS_VERSION="Debian: 12.7"
 
