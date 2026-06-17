@@ -1,0 +1,30 @@
+
+services:
+  iasd_api:
+    image: juancholll/laravel_api  # La imagen que se va a utilizar
+    container_name: iasd_api  # Nombre del contenedor
+    networks:
+      red_interna:
+        ipv4_address: 192.168.20.12
+    hostname: servidor_mariadb
+    ports:
+      - "puertoAfueraAPI1:puertoAdentroAPI1"  # Mapea el puerto 8080 del host al puerto 80 del contenedor
+      - "puertoAfueraAPI2:puertoAdentroAPI2"
+    volumes:
+      - /home/juan/Documentos/proyecto_iasd/api:/home/demo  # Mapea el volumen de tu directorio local
+    stdin_open: true  # Mantiene abierto el stdin
+    tty: true  # Habilita una terminal interactiva
+    command: /bin/bash -c "
+      cd /home/demo/zeus-api && php artisan serve --host=192.168.20.12 --port=80 &
+      cd /home/demo/mockup && php artisan serve --host=192.168.20.12 --port=81 &
+      wait &&
+      /bin/bash"  # Ejecuta la secuencia de comandos al iniciar el contenedor
+networks:
+    red_web:
+        ipam:
+            config:
+              - subnet: 192.168.10.0/24
+    red_interna:
+        ipam:
+            config:
+              - subnet: 192.168.20.0/24
