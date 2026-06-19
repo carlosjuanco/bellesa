@@ -5,7 +5,9 @@
 # ============================================================================
 
 # Variables principales del proyecto
-readonly PROJECT_NAME="filament"
+readonly PROJECT_NAME="filament" 
+# Debio de ser main el nombre del proyecto, pero ya existe ese nombre para
+# administrar el proyecto de zeus-api y meca-api.
 readonly PROJECT_DESCRIPTION="Base de filament para los siguientes proyecto."
 readonly OS_VERSION="Sonoma 14.3"
 
