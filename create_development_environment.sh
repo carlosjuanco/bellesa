@@ -397,9 +397,13 @@ generate_install_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
+
+    # La variable ${CONTAINERS[instalar_dependencias_en_api]}, se pone dos veces, pero
+    # uno es el nombre del servicio en docker compose y el segundo es el nombre del 
+    # contenedor, pero ambos tienen el mismo nombre
     sed -i '' \
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
-        -e "s|instalar_dependencias_en_api:|${PROJECT_NAME}_instalar_dependencias_en_api:|g" \
+        -e "s|instalar_dependencias_en_api:|${CONTAINERS[instalar_dependencias_en_api]}:|g" \
         -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
@@ -427,9 +431,13 @@ generate_install_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
+
+    # La variable ${CONTAINERS[instalar_dependencias_en_app]}, se pone dos veces, pero
+    # uno es el nombre del servicio en docker compose y el segundo es el nombre del 
+    # contenedor, pero ambos tienen el mismo nombre
     sed -i '' \
         -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
-        -e "s|instalar_dependencias_en_app:|${PROJECT_NAME}_instalar_dependencias_en_app:|g" \
+        -e "s|instalar_dependencias_en_app:|${CONTAINERS[instalar_dependencias_en_app]}:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: instalar_dependencias_en_app|container_name: ${CONTAINERS[instalar_dependencias_en_app]}|g" \
         -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
