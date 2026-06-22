@@ -494,12 +494,12 @@ generate_run_services_file() {
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
         -e "s|ipv4_address: 192.168.20.14|ipv4_address: $APP_CONTAINER_IP|g" \
-        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|${APP_PORT}:$APP_PORT_INTERNAL|g" \
-        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|${APP_MOCKUP_PORT}:$APP_MOCKUP_PORT_INTERNAL|g" \
+        -e "s|puertoAfueraAPP1:puertoAdentroAPP1|$APP_PORT:$APP_PORT_INTERNAL|g" \
+        -e "s|puertoAfueraAPP2:puertoAdentroAPP2|$APP_MOCKUP_PORT:$APP_MOCKUP_PORT_INTERNAL|g" \
         -e "s|/meca-app|/${RENAME_APP_REPOSITORY_FOLDER}|g" \
         -e "s|/mockup|/${RENAME_APP_REPOSITORY_MOCKUP_FOLDER}|g" \
-        -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_MOCKUP_PORT_INTERNAL|g" \
-        -e "s|npm run serve -- --port 82|npm run serve -- --port $APP_PORT_INTERNAL|g" \
+        -e "s|npm run serve -- --port 82|npm run serve -- --port $APP_MOCKUP_PORT_INTERNAL|g" \
+        -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
         "$dest_file"
     
     print_success "Archivo de ejecución generado: $dest_file"
