@@ -5,10 +5,10 @@
 # ============================================================================
 
 # Variables principales del proyecto
-readonly PROJECT_NAME="filament" 
+readonly PROJECT_NAME="aog" 
 # Debio de ser main el nombre del proyecto, pero ya existe ese nombre para
 # administrar el proyecto de zeus-api y meca-api.
-readonly PROJECT_DESCRIPTION="Base de filament para los siguientes proyecto."
+readonly PROJECT_DESCRIPTION="Mi motivación principal para desarrollar este proyecto en laravel con “filament”, es registrar los gastos que hace mi jefa."
 readonly OS_VERSION="Sonoma 14.3"
 
 # Rutas del sistema
@@ -31,9 +31,9 @@ declare -r DIRECTORIES
 # Base de datos
 readonly DB_NAME="${PROJECT_NAME}_dev"
 readonly DB_ROOT_PASSWORD="juan"
-readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.20"
-readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.20"
-readonly DB_PORT="3309"
+readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.28"
+readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.28"
+readonly DB_PORT="3311"
 
 # Contenedores Docker
 declare -A CONTAINERS=(
@@ -46,16 +46,16 @@ declare -r CONTAINERS
 # Configuración de FULL STACK
 readonly FULLSTACK_CONTAINER_NAME="${CONTAINERS[fullstack]}"
 readonly API_IMAGE="juancholll/laravel_fullstack_macos:1.0.0"
-readonly FULLSTACK_CONTAINER_IP="192.168.20.22"
-readonly FULLSTACK_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.21"
-readonly FULLSTACK_PORT=8088
+readonly FULLSTACK_CONTAINER_IP="192.168.20.30"
+readonly FULLSTACK_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.29"
+readonly FULLSTACK_PORT=8093
 
 # Repositorios Git
 readonly REPO_FULLSTACK="https://github.com/carlosjuanco/laravelwithfilament.git"
 
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
-    ["fullstack"]="dev"
+    ["fullstack"]="${PROJECT_NAME}-dev"
 )
 
 declare -r GIT_BRANCHES
