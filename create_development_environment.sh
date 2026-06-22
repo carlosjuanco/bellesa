@@ -5,8 +5,8 @@
 # ============================================================================
 
 # Variables principales del proyecto
-readonly PROJECT_NAME="main"
-readonly PROJECT_DESCRIPTION="Base para todos los proyectos"
+readonly PROJECT_NAME="ss0"
+readonly PROJECT_DESCRIPTION="Crear un entorno de desarrollo para el proyecto Supervisión Escolar 077."
 readonly OS_VERSION="Debian: 12.7"
 
 # Rutas del sistema
@@ -37,12 +37,12 @@ readonly -A DIRECTORIES=(
 declare -r DIRECTORIES
 
 # Base de datos
-readonly DB_NAME="${PROJECT_NAME}"
+readonly DB_NAME="${PROJECT_NAME}_dev"
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD="juan"
-readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.10"
-readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.10"
-readonly DB_PORT="3307"
+readonly DB_CONTAINER_IP_WEB_NETWORK="192.168.10.23"
+readonly DB_CONTAINER_IP_INTERNAL_NETWORK="192.168.20.23"
+readonly DB_PORT="3310"
 
 # Contenedores Docker
 declare -A CONTAINERS=(
@@ -57,19 +57,19 @@ declare -r CONTAINERS
 # Configuración de API
 readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
 readonly API_IMAGE="juancholll/laravel_api_debian:1.0.0"
-readonly API_CONTAINER_IP="192.168.20.12"
-readonly API_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.11"
-readonly API_PORT=8080
-readonly API_MOCKUP_PORT=8081
+readonly API_CONTAINER_IP="192.168.20.26"
+readonly API_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.24"
+readonly API_PORT=8088
+readonly API_MOCKUP_PORT=8089
 
 # Configuración de APP
 readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
-readonly APP_CONTAINER_IP="192.168.20.14"
-readonly APP_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.13"
-readonly APP_PORT=8082
-readonly APP_PORT_INTERNAL=82
-readonly APP_MOCKUP_PORT=8083
-readonly APP_MOCKUP_PORT_INTERNAL=83
+readonly APP_CONTAINER_IP="192.168.20.27"
+readonly APP_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.25"
+readonly APP_PORT=8090
+readonly APP_PORT_INTERNAL=90
+readonly APP_MOCKUP_PORT=8091
+readonly APP_MOCKUP_PORT_INTERNAL=91
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
@@ -78,8 +78,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 # Ramas Git por entorno
 declare -A GIT_BRANCHES=(
     ["api"]="${PROJECT_NAME}"
+    ["api_dev"]="${PROJECT_NAME}-dev"
     ["api_mockup"]="mockup"
     ["app"]="${PROJECT_NAME}"
+    ["app_dev"]="${PROJECT_NAME}-dev"
     ["app_mockup"]="mockup"
 )
 
@@ -258,11 +260,11 @@ clone_repositories() {
     print_section "CLONANDO REPOSITORIOS"
     
     # Clonar repositorios de API
-    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api]}"
+    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
     clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
     
     # Clonar repositorios de APP
-    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app]}"
+    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
     clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
 }
 
@@ -580,7 +582,13 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
+            // Para la instalación en la maqueta
             if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
+                ((npm_count++))
+            fi
+
+            // Para la instalacion en DEV
+            if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
 
