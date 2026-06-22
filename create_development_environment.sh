@@ -79,10 +79,10 @@ readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 declare -A GIT_BRANCHES=(
     ["api"]="${PROJECT_NAME}"
     ["api_dev"]="${PROJECT_NAME}-dev"
-    ["api_mockup"]="mockup"
+    ["api_mockup"]="${PROJECT_NAME}-mockup"
     ["app"]="${PROJECT_NAME}"
     ["app_dev"]="${PROJECT_NAME}-dev"
-    ["app_mockup"]="mockup"
+    ["app_mockup"]="${PROJECT_NAME}-mockup"
 )
 
 # ============================================================================
@@ -582,12 +582,12 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            // Para la instalación en la maqueta
+            # Para la instalación en la maqueta
             if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
 
-            // Para la instalacion en DEV
+            # Para la instalacion en DEV
             if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
