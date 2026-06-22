@@ -59,17 +59,17 @@ readonly API_CONTAINER_NAME="${CONTAINERS[api]}"
 readonly API_IMAGE="juancholll/laravel_api_debian:1.0.0"
 readonly API_CONTAINER_IP="192.168.20.26"
 readonly API_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.24"
-readonly API_PORT=8088
-readonly API_MOCKUP_PORT=8089
+readonly API_PORT=8089
+readonly API_MOCKUP_PORT=8090
 
 # Configuración de APP
 readonly APP_CONTAINER_NAME="${CONTAINERS[app]}"
 readonly APP_CONTAINER_IP="192.168.20.27"
 readonly APP_CONTAINER_INSTALL_DEPENDENCIES_IP="192.168.20.25"
-readonly APP_PORT=8090
-readonly APP_PORT_INTERNAL=90
-readonly APP_MOCKUP_PORT=8091
-readonly APP_MOCKUP_PORT_INTERNAL=91
+readonly APP_PORT=8091
+readonly APP_PORT_INTERNAL=91
+readonly APP_MOCKUP_PORT=8092
+readonly APP_MOCKUP_PORT_INTERNAL=92
 
 # Repositorios Git
 readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
