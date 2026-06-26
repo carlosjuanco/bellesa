@@ -111,7 +111,7 @@ check_docker() {
         DOCKER_VERSION=$(docker --version | cut -d ' ' -f3 | sed 's/,//')
         print_success "Docker ya está instalado: $DOCKER_VERSION"
 
-        if ["$OS_TYPE" == "linux"]; then 
+        if [["$OS_TYPE" == "linux"]]; then 
             print_info "¿Deseas desinstalar Docker?"
             read -p "Ingrese si o no: " UNINSTALL_DOCKER
             
