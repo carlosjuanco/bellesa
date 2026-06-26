@@ -101,7 +101,7 @@ EXPLICACION_UNAME
 }
 
 # =============================================================================
-# 2. VERIFICAR/INSTALAR DOCKER
+# 2. VERIFICAR/INSTALAR DOCKER/DESINSTALAR DOCKER
 # =============================================================================
 
 check_docker() {
@@ -110,10 +110,30 @@ check_docker() {
     if command -v docker &> /dev/null; then
         DOCKER_VERSION=$(docker --version | cut -d ' ' -f3 | sed 's/,//')
         print_success "Docker ya está instalado: $DOCKER_VERSION"
+
+        if "$OS_TYPE" == "linux" &> /dev/null; then 
+            print_info "¿Deseas desinstalar Docker?"
+            read -p "Ingrese si o no: " UNINSTALL_DOCKER
+            
+            case $UNINSTALL_DOCKER in
+                si)
+                    uninstall_docker
+                    check_docker
+                    ;;
+            esac
+        fi
+
         return 0
     else
         print_warning "Docker no está instalado"
-        install_docker
+        if "$OS_TYPE" == "linux" &> /dev/null; then 
+            install_docker
+            exit 0
+        elif "$OS_TYPE" == "macOS" &> /dev/null; then
+            print_warning "Tienes que instalarlo desde la página oficial"
+            print_warning "Es el único sistema operativo que funciona bien su versión de escritorio"
+            exit 1
+        fi
     fi
 }
 
@@ -153,6 +173,46 @@ install_docker() {
         print_success "Docker instalado correctamente: $DOCKER_VERSION"
     else
         print_error "Fallo en la instalación de Docker"
+        exit 1
+    fi
+}
+
+uninstall_docker() {
+    # Desinstalar docker solo funciona en ambientes Linux.
+    # Solo en debian he probado la desinstalación de docker.
+
+    print_info "1.- Detén todos los contenedores y servicios"
+
+    sudo systemctl stop docker
+    sudo systemctl stop docker.socket
+
+    print_info "2.- Elimina los paquetes de Docker"
+    
+    sudo apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt purge docker.io docker-compose docker-compose-v2
+
+    print_info "3.- Elimina también dependencias no usadas"
+
+    sudo apt autoremove -y
+    sudo apt autoclean
+
+    print_info "4.- Limpia todos los datos de Docker"
+
+    sudo rm -rf /var/lib/docker
+    sudo rm -rf /var/lib/containerd
+    sudo rm -rf /etc/docker
+    sudo rm -rf /run/docker
+    sudo rm -rf /var/run/docker.sock
+
+    print_info "5.- Verifica que se desinstaló correctamente"
+    
+    # Al ejecutar sudo docker --version, deberia regresar "command not found"
+    # Es decir hubo un error
+    if sudo docker --version 2>/dev/null; then 
+        print_info "Docker desinstalado correctamente"
+        exit 0
+    else
+        print_warning "Algo paso en la desinstalación de docker"
         exit 1
     fi
 }
