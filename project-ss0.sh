@@ -430,6 +430,10 @@ deploy_bash_file() {
             # Construir el comando sed
             SED_CMD="sed $SED_INLINE"
 
+            # Observaciones
+            # Para sustituir {{VERIFY_THAT_THE_CREDENTIALS_ARE_VALID}}, debio ser
+            # {{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}, pero por alguna razon no
+            # lo sustituye correctamente.
             $SED_CMD \
                 -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
                 -e "s|{{ PROJECT_DESCRIPTION }}|'$PROJECT_DESCRIPTION'|g" \
