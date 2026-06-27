@@ -133,7 +133,6 @@ check_docker() {
         print_warning "Docker no está instalado"
         if [[ "$OS_TYPE" == "linux" ]]; then 
             install_docker
-            exit 0
         elif [[ "$OS_TYPE" == "macOS" ]]; then
             print_warning "Tienes que instalarlo desde la página oficial"
             print_warning "Es el único sistema operativo que funciona bien su versión de escritorio"
@@ -221,10 +220,8 @@ uninstall_docker() {
     # > /dev/null 2>&1  Redirige stdout y stderr a /dev/null    ✅ Correcto (tradicional)
     if command -v docker &> /dev/null; then 
         print_warning "Algo paso en la desinstalación de docker"
-        exit 1
     else
         print_info "Docker desinstalado correctamente"
-        exit 0
     fi
 }
 
