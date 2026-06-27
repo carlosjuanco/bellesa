@@ -213,7 +213,13 @@ uninstall_docker() {
     
     # Al ejecutar sudo docker --version, deberia regresar "command not found"
     # Es decir hubo un error
-    if command -v docker &> /dev/null; then 
+
+    # Sintaxis          Significado                             ¿Es correcto?
+    # 2> /dev/null    Redirige el stderr (error 2) a /dev/null    ✅ Correcto
+    # 2&> /dev/null   ❌ Sintaxis incorrecta                     ❌ Error
+    # &> /dev/null      Redirige stdout y stderr a /dev/null    ✅ Correcto (más simple)
+    # > /dev/null 2>&1  Redirige stdout y stderr a /dev/null    ✅ Correcto (tradicional)
+    if command -v docker 2> /dev/null; then 
         print_info "Docker desinstalado correctamente"
         exit 0
     else
