@@ -267,37 +267,37 @@ ip_control_in_containers() {
     # Descripción del proyecto
     PROJECT_DESCRIPTION="Sistema web para la supervisión escolar 077"
 
-    # IP para el contenedor de la base de datos, red interna
-    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="192.168.10.10"
     # IP para el contenedor de la base de datos, red pública
-    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="192.168.20.10"
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="192.168.10.23"
+    # IP para el contenedor de la base de datos, red interna
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="192.168.20.23"
     # Puerto afuera del contenedor de la base de datos
-    PORT_OUTSIDE_THE_DATABASE_CONTAINER="3307"
+    PORT_OUTSIDE_THE_DATABASE_CONTAINER="3310"
     # IP del contenedor instalar dependencias en api
-    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="192.168.20.11"
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="192.168.20.24"
     # IP del contenedor instalar dependencias en app
-    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="192.168.20.12"
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="192.168.20.25"
     # IP del contenedor API para DEV
-    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="192.168.20.13"
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="192.168.20.26"
     # IP del contenedor API para la maqueta
-    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="192.168.20.13"
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="192.168.20.26"
     # Puerto afuera del contenedor API para DEV
-    PORT_OUTSIDE_CONTAINER_API_FOR_DEV="8080"
+    PORT_OUTSIDE_CONTAINER_API_FOR_DEV="8089"
     # Puerto afuera del contenedor API para la maqueta
-    PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="8081"
+    PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="8090"
     # IP del contenedor APP para DEV
-    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="192.168.20.14"
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="192.168.20.27"
     # IP del contenedor APP para la maqueta
-    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="192.168.20.14"
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="192.168.20.27"
     # Puerto afuera del contenedor APP para DEV
-    PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="8082"
+    PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="8091"
     # Puerto afuera del contenedor APP para la maqueta
-    PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="8083"
+    PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="8092"
 
     # Puerto dentro del contenedor APP para DEV
-    PORT_INSIDE_CONTAINER_APP_FOR_DEV="82"
+    PORT_INSIDE_CONTAINER_APP_FOR_DEV="91"
     # Puerto afuera del contenedor APP para la maqueta
-    PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="83"
+    PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="92"
 
     # =============================================================================
     # Hasta aquí en el futuro debe llenarse automaticamente en base al proyecto
@@ -432,7 +432,7 @@ deploy_bash_file() {
                 -e "s|{{ DOCKER_CONFIGURATION_FILE }}|'$DOCKER_CONFIGURATION_FILE'|g" \
                 -e "s|{{ DB_ROOT_PASSWORD }}|'$DATABASE_PASSWORD'|g" \
                 -e "s|{{ DB_CONTAINER_IP_WEB_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK'|g" \
-                -e "s|{{ DB_CONTAINER_IP_INTERNAL_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK'|g" \
+                -e "s|{{ DB_CONTAINER_IP_INTERNAL_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK'|g" \
                 -e "s|{{ DB_PORT }}|$PORT_OUTSIDE_THE_DATABASE_CONTAINER|g" \
                 -e "s|{{ API_IMAGE }}|'$IMAGE_NAME'|g" \
                 -e "s|{{ API_CONTAINER_IP }}|'$IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV'|g" \
@@ -467,6 +467,18 @@ deploy_bash_file() {
     esac
 }
 
+run_file_to_create_a_development_environment() {
+    print_header "Ejecutar archivo 'crear un entorno de desarrollo'"
+    if [[ "$OS_TYPE" == "linux" ]]; then 
+        sudo chmod a+x $CREATE_A_DEVELOPMENT_ENVIRONMENT
+        $CREATE_A_DEVELOPMENT_ENVIRONMENT
+    elif [[ "$OS_TYPE" == "macOS" ]]; then
+        chmod a+x $CREATE_A_DEVELOPMENT_ENVIRONMENT
+        # Lo ejecuto sin el punto, debido a que tiene toda la ruta
+        $CREATE_A_DEVELOPMENT_ENVIRONMENT
+    fi
+}
+
 # =============================================================================
 # 6. FUNCIÓN PRINCIPAL (MAIN)
 # =============================================================================
@@ -486,6 +498,8 @@ main() {
     setup_environment
     
     print_success "¡CONFIGURACIÓN COMPLETADA!"
+    echo ""
+    run_file_to_create_a_development_environment
     echo ""
 }
 
