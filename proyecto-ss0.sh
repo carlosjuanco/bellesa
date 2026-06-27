@@ -256,6 +256,7 @@ uninstall_docker() {
 
 ip_control_in_containers() {
     print_header "CONTROL DE IPS EN CONTENEDORES"
+    print_info "Iniciando el reeemplazo de ips, puertos, rutas y contraseñas "
         
     # =============================================================================
     # Deberá llenarse solo en base al proyecto
@@ -309,24 +310,19 @@ ip_control_in_containers() {
     # Rutas del sistema
     readonly CURRENT_DIR=$(pwd)
     BASE_DIR=${CURRENT_DIR/bellesa/proyecto_$PROJECT} # Reemplazar la primera coincidencia
-    print_info $BASE_DIR
 
     if [[ "$OS_TYPE" == "linux" ]]; then 
         # Si estamos en el servidor VPS
         if echo "$CURRENT_DIR" | grep -q "Documentos"; then
-            print_info "La palabra 'Documentos' existe, estamos en una computadora normal con Linux"
             DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documentos\/bellesa/.docker/config.json}
         else
-            print_info "La palabra 'Documentos' NO existe, estamos en un servidor sin entorno de escritorio"
             DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/bellesa/.docker/config.json}
         fi
 
-        print_info $DOCKER_CONFIGURATION_FILE  
         # Nombre de la imagen
         IMAGE_NAME="juancholll/laravel_api_debian:1.0.0"
     elif [[ "$OS_TYPE" == "macOS" ]]; then
         DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documents\/bellesa/.docker/config.json}
-        print_info $DOCKER_CONFIGURATION_FILE  
 
         # Nombre de la imagen
         IMAGE_NAME="juancholll/laravel_api_macos:1.0.0"
@@ -334,6 +330,8 @@ ip_control_in_containers() {
 
     TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/create-a-development-environment.txt"
     CREATE_A_DEVELOPMENT_ENVIRONMENT="$CURRENT_DIR/create-a-development-environment.sh"
+
+    print_success "Se termino de reemplazar informacion del proyecto"
 }
 
 # =============================================================================
@@ -405,7 +403,7 @@ deploy_environment() {
 deploy_bash_file() {
     local env_type=$1
     
-    print_header "CREANDO ARHIVO: create-a-development-environment.sh"
+    print_info "Creando arhivo: create-a-development-environment.sh"
     
     # En función del entorno, configurar diferentes parámetros
     case $env_type in
@@ -487,9 +485,7 @@ main() {
     echo ""
     setup_environment
     
-    print_header "¡CONFIGURACIÓN COMPLETADA!"
-    print_info "Para ver los contenedores en ejecución: docker ps"
-    print_info "Para detener todos los contenedores: docker compose down"
+    print_success "¡CONFIGURACIÓN COMPLETADA!"
     echo ""
 }
 
