@@ -194,8 +194,8 @@ uninstall_docker() {
 
     print_info "2.- Elimina los paquetes de Docker"
     
-    sudo apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo apt purge docker.io docker-compose docker-compose-v2
+    sudo apt purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt purge -y docker.io docker-compose
 
     print_info "3.- Elimina también dependencias no usadas"
 
