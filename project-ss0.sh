@@ -22,6 +22,7 @@ IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP=""
 PORT_OUTSIDE_CONTAINER_APP_FOR_DEV=""
 PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP=""
 
+VERIFY_THAT_THE_CREDENTIALS_ARE_VALID=""
 DATABASE_PASSWORD=""
 CURRENT_DIR=""
 BASE_DIR=""
@@ -304,6 +305,9 @@ ip_control_in_containers() {
     # Control De Ips De Contenedores En Docker
     # =============================================================================
 
+    # Función: check_docker_auth
+    # Línea original: ! docker pull hello-world > /dev/null 2>&1
+    VERIFY_THAT_THE_CREDENTIALS_ARE_VALID=""
     # Contraseña de la base de datos
     DATABASE_PASSWORD="juan"
 
@@ -321,11 +325,13 @@ ip_control_in_containers() {
 
         # Nombre de la imagen
         IMAGE_NAME="juancholll/laravel_api_debian:1.0.0"
+        VERIFY_THAT_THE_CREDENTIALS_ARE_VALID="! sudo docker pull hello-world > /dev/null 2>&1"
     elif [[ "$OS_TYPE" == "macOS" ]]; then
         DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documents\/bellesa/.docker/config.json}
 
         # Nombre de la imagen
         IMAGE_NAME="juancholll/laravel_api_macos:1.0.0"
+        VERIFY_THAT_THE_CREDENTIALS_ARE_VALID="! docker pull hello-world > /dev/null 2>&1"
     fi
 
     TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/create-a-development-environment.txt"
@@ -445,6 +451,7 @@ deploy_bash_file() {
                 -e "s|{{ APP_MOCKUP_PORT }}|$PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
                 -e "s|{{ APP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_DEV|g" \
                 -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
+                -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
                 "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
             
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
