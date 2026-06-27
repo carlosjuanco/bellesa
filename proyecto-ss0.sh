@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # =============================================================================
+# CONFIGURACIÓN
+# =============================================================================
+OS_TYPE=""
+
+# =============================================================================
 # Script: deploy_docker_environment.sh
 # Descripción: Identifica SO, instala Docker y levanta entornos según
 #              ControlDeIpsDeContenedoresEnDocker.pdf
@@ -111,7 +116,8 @@ check_docker() {
         DOCKER_VERSION=$(docker --version | cut -d ' ' -f3 | sed 's/,//')
         print_success "Docker ya está instalado: $DOCKER_VERSION"
 
-        if [["$OS_TYPE" == "linux"]]; then 
+        print_info "jjjjjj $OS_TYPE"
+        if [[ "$OS_TYPE" == "linux" ]]; then 
             print_info "¿Deseas desinstalar Docker?"
             read -p "Ingrese si o no: " UNINSTALL_DOCKER
             
