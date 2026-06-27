@@ -4,6 +4,31 @@
 # CONFIGURACIÓN
 # =============================================================================
 OS_TYPE=""
+OS_PRETTY_NAME=""
+
+PROJECT=""
+PROJECT_DESCRIPTION=""
+IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK=""
+IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK=""
+PORT_OUTSIDE_THE_DATABASE_CONTAINER=""
+IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API=""
+IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP=""
+IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV=""
+IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP=""
+PORT_OUTSIDE_CONTAINER_API_FOR_DEV=""
+PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP=""
+IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV=""
+IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP=""
+PORT_OUTSIDE_CONTAINER_APP_FOR_DEV=""
+PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP=""
+
+DATABASE_PASSWORD=""
+CURRENT_DIR=""
+BASE_DIR=""
+IMAGE_NAME=""
+DOCKER_CONFIGURATION_FILE=""
+TEMPLATE_FOR_CREATING_BASH_FILE=""
+CREATE_A_DEVELOPMENT_ENVIRONMENT=""
 
 # =============================================================================
 # Script: deploy_docker_environment.sh
@@ -229,64 +254,86 @@ uninstall_docker() {
 # 3. PROCESAR ARCHIVO DE CONTROL DE IPS
 # =============================================================================
 
-process_control_file() {
-    print_header "PROCESANDO CONTROL DE IPs"
-    
-    CONTROL_FILE="ControlDeIpsDeContenedoresEnDocker.pdf"
-    
-    if [ ! -f "$CONTROL_FILE" ]; then
-        print_warning "No se encontró el archivo $CONTROL_FILE"
-        print_info "Se usará una configuración por defecto"
-        setup_default_environment
-        return
-    fi
-    
-    print_info "Archivo encontrado: $CONTROL_FILE"
-    
-    # Extraer información del PDF (requiere pdftotext o similar)
-    if command -v pdftotext &> /dev/null; then
-        print_info "Extrayendo datos del PDF..."
-        pdftotext -layout "$CONTROL_FILE" /tmp/control_temp.txt
-        parse_control_data
-    else
-        print_warning "pdftotext no instalado. Instalando..."
-        sudo apt-get install -y poppler-utils
-        if command -v pdftotext &> /dev/null; then
-            pdftotext -layout "$CONTROL_FILE" /tmp/control_temp.txt
-            parse_control_data
-        else
-            print_error "No se pudo instalar pdftotext"
-            setup_default_environment
-        fi
-    fi
-}
+ip_control_in_containers() {
+    print_header "CONTROL DE IPS EN CONTENEDORES"
+        
+    # =============================================================================
+    # Deberá llenarse solo en base al proyecto
+    # Control De Ips De Contenedores En Docker
+    # =============================================================================
+    # Proyecto
+    PROJECT="ss0"
+    # Descripción del proyecto
+    PROJECT_DESCRIPTION="Sistema web para la supervisión escolar 077"
 
-parse_control_data() {
-    if [ -f /tmp/control_temp.txt ]; then
-        print_info "Datos extraídos del control de IPs"
-        
-        # Extraer proyectos y servicios (simplificado para ejemplo)
-        # En un caso real, se parsearía el archivo de texto extraído
-        
-        # Ejemplo de parseo para los proyectos detectados
-        PROJECTS=$(grep -E "(MAIN|SDAC|filament|SS0|AOG)" /tmp/control_temp.txt | cut -d' ' -f1 | sort -u)
-        
-        print_success "Proyectos encontrados:"
-        for project in $PROJECTS; do
-            echo "  - $project"
-        done
-        
-        # Mostrar IPs por rango
-        echo ""
-        print_info "Resumen de IPs por rango:"
-        echo "  RED 192.168.10.x:"
-        grep "192.168.10" /tmp/control_temp.txt | awk '{print "    - " $1 ": " $2}' | sort -u
-        echo "  RED 192.168.20.x:"
-        grep "192.168.20" /tmp/control_temp.txt | awk '{print "    - " $1 ": " $2}' | sort -u
-        
-        # Limpiar
-        rm -f /tmp/control_temp.txt
+    # IP para el contenedor de la base de datos, red interna
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="192.168.10.10"
+    # IP para el contenedor de la base de datos, red pública
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="192.168.20.10"
+    # Puerto afuera del contenedor de la base de datos
+    PORT_OUTSIDE_THE_DATABASE_CONTAINER="3307"
+    # IP del contenedor instalar dependencias en api
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="192.168.20.11"
+    # IP del contenedor instalar dependencias en app
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="192.168.20.12"
+    # IP del contenedor API para DEV
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="192.168.20.13"
+    # IP del contenedor API para la maqueta
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="192.168.20.13"
+    # Puerto afuera del contenedor API para DEV
+    PORT_OUTSIDE_CONTAINER_API_FOR_DEV="8080"
+    # Puerto afuera del contenedor API para la maqueta
+    PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="8081"
+    # IP del contenedor APP para DEV
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="192.168.20.14"
+    # IP del contenedor APP para la maqueta
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="192.168.20.14"
+    # Puerto afuera del contenedor APP para DEV
+    PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="8082"
+    # Puerto afuera del contenedor APP para la maqueta
+    PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="8083"
+
+    # Puerto dentro del contenedor APP para DEV
+    PORT_INSIDE_CONTAINER_APP_FOR_DEV="82"
+    # Puerto afuera del contenedor APP para la maqueta
+    PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="83"
+
+    # =============================================================================
+    # Hasta aquí en el futuro debe llenarse automaticamente en base al proyecto
+    # Control De Ips De Contenedores En Docker
+    # =============================================================================
+
+    # Contraseña de la base de datos
+    DATABASE_PASSWORD="juan"
+
+    # Rutas del sistema
+    readonly CURRENT_DIR=$(pwd)
+    BASE_DIR=${CURRENT_DIR/bellesa/proyecto_$PROJECT} # Reemplazar la primera coincidencia
+    print_info $BASE_DIR
+
+    if [[ "$OS_TYPE" == "linux" ]]; then 
+        # Si estamos en el servidor VPS
+        if echo "$CURRENT_DIR" | grep -q "Documentos"; then
+            print_info "La palabra 'Documentos' existe, estamos en una computadora normal con Linux"
+            DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documentos\/bellesa/.docker/config.json}
+        else
+            print_info "La palabra 'Documentos' NO existe, estamos en un servidor sin entorno de escritorio"
+            DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/bellesa/.docker/config.json}
+        fi
+
+        print_info $DOCKER_CONFIGURATION_FILE  
+        # Nombre de la imagen
+        IMAGE_NAME="juancholll/laravel_api_debian:1.0.0"
+    elif [[ "$OS_TYPE" == "macOS" ]]; then
+        DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documents\/bellesa/.docker/config.json}
+        print_info $DOCKER_CONFIGURATION_FILE  
+
+        # Nombre de la imagen
+        IMAGE_NAME="juancholll/laravel_api_macos:1.0.0"
     fi
+
+    TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/create-a-development-environment.txt"
+    CREATE_A_DEVELOPMENT_ENVIRONMENT="$CURRENT_DIR/create-a-development-environment.sh"
 }
 
 # =============================================================================
@@ -301,10 +348,9 @@ setup_environment() {
     echo "  2) Entorno para desarrollo de software"
     echo "  3) Entorno para manual de usuario"
     echo "  4) Entorno para producción"
-    echo "  5) Todos los entornos"
-    echo "  6) Salir"
+    echo "  5) Salir"
     echo ""
-    read -p "Ingrese su opción [1-6]: " ENVIRONMENT_CHOICE
+    read -p "Ingrese su opción [1-5]: " ENVIRONMENT_CHOICE
     
     case $ENVIRONMENT_CHOICE in
         1)
@@ -320,15 +366,8 @@ setup_environment() {
             deploy_environment "produccion"
             ;;
         5)
-            deploy_environment "all"
-            ;;
-        6)
             print_info "Saliendo..."
             exit 0
-            ;;
-        *)
-            print_error "Opción inválida"
-            setup_environment
             ;;
     esac
 }
@@ -343,215 +382,91 @@ deploy_environment() {
         "maqueta")
             print_info "Configurando entorno para maqueta"
             # Configuración para maqueta
-            # Puertos externos: 8080-8083, 8484-8487, etc.
-            deploy_compose_files "maqueta"
+            deploy_bash_file "maqueta"
             ;;
         "desarrollo")
             print_info "Configurando entorno para desarrollo"
             # Configuración para desarrollo
-            # Puertos externos: 80-83, 84-87, etc.
-            deploy_compose_files "desarrollo"
+            deploy_bash_file "desarrollo"
             ;;
         "manual_usuario")
             print_info "Configurando entorno para manual de usuario"
             # Configuración para manual de usuario
-            # Puertos externos: 4321, 4322
-            deploy_compose_files "manual_usuario"
+            deploy_bash_file "manual_usuario"
             ;;
         "produccion")
             print_info "Configurando entorno para producción"
             # Configuración para producción
-            deploy_compose_files "produccion"
-            ;;
-        "all")
-            print_info "Levantando todos los entornos"
-            deploy_all_environments
-            ;;
-        *)
-            print_error "Entorno desconocido"
-            return 1
+            deploy_bash_file "produccion"
             ;;
     esac
 }
 
-deploy_compose_files() {
-    local env=$1
+deploy_bash_file() {
+    local env_type=$1
     
-    # Aquí se crearían los archivos docker-compose para cada proyecto
-    # Basado en los datos del control de IPs
+    print_header "CREANDO ARHIVO: create-a-development-environment.sh"
     
-    print_info "Creando archivos docker-compose para $env"
-    
-    # Crear directorio de configuración
-    mkdir -p docker_configs
-    
-    # Ejemplo de creación de compose para MAIN
-    cat > docker_configs/docker-compose-main-${env}.yml << EOF
-version: '3.8'
+    # En función del entorno, configurar diferentes parámetros
+    case $env_type in
+        "maqueta")
+            if [ ! -f "$TEMPLATE_FOR_CREATING_BASH_FILE" ]; then
+                print_error "Archivo de entrada no encontrado: $TEMPLATE_FOR_CREATING_BASH_FILE"
+                return 1
+            fi
+            
+            cp "$TEMPLATE_FOR_CREATING_BASH_FILE" "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
+            
+            if [[ "$OS_TYPE" == "linux" ]]; then 
+                SED_INLINE="-i"
+            elif [[ "$OS_TYPE" == "macOS" ]]; then
+                SED_INLINE="-i ''"
+            fi
 
-services:
-  main_bd:
-    image: mysql:8.0
-    container_name: main_bd_${env}
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: main_db
-    ports:
-      - "3306:3306"
-    networks:
-      main_network:
-        ipv4_address: 192.168.10.10
+            # Construir el comando sed
+            SED_CMD="sed $SED_INLINE"
 
-  main_api:
-    image: main_api:latest
-    container_name: main_api_${env}
-    ports:
-      - "80${env:+0}$(get_env_suffix $env):8080"
-    networks:
-      main_network:
-        ipv4_address: 192.168.20.12
-
-  main_app:
-    image: main_app:latest
-    container_name: main_app_${env}
-    ports:
-      - "82${env:+0}$(get_env_suffix $env):8080"
-    networks:
-      main_network:
-        ipv4_address: 192.168.20.14
-
-networks:
-  main_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.20.0/24
-EOF
-
-    print_success "Archivo docker-compose creado para MAIN en $env"
-    
-    # Similar para otros proyectos (SDAC, Filament, SS0, AOG)
-    create_compose_for_project "sdac" "$env"
-    create_compose_for_project "filament" "$env"
-    create_compose_for_project "ss0" "$env"
-    create_compose_for_project "aog" "$env"
-}
-
-get_env_suffix() {
-    local env=$1
-    case $env in
-        "maqueta") echo "m" ;;
-        "desarrollo") echo "d" ;;
-        "manual_usuario") echo "u" ;;
-        "produccion") echo "p" ;;
-        *) echo "" ;;
+            $SED_CMD \
+                -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
+                -e "s|{{ PROJECT_DESCRIPTION }}|'$PROJECT_DESCRIPTION'|g" \
+                -e "s|{{ OS_VERSION }}|'$OS_PRETTY_NAME'|g" \
+                -e "s|{{ BASE_DIR }}|'$BASE_DIR'|g" \
+                -e "s|{{ DOCKER_CONFIGURATION_FILE }}|'$DOCKER_CONFIGURATION_FILE'|g" \
+                -e "s|{{ DB_ROOT_PASSWORD }}|'$DATABASE_PASSWORD'|g" \
+                -e "s|{{ DB_CONTAINER_IP_WEB_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK'|g" \
+                -e "s|{{ DB_CONTAINER_IP_INTERNAL_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK'|g" \
+                -e "s|{{ DB_PORT }}|$PORT_OUTSIDE_THE_DATABASE_CONTAINER|g" \
+                -e "s|{{ API_IMAGE }}|'$IMAGE_NAME'|g" \
+                -e "s|{{ API_CONTAINER_IP }}|'$IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV'|g" \
+                -e "s|{{ API_CONTAINER_INSTALL_DEPENDENCIES_IP }}|'$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API'|g" \
+                -e "s|{{ API_PORT }}|$PORT_OUTSIDE_CONTAINER_API_FOR_DEV|g" \
+                -e "s|{{ API_MOCKUP_PORT }}|$PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP|g" \
+                -e "s|{{ APP_CONTAINER_IP }}|'$IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV'|g" \
+                -e "s|{{ APP_CONTAINER_INSTALL_DEPENDENCIES_IP }}|'$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP'|g" \
+                -e "s|{{ APP_PORT }}|$PORT_OUTSIDE_CONTAINER_APP_FOR_DEV|g" \
+                -e "s|{{ APP_MOCKUP_PORT }}|$PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
+                -e "s|{{ APP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_DEV|g" \
+                -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
+                "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
+            
+            print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
+            ;;
+        "desarrollo")
+            print_info "Configurando entorno para desarrollo"
+            # Configuración para desarrollo
+            deploy_bash_file "desarrollo"
+            ;;
+        "manual_usuario")
+            print_info "Configurando entorno para manual de usuario"
+            # Configuración para manual de usuario
+            deploy_bash_file "manual_usuario"
+            ;;
+        "produccion")
+            print_info "Configurando entorno para producción"
+            # Configuración para producción
+            deploy_bash_file "produccion"
+            ;;
     esac
-}
-
-create_compose_for_project() {
-    local project=$1
-    local env=$2
-    
-    # Simplificado - en la práctica se crearían todos los servicios
-    cat > docker_configs/docker-compose-${project}-${env}.yml << EOF
-version: '3.8'
-
-services:
-  ${project}_bd:
-    image: mysql:8.0
-    container_name: ${project}_bd_${env}
-    ports:
-      - "3307:3306"
-    networks:
-      ${project}_network:
-        ipv4_address: 192.168.10.15
-
-networks:
-  ${project}_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.10.0/24
-EOF
-
-    print_success "Archivo docker-compose creado para ${project^^} en $env"
-}
-
-deploy_all_environments() {
-    print_info "Levantando todos los entornos"
-    for env in "maqueta" "desarrollo" "manual_usuario" "produccion"; do
-        deploy_environment "$env"
-    done
-}
-
-setup_default_environment() {
-    print_warning "Usando configuración por defecto"
-    print_info "Creando estructura básica de docker-compose"
-    
-    # Crear docker-compose base
-    cat > docker-compose.yml << EOF
-version: '3.8'
-
-services:
-  web:
-    image: nginx:alpine
-    container_name: web_default
-    ports:
-      - "8080:80"
-    networks:
-      - default_network
-
-  db:
-    image: mysql:8.0
-    container_name: db_default
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: default_db
-    ports:
-      - "3306:3306"
-    networks:
-      - default_network
-
-networks:
-  default_network:
-    driver: bridge
-EOF
-    
-    print_success "Archivo docker-compose por defecto creado"
-}
-
-# =============================================================================
-# 5. VERIFICACIÓN FINAL
-# =============================================================================
-
-final_check() {
-    print_header "VERIFICACIÓN FINAL"
-    
-    # Verificar que Docker esté funcionando
-    if sudo docker ps &> /dev/null; then
-        print_success "Docker está funcionando correctamente"
-    else
-        print_warning "Docker no está respondiendo. Reiniciando..."
-        sudo systemctl restart docker
-        if sudo docker ps &> /dev/null; then
-            print_success "Docker reiniciado correctamente"
-        else
-            print_error "Docker no funciona. Verifique manualmente"
-        fi
-    fi
-    
-    # Verificar docker-compose
-    if command -v docker-compose &> /dev/null; then
-        COMPOSE_VERSION=$(docker-compose --version)
-        print_success "Docker Compose: $COMPOSE_VERSION"
-    elif docker compose version &> /dev/null; then
-        COMPOSE_VERSION=$(docker compose version)
-        print_success "Docker Compose: $COMPOSE_VERSION (plugin)"
-    else
-        print_warning "Docker Compose no encontrado"
-    fi
-    
-    print_success "Entorno listo para usar"
 }
 
 # =============================================================================
@@ -568,11 +483,9 @@ main() {
     echo ""
     check_docker
     echo ""
-    process_control_file
+    ip_control_in_containers
     echo ""
     setup_environment
-    echo ""
-    final_check
     
     print_header "¡CONFIGURACIÓN COMPLETADA!"
     print_info "Para ver los contenedores en ejecución: docker ps"
