@@ -213,7 +213,7 @@ uninstall_docker() {
     
     # Al ejecutar sudo docker --version, deberia regresar "command not found"
     # Es decir hubo un error
-    if sudo docker --version 2>/dev/null; then 
+    if command -v docker &> /dev/null; then 
         print_info "Docker desinstalado correctamente"
         exit 0
     else
