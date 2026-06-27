@@ -116,7 +116,6 @@ check_docker() {
         DOCKER_VERSION=$(docker --version | cut -d ' ' -f3 | sed 's/,//')
         print_success "Docker ya está instalado: $DOCKER_VERSION"
 
-        print_info "jjjjjj $OS_TYPE"
         if [[ "$OS_TYPE" == "linux" ]]; then 
             print_info "¿Deseas desinstalar Docker?"
             read -p "Ingrese si o no: " UNINSTALL_DOCKER
@@ -132,10 +131,10 @@ check_docker() {
         return 0
     else
         print_warning "Docker no está instalado"
-        if "$OS_TYPE" == "linux" &> /dev/null; then 
+        if [[ "$OS_TYPE" == "linux" ]]; then 
             install_docker
             exit 0
-        elif "$OS_TYPE" == "macOS" &> /dev/null; then
+        elif [[ "$OS_TYPE" == "macOS" ]]; then
             print_warning "Tienes que instalarlo desde la página oficial"
             print_warning "Es el único sistema operativo que funciona bien su versión de escritorio"
             exit 1
