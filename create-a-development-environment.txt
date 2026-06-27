@@ -105,7 +105,7 @@ check_docker_auth() {
     
     # Verificar que las credenciales sean válidas
     # También me sirve para indicar que no he iniciado docker
-    if {{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}; then
+    if {{VERIFY_THAT_THE_CREDENTIALS_ARE_VALID}}; then
         print_warning "Credenciales de Docker expiradas o inválidas"
         print_info "Ejecuta: docker login"
         return 1
