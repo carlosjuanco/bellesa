@@ -309,7 +309,7 @@ ip_control_in_containers() {
         VERIFY_THAT_THE_CREDENTIALS_ARE_VALID="! docker pull hello-world > /dev/null 2>\&1"
     fi
 
-    TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/create-a-development-environment.txt"
+    TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/template-for-creating-bash-file.txt"
     CREATE_A_DEVELOPMENT_ENVIRONMENT="$CURRENT_DIR/create-a-development-environment.sh"
 
     # Mostrar configuración
