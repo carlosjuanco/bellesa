@@ -603,7 +603,7 @@ deploy_bash_file() {
             fi
 
             # Construir el comando sed
-            SED_CMD="sed $SED_INLINE"
+            SED_CMD="sed $SED_INLINE "
 
             $SED_CMD \
                 -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
@@ -627,7 +627,7 @@ deploy_bash_file() {
                 -e "s|{{ APP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_DEV|g" \
                 -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
                 -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
-                -e "s|sed -i ''|$SED_CMD|g" \
+                -e "s|sed -i |$SED_CMD|g" \
                 "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
             
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
@@ -686,7 +686,7 @@ main() {
     
     print_success "¡CONFIGURACIÓN COMPLETADA!"
     echo ""
-    run_file_to_create_a_development_environment
+    # run_file_to_create_a_development_environment
     echo ""
 }
 

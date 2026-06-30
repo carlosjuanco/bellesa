@@ -330,7 +330,7 @@ create_api_env_file() {
     
     cp "$input_file" "$output_file"
     
-    sed -i '' \
+    sed -i \
         -e "s|DB_HOST=127.0.0.1|DB_HOST=$DB_CONTAINER_IP_INTERNAL_NETWORK|g" \
         -e "s|DB_DATABASE=laravel|DB_DATABASE=$db_name|g" \
         -e "s|DB_PASSWORD=|DB_PASSWORD=$DB_ROOT_PASSWORD|g" \
@@ -351,7 +351,7 @@ create_app_env_file() {
     
     cp "$input_file" "$output_file"
     
-    sed -i '' "s|8081|$api_port|g" "$output_file"
+    sed -i "s|8081|$api_port|g" "$output_file"
     
     print_success "Archivo .env creado: $output_file"
 }
@@ -362,7 +362,7 @@ update_database_init_file() {
     local init_file="${DIRECTORIES[zeus_api]}/database/init.sql"
     
     if [ -f "$init_file" ]; then
-        sed -i '' \
+        sed -i \
             -e "s|nombreDeLaBaseDeDatosParaElDesarrollo|$DB_NAME|g" \
             -e "s|nombreDeLaBaseDeDatosParaLaMaqueta|$MOCKUP_DB_NAME|g" \
             "$init_file"
@@ -398,7 +398,7 @@ generate_install_services_file() {
     # La variable ${CONTAINERS[instalar_dependencias_en_api]}, se pone dos veces, pero
     # uno es el nombre del servicio en docker compose y el segundo es el nombre del 
     # contenedor, pero ambos tienen el mismo nombre
-    sed -i '' \
+    sed -i \
         -e "s|iasd_mysql:|${PROJECT_NAME}_mysql:|g" \
         -e "s|instalar_dependencias_en_api:|${CONTAINERS[instalar_dependencias_en_api]}:|g" \
         -e "s|container_name: iasd_bd|container_name: ${CONTAINERS[bd]}|g" \
@@ -432,7 +432,7 @@ generate_install_services_file() {
     # La variable ${CONTAINERS[instalar_dependencias_en_app]}, se pone dos veces, pero
     # uno es el nombre del servicio en docker compose y el segundo es el nombre del 
     # contenedor, pero ambos tienen el mismo nombre
-    sed -i '' \
+    sed -i \
         -e "s|proyectoBellesa|${CURRENT_DIR}|g" \
         -e "s|instalar_dependencias_en_app:|${CONTAINERS[instalar_dependencias_en_app]}:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
@@ -459,7 +459,7 @@ generate_run_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i '' \
+    sed -i \
         -e "s|iasd_api:|${PROJECT_NAME}_api:|g" \
         -e "s|image: juancholll/laravel_api|image: $API_IMAGE|g" \
         -e "s|container_name: iasd_api|container_name: $API_CONTAINER_NAME|g" \
@@ -488,7 +488,7 @@ generate_run_services_file() {
     cp "$source_file" "$dest_file"
     
     # Reemplazos en el archivo YML
-    sed -i '' \
+    sed -i \
         -e "s|iasd_app:|${PROJECT_NAME}_app:|g" \
         -e "s|/home/juan/Documentos/proyecto_iasd|$BASE_DIR|g" \
         -e "s|container_name: iasd_app|container_name: $APP_CONTAINER_NAME|g" \
