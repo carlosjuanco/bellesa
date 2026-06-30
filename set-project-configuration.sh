@@ -6,31 +6,6 @@
 OS_TYPE=""
 OS_PRETTY_NAME=""
 
-PROJECT=""
-PROJECT_DESCRIPTION=""
-IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK=""
-IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK=""
-PORT_OUTSIDE_THE_DATABASE_CONTAINER=""
-IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API=""
-IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP=""
-IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV=""
-IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP=""
-PORT_OUTSIDE_CONTAINER_API_FOR_DEV=""
-PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP=""
-IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV=""
-IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP=""
-PORT_OUTSIDE_CONTAINER_APP_FOR_DEV=""
-PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP=""
-
-VERIFY_THAT_THE_CREDENTIALS_ARE_VALID=""
-DATABASE_PASSWORD=""
-CURRENT_DIR=""
-BASE_DIR=""
-IMAGE_NAME=""
-DOCKER_CONFIGURATION_FILE=""
-TEMPLATE_FOR_CREATING_BASH_FILE=""
-CREATE_A_DEVELOPMENT_ENVIRONMENT=""
-
 # =============================================================================
 # Script: deploy_docker_environment.sh
 # Descripción: Identifica SO, instala Docker y levanta entornos según
@@ -256,60 +231,58 @@ uninstall_docker() {
 # =============================================================================
 
 ip_control_in_containers() {
-    print_header "CONTROL DE IPS EN CONTENEDORES"
+    print_header "CONFIGURANDO PARÁMETROS DEL PROYECTO"
     print_info "Iniciando el reeemplazo de ips, puertos, rutas y contraseñas "
         
     # =============================================================================
-    # Deberá llenarse solo en base al proyecto
-    # Control De Ips De Contenedores En Docker
+    # Orden
     # =============================================================================
     # Proyecto
-    PROJECT="ss0"
+    PROJECT="$1"
     # Descripción del proyecto
-    PROJECT_DESCRIPTION="Sistema web para la supervisión escolar 077"
+    PROJECT_DESCRIPTION="$2"
 
     # IP para el contenedor de la base de datos, red pública
-    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="192.168.10.23"
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="$3"
     # IP para el contenedor de la base de datos, red interna
-    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="192.168.20.23"
+    IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="$4"
     # Puerto afuera del contenedor de la base de datos
-    PORT_OUTSIDE_THE_DATABASE_CONTAINER="3310"
+    PORT_OUTSIDE_THE_DATABASE_CONTAINER="$5"
     # IP del contenedor instalar dependencias en api
-    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="192.168.20.24"
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="$6"
     # IP del contenedor instalar dependencias en app
-    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="192.168.20.25"
+    IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="$7"
     # IP del contenedor API para DEV
-    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="192.168.20.26"
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="$8"
     # IP del contenedor API para la maqueta
-    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="192.168.20.26"
+    IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="$9"
     # Puerto afuera del contenedor API para DEV
-    PORT_OUTSIDE_CONTAINER_API_FOR_DEV="8089"
+    PORT_OUTSIDE_CONTAINER_API_FOR_DEV="${10}"
     # Puerto afuera del contenedor API para la maqueta
-    PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="8090"
+    PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="${11}"
     # IP del contenedor APP para DEV
-    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="192.168.20.27"
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="${12}"
     # IP del contenedor APP para la maqueta
-    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="192.168.20.27"
+    IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="${13}"
     # Puerto afuera del contenedor APP para DEV
-    PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="8091"
+    PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="${14}"
     # Puerto afuera del contenedor APP para la maqueta
-    PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="8092"
+    PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="${15}"
 
     # Puerto dentro del contenedor APP para DEV
-    PORT_INSIDE_CONTAINER_APP_FOR_DEV="91"
+    PORT_INSIDE_CONTAINER_APP_FOR_DEV="${16}"
     # Puerto afuera del contenedor APP para la maqueta
-    PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="92"
+    PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="${17}"
 
     # =============================================================================
-    # Hasta aquí en el futuro debe llenarse automaticamente en base al proyecto
-    # Control De Ips De Contenedores En Docker
+    # Hasta aquí
     # =============================================================================
 
     # Función: check_docker_auth
     # Línea original: ! docker pull hello-world > /dev/null 2>&1
     VERIFY_THAT_THE_CREDENTIALS_ARE_VALID=""
     # Contraseña de la base de datos
-    DATABASE_PASSWORD="juan"
+    DATABASE_PASSWORD="${18}"
 
     # Rutas del sistema
     readonly CURRENT_DIR=$(pwd)
@@ -339,7 +312,207 @@ ip_control_in_containers() {
     TEMPLATE_FOR_CREATING_BASH_FILE="$CURRENT_DIR/create-a-development-environment.txt"
     CREATE_A_DEVELOPMENT_ENVIRONMENT="$CURRENT_DIR/create-a-development-environment.sh"
 
+    # Mostrar configuración
+    echo ""
+    print_info "Configuración establecida:"
+    echo "  ┌─────────────────────────────────────────────────────────────"
+    echo "  │ PROYECTO: $PROJECT_NAME"
+    echo "  │ DESCRIPCIÓN: $PROJECT_DESCRIPTION"
+    echo "  ├─────────────────────────────────────────────────────────────"
+    echo "  │ BASE DE DATOS:"
+    echo "  │   IP Red Web:     $IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK"
+    echo "  │   IP Red Interna: $IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK"
+    echo "  │   Puerto:         $PORT_OUTSIDE_THE_DATABASE_CONTAINER"
+    echo "  │   Password:       ${DATABASE_PASSWORD:0:4}****"
+    echo "  ├─────────────────────────────────────────────────────────────"
+    echo "  │ API:"
+    echo "  │   IP del contenedor instalar dependencias:   $IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API"
+    echo "  │   IP del contenedor para dev:                $IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV"
+    echo "  │   Puerto DEV:                                $PORT_OUTSIDE_CONTAINER_API_FOR_DEV"
+    echo "  │   Puerto Mockup:                             $PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP"
+    echo "  ├─────────────────────────────────────────────────────────────"
+    echo "  │ APP:"
+    echo "  │   IP del contenedor instalar dependencias:   $IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP"
+    echo "  │   IP del contenedor para dev:                $IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV"
+    echo "  │   Puerto DEV:                                $PORT_OUTSIDE_CONTAINER_APP_FOR_DEV:$PORT_INSIDE_CONTAINER_APP_FOR_DEV"
+    echo "  │   Puerto Mockup:                             $PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP:$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP"
+    echo "  └─────────────────────────────────────────────────────────────"
+    echo ""
+
+    # Exportar variables para uso global
+    export PROJECT
+    export PROJECT_DESCRIPTION
+    export IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK
+    export IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK
+    export PORT_OUTSIDE_THE_DATABASE_CONTAINER
+    export IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API
+    export IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP
+    export IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV
+    export IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP
+    export PORT_OUTSIDE_CONTAINER_API_FOR_DEV
+    export PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP
+    export IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV
+    export IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP
+    export PORT_OUTSIDE_CONTAINER_APP_FOR_DEV
+    export PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP
+    export PORT_INSIDE_CONTAINER_APP_FOR_DEV
+    export PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP
+
+    export VERIFY_THAT_THE_CREDENTIALS_ARE_VALID
+    export DATABASE_PASSWORD
+    export CURRENT_DIR
+    export BASE_DIR
+    export IMAGE_NAME
+    export DOCKER_CONFIGURATION_FILE
+    export TEMPLATE_FOR_CREATING_BASH_FILE
+    export CREATE_A_DEVELOPMENT_ENVIRONMENT
+
     print_success "Se termino de reemplazar informacion del proyecto"
+}
+
+# ============================================================================
+# FUNCIÓN: CARGAR PROYECTO DESDE ARCHIVO
+# ============================================================================
+
+load_project_from_file() {
+    local project_file="$1"
+    
+    if [ ! -f "$project_file" ]; then
+        print_error "Archivo de proyecto no encontrado: $project_file"
+        return 1
+    fi
+    
+    print_info "Cargando configuración desde: $project_file"
+    
+    # Leer el archivo línea por línea y extraer valores
+    while IFS='=' read -r key value; do
+        # Ignorar líneas vacías y comentarios
+        if [[ -z "$key" ]] || [[ "$key" == \#* ]]; then
+            continue
+        fi
+        
+        # Limpiar espacios y comillas
+        key=$(echo "$key" | xargs)
+        value=$(echo "$value" | xargs | sed 's/^"//;s/"$//')
+        
+        # Asignar variables según la clave
+        case "$key" in
+            "PROJECT") PROJECT_NAME="$value" ;;
+            "PROJECT_DESCRIPTION") PROJECT_DESCRIPTION="$value" ;;
+            "IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK") 
+                IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK="$value" ;;
+            "IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK") 
+                IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK="$value" ;;
+            "PORT_OUTSIDE_THE_DATABASE_CONTAINER") 
+                PORT_OUTSIDE_THE_DATABASE_CONTAINER="$value" ;;
+            "IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API") 
+                IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API="$value" ;;
+            "IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP") 
+                IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP="$value" ;;
+            "IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV") 
+                IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV="$value" ;;
+            "IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP") 
+                IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP="$value" ;;
+            "PORT_OUTSIDE_CONTAINER_API_FOR_DEV") 
+                PORT_OUTSIDE_CONTAINER_API_FOR_DEV="$value" ;;
+            "PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP") 
+                PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP="$value" ;;
+            "IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV") 
+                IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV="$value" ;;
+            "IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP") 
+                IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP="$value" ;;
+            "PORT_OUTSIDE_CONTAINER_APP_FOR_DEV") 
+                PORT_OUTSIDE_CONTAINER_APP_FOR_DEV="$value" ;;
+            "PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP") 
+                PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP="$value" ;;
+            "PORT_INSIDE_CONTAINER_APP_FOR_DEV") 
+                PORT_INSIDE_CONTAINER_APP_FOR_DEV="$value" ;;
+            "PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP") 
+                PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="$value" ;;
+            "DATABASE_PASSWORD") 
+                DATABASE_PASSWORD="$value" ;;
+        esac
+    done < "$project_file"
+    
+    # Llamar a ip_control_in_containers con los parámetros cargados
+    ip_control_in_containers \
+        "$PROJECT_NAME" \
+        "$PROJECT_DESCRIPTION" \
+        "$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK" \
+        "$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK" \
+        "$PORT_OUTSIDE_THE_DATABASE_CONTAINER" \
+        "$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API" \
+        "$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP" \
+        "$IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV" \
+        "$IP_ADDRESS_OF_THE_API_CONTAINER_FOR_THE_MOCKUP" \
+        "$PORT_OUTSIDE_CONTAINER_API_FOR_DEV" \
+        "$PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP" \
+        "$IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV" \
+        "$IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_THE_MOCKUP" \
+        "$PORT_OUTSIDE_CONTAINER_APP_FOR_DEV" \
+        "$PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP" \
+        "$PORT_INSIDE_CONTAINER_APP_FOR_DEV" \
+        "$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP" \
+        "$DATABASE_PASSWORD"
+}
+
+# ============================================================================
+# FUNCIÓN: SELECCIONAR PROYECTO
+# ============================================================================
+
+select_project() {
+    print_header "SELECCIÓN DE PROYECTO"
+    
+    # Buscar archivos de proyecto
+    local project_files=(project-*.txt)
+    
+    if [ ${#project_files[@]} -eq 0 ]; then
+        print_error "No se encontraron archivos de proyecto (project-*.txt)"
+        return 1
+    fi
+    
+    # Mostrar proyectos disponibles
+    echo "Proyectos disponibles:"
+    echo ""
+    
+    local i=1
+    for file in "${project_files[@]}"; do
+        # Extraer nombre del proyecto del archivo
+        local project_name=$(grep "^PROJECT=" "$file" 2>/dev/null | cut -d'=' -f2 | xargs)
+        local project_desc=$(grep "^PROJECT_DESCRIPTION=" "$file" 2>/dev/null | cut -d'=' -f2 | xargs)
+        
+        if [ -z "$project_name" ]; then
+            project_name="${file%.txt}"
+            project_name="${project_name#project-}"
+        fi
+        
+        echo "  $i) $project_name - ${project_desc:-Sin descripción}"
+        echo "     Archivo: $file"
+        ((i++))
+    done
+    
+    echo ""
+    echo "  0) Salir"
+    echo ""
+    
+    local choice
+    read -p "Seleccione un proyecto [0-${#project_files[@]}]: " choice
+    
+    if [[ "$choice" == "0" ]]; then
+        print_info "Saliendo..."
+        exit 0
+    fi
+    
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#project_files[@]}" ]; then
+        local selected_file="${project_files[$((choice-1))]}"
+        print_success "Proyecto seleccionado: $selected_file"
+        echo ""
+        load_project_from_file "$selected_file"
+        return 0
+    else
+        print_error "Opción inválida"
+        return 1
+    fi
 }
 
 # =============================================================================
@@ -503,7 +676,11 @@ main() {
     echo ""
     check_docker
     echo ""
-    ip_control_in_containers
+    # Seleccionar proyecto
+    if ! select_project; then
+        print_error "Error al seleccionar proyecto"
+        exit 1
+    fi
     echo ""
     setup_environment
     
