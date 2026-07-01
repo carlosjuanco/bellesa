@@ -543,12 +543,18 @@ deploy_bash_file() {
             if [[ "$OS_TYPE" == "linux" ]]; then 
                 SED_INLINE="-i"
             elif [[ "$OS_TYPE" == "macOS" ]]; then
-                # Si no escapo las comillas simples, crea dos archivo y al final 
-                # le agrega dos comillas simples.
-                SED_INLINE="-i /\'/\'"
+                SED_INLINE="-i ''"
             fi
 
-            sed $SED_INLINE \
+            # Construir el comando sed
+            SED_CMD="sed $SED_INLINE "
+
+            # Usar la función para usar correcamente "sed -i ''" en este archivo
+            # debido a que se manejaba las comillas simples en una variable
+            # pero esto causaba que se creaban dos archivos.
+            # Sin embargo para la sustitucion en el archivo final,
+            # funciona correctamente
+            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
                 -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
                 -e "s|{{ PROJECT_DESCRIPTION }}|'$PROJECT_DESCRIPTION'|g" \
                 -e "s|{{ OS_VERSION }}|'$OS_PRETTY_NAME'|g" \
@@ -571,8 +577,7 @@ deploy_bash_file() {
                 -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
                 -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
                 -e "s|sed -i |$SED_CMD|g" \
-                "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
-            
+
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
         "desarrollo")
@@ -591,6 +596,18 @@ deploy_bash_file() {
             deploy_bash_file "produccion"
             ;;
     esac
+}
+
+# Definir una función que maneje la llamada a sed según el SO
+run_sed() {
+    local file="$1"
+    shift  # Remover el primer argumento (el archivo)
+    
+    if [[ "$OS_TYPE" == "linux" ]]; then 
+        sed -i "$@" "$file"
+    elif [[ "$OS_TYPE" == "macOS" ]]; then
+        sed -i '' "$@" "$file"
+    fi
 }
 
 run_file_to_create_a_development_environment() {
@@ -629,7 +646,7 @@ main() {
     
     print_success "¡CONFIGURACIÓN COMPLETADA!"
     echo ""
-    # run_file_to_create_a_development_environment
+    run_file_to_create_a_development_environment
     echo ""
 }
 
