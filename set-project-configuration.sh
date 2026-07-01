@@ -578,6 +578,9 @@ deploy_bash_file() {
                 -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
                 -e "s|sed -i |$SED_CMD|g" \
 
+            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
+                -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}||g" \
+
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
         "desarrollo")
@@ -591,9 +594,56 @@ deploy_bash_file() {
             deploy_bash_file "manual_usuario"
             ;;
         "produccion")
-            print_info "Configurando entorno para producción"
-            # Configuración para producción
-            deploy_bash_file "produccion"
+            if [ ! -f "$TEMPLATE_FOR_CREATING_BASH_FILE" ]; then
+                print_error "Archivo de entrada no encontrado: $TEMPLATE_FOR_CREATING_BASH_FILE"
+                return 1
+            fi
+            
+            cp "$TEMPLATE_FOR_CREATING_BASH_FILE" "$CREATE_A_DEVELOPMENT_ENVIRONMENT"
+            
+            if [[ "$OS_TYPE" == "linux" ]]; then 
+                SED_INLINE="-i"
+            elif [[ "$OS_TYPE" == "macOS" ]]; then
+                SED_INLINE="-i ''"
+            fi
+
+            # Construir el comando sed
+            SED_CMD="sed $SED_INLINE "
+
+            # Usar la función para usar correcamente "sed -i ''" en este archivo
+            # debido a que se manejaba las comillas simples en una variable
+            # pero esto causaba que se creaban dos archivos.
+            # Sin embargo para la sustitucion en el archivo final,
+            # funciona correctamente
+            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
+                -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
+                -e "s|{{ PROJECT_DESCRIPTION }}|'$PROJECT_DESCRIPTION'|g" \
+                -e "s|{{ OS_VERSION }}|'$OS_PRETTY_NAME'|g" \
+                -e "s|{{ BASE_DIR }}|'$BASE_DIR'|g" \
+                -e "s|{{ DOCKER_CONFIGURATION_FILE }}|'$DOCKER_CONFIGURATION_FILE'|g" \
+                -e "s|{{ DB_ROOT_PASSWORD }}|'$DATABASE_PASSWORD'|g" \
+                -e "s|{{ DB_CONTAINER_IP_WEB_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_PUBLIC_NETWORK'|g" \
+                -e "s|{{ DB_CONTAINER_IP_INTERNAL_NETWORK }}|'$IP_ADDRESS_FOR_THE_DATABASE_CONTAINER_INTERNAL_NETWORK'|g" \
+                -e "s|{{ DB_PORT }}|$PORT_OUTSIDE_THE_DATABASE_CONTAINER|g" \
+                -e "s|{{ API_IMAGE }}|'$IMAGE_NAME'|g" \
+                -e "s|{{ API_CONTAINER_IP }}|'$IP_ADDRESS_OF_THE_API_CONTAINER_FOR_DEV'|g" \
+                -e "s|{{ API_CONTAINER_INSTALL_DEPENDENCIES_IP }}|'$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_API'|g" \
+                -e "s|{{ API_PORT }}|$PORT_OUTSIDE_CONTAINER_API_FOR_DEV|g" \
+                -e "s|{{ API_MOCKUP_PORT }}|$PORT_OUTSIDE_CONTAINER_API_FOR_MOCKUP|g" \
+                -e "s|{{ APP_CONTAINER_IP }}|'$IP_ADDRESS_OF_THE_APP_CONTAINER_FOR_DEV'|g" \
+                -e "s|{{ APP_CONTAINER_INSTALL_DEPENDENCIES_IP }}|'$IP_ADDRESS_OF_THE_CONTAINER_TO_INSTALL_DEPENDENCIES_IN_THE_APP'|g" \
+                -e "s|{{ APP_PORT }}|$PORT_OUTSIDE_CONTAINER_APP_FOR_DEV|g" \
+                -e "s|{{ APP_MOCKUP_PORT }}|$PORT_OUTSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
+                -e "s|{{ APP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_DEV|g" \
+                -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
+                -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
+                -e "s|sed -i |$SED_CMD|g"
+
+            # PASO 1: Tu terminal (el host)
+            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
+                -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}|export UID=$(id -u) GID=$(id -g)|g" \
+
+            print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
     esac
 }

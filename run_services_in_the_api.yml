@@ -3,6 +3,7 @@ services:
   iasd_api:
     image: juancholll/laravel_api  # La imagen que se va a utilizar
     container_name: iasd_api  # Nombre del contenedor
+    user: "${UID:-1000}:${GID:-1000}" # Toma variables de entorno
     networks:
       red_interna:
         ipv4_address: 192.168.20.12

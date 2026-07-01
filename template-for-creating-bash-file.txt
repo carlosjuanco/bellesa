@@ -511,6 +511,8 @@ run_services() {
     local installation_file_for_the_api="$CURRENT_DIR/create_containers_to_install_dependencies_on_the_${PROJECT_NAME}_api.yml"
     local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
     local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
+
+    {{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}
     
     # Instalar dependencias
     

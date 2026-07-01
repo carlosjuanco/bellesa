@@ -9,6 +9,7 @@ services:
     - npm_config_audit=false
     image: node:20.14.0  # La imagen que se va a utilizar
     container_name: instalar_dependencias_en_app # Nombre del contenedor
+    user: "${UID:-1000}:${GID:-1000}" # Toma variables de entorno
     networks:
       red_interna:
         ipv4_address: 192.168.20.13
