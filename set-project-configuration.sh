@@ -543,13 +543,12 @@ deploy_bash_file() {
             if [[ "$OS_TYPE" == "linux" ]]; then 
                 SED_INLINE="-i"
             elif [[ "$OS_TYPE" == "macOS" ]]; then
-                SED_INLINE="-i ''"
+                # Si no escapo las comillas simples, crea dos archivo y al final 
+                # le agrega dos comillas simples.
+                SED_INLINE="-i /\'/\'"
             fi
 
-            # Construir el comando sed
-            SED_CMD="sed $SED_INLINE "
-
-            $SED_CMD \
+            sed $SED_INLINE \
                 -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
                 -e "s|{{ PROJECT_DESCRIPTION }}|'$PROJECT_DESCRIPTION'|g" \
                 -e "s|{{ OS_VERSION }}|'$OS_PRETTY_NAME'|g" \
