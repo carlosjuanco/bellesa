@@ -36,3 +36,4 @@ PORT_INSIDE_CONTAINER_APP_FOR_DEV="91"
 PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP="92"
 # Contraseña por defecto en las base de datos
 DATABASE_PASSWORD="juan"
+# Debe tener una línea de más para que lea la última variable
