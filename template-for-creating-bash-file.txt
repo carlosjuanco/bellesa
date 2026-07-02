@@ -652,7 +652,6 @@ monitor_initial_logs() {
     elif [ "$1" = "APP" ]; then
         # Mostrar logs iniciales de APP
         print_section "LOGS INICIALES - APP"
-        # sudo docker logs -f "${APP_CONTAINER_NAME}"
 
         npm_count=0
 
