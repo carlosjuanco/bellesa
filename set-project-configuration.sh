@@ -580,7 +580,6 @@ deploy_bash_file() {
 
             run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
                 -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}||g" \
-                -e "s|{{ SUDO_TO_MKDIR }}| |g" \
 
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
@@ -643,7 +642,6 @@ deploy_bash_file() {
             # PASO 1: Tu terminal (el host)
             run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
                 -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}|export UID=$(id -u) GID=$(id -g)|g" \
-                -e "s|{{ SUDO_TO_MKDIR }}|  sudo|g" \
 
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
