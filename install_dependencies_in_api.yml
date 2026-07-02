@@ -32,8 +32,6 @@ services:
     stdin_open: true  # Mantiene abierto el stdin
     tty: true  # Habilita una terminal interactiva
     command: /bin/bash -c "
-      id -u &&
-      id -g &&
       cd /home/demo/mockup && 
       composer require laravel/framework:9.52.15 && 
       php artisan --version && 
