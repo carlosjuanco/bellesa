@@ -641,7 +641,7 @@ deploy_bash_file() {
 
             # PASO 1: Tu terminal (el host)
             run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
-                -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}|export UID=$(id -u) GID=$(id -g)|g" \
+                -e "s|{{ ENVIRONMENT }}|$env_type|g" \
                 -e "s|sudo docker|docker|g" \
 
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"

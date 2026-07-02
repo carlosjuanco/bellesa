@@ -8,6 +8,7 @@
 readonly PROJECT_NAME={{ PROJECT_NAME }}
 readonly PROJECT_DESCRIPTION={{ PROJECT_DESCRIPTION }}
 readonly OS_VERSION={{ OS_VERSION }}
+readonly ENVIRONMENT={{ ENVIRONMENT }}
 
 # Rutas del sistema
 readonly CURRENT_DIR=$(pwd)
@@ -512,7 +513,20 @@ run_services() {
     local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
     local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
 
-    {{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}
+    if [ "$ENVIRONMENT" = "produccion" ]; then
+        print_error "Exportar variable UID y GID globales"
+        export UID=$(id -u) GID=$(id -g)
+
+        print_error "Crear el directorio .composer en ${DIRECTORIES[zeus_api]}"
+        cd "${DIRECTORIES[zeus_api]}"
+        mkdir -p .composer
+        chmod 777 .composer
+
+        print_error "Crear el directorio .composer en ${DIRECTORIES[api_mockup]}"
+        cd "${DIRECTORIES[api_mockup]}"
+        mkdir -p .composer
+        chmod 777 .composer
+    fi
     
     # Instalar dependencias
     
