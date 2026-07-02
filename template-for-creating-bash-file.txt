@@ -236,7 +236,7 @@ create_project_structure() {
     print_section "CREANDO ESTRUCTURA DEL PROYECTO"
     
     for clave in "${!DIRECTORIES[@]}"; do
-        mkdir -p "${DIRECTORIES[$clave]}"
+      {{ SUDO_TO_MKDIR }} mkdir -p "${DIRECTORIES[$clave]}"
         check_command "No se pudo crear el directorio: $clave"
         print_success "Creado: $clave"
     done
