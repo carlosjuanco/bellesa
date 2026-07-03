@@ -416,6 +416,18 @@ generate_install_services_file() {
 
     print_success "Archivo de instalación generado: $dest_file"
 
+    if [ "$ENVIRONMENT" = "produccion" ]; then
+        # Definir la línea a insertar
+        NEW_USER_LINE="user: '${UID:-1000}:${GID:-1000}'"
+
+        # Usar sed con formato de múltiples líneas
+        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
+        # que habrá en el archivo final, por eso se ve descuadrado.
+        sed -i "/container_name/a\\
+    ${NEW_USER_LINE}
+        " "$dest_file"
+    fi
+
     # Generar archivo de instalación para la APP
 
     source_file="$CURRENT_DIR/install_dependencies_in_app.yml"

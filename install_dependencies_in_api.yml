@@ -3,7 +3,6 @@ services:
   iasd_mysql:
     image: mysql:8.0.34
     container_name: iasd_bd
-    user: "${UID:-1000}:${GID:-1000}" # Toma variables de entorno
     environment:
       - MYSQL_ROOT_PASSWORD=juan
       - MYSQL_ROOT_HOST=%
@@ -22,7 +21,6 @@ services:
   instalar_dependencias_en_api:
     image: juancholll/laravel_api  # La imagen que se va a utilizar
     container_name: instalar_dependencias_en_api  # Nombre del contenedor
-    user: "${UID:-1000}:${GID:-1000}" # Toma variables de entorno
     networks:
       red_interna:
         ipv4_address: 192.168.20.11
