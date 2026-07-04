@@ -414,10 +414,39 @@ generate_install_services_file() {
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${API_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
 
-    print_success "Archivo de instalación generado: $dest_file"
-
     if [ "$ENVIRONMENT" = "produccion" ]; then
-        # Definir la línea a insertar
+: <<'EXPLICACION_UID_Y_GID'
+    🔍 Desglose de user: "${UID:-1000}:${GID:-1000}"
+    user: - La instrucción de Docker Compose
+    "${UID:-1000}:${GID:-1000}" - La sintaxis de variables de entorno con valor por defecto
+
+    1️⃣ La instrucción user:
+
+    En Docker Compose, user: especifica con qué usuario y grupo se ejecutará el proceso
+    principal dentro del contenedor.
+
+    user: "UID:GID"
+    # o
+    user: "nombre_usuario:nombre_grupo"
+
+    2️⃣ La sintaxis ${UID:-1000}:${GID:-1000}
+
+    Esta es una expansión de parámetros de Shell/Bash que funciona en docker-compose.yml.
+    Se lee así:
+
+    ${UID:-1000}
+
+    Parte  |    Significado
+    ${...}      Indica que es una variable de entorno
+    UID         Nombre de la variable a buscar
+    :-          Operador de "valor por defecto"
+    1000        Valor a usar si la variable UID no está definida
+
+    Traducción completa:
+
+    "Usa el valor de la variable de entorno UID. Si no está definida, usa 1000."
+EXPLICACION_UID_Y_GID
+        
         NEW_USER_LINE="user: '${UID:-1000}:${GID:-1000}'"
 
         # Usar sed con formato de múltiples líneas
@@ -426,7 +455,13 @@ generate_install_services_file() {
         sed -i "/container_name/a\\
     ${NEW_USER_LINE}
         " "$dest_file"
+
+        sed -i "/hostname: servidor_mariadb/a\\
+    working_dir: ${BASE_DIR}
+        " "$dest_file"
     fi
+
+    print_success "Archivo de instalación generado: $dest_file"
 
     # Generar archivo de instalación para la APP
 
@@ -455,6 +490,15 @@ generate_install_services_file() {
         -e "s|ipv4_address: 192.168.20.13|ipv4_address: ${APP_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
     
+    if [ "$ENVIRONMENT" = "produccion" ]; then
+        # Usar sed con formato de múltiples líneas
+        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
+        # que habrá en el archivo final, por eso se ve descuadrado.
+        sed -i "/container_name/a\\
+    ${NEW_USER_LINE}
+        " "$dest_file"
+    fi
+
     print_success "Archivo de instalación generado: $dest_file"
 }
 
@@ -486,6 +530,15 @@ generate_run_services_file() {
         -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
         "$dest_file"
     
+    if [ "$ENVIRONMENT" = "produccion" ]; then
+        # Usar sed con formato de múltiples líneas
+        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
+        # que habrá en el archivo final, por eso se ve descuadrado.
+        sed -i "/container_name/a\\
+    ${NEW_USER_LINE}
+        " "$dest_file"
+    fi
+
     print_success "Archivo de ejecución generado: $dest_file"
 
     # Generar archivo de ejecución para la APP
@@ -514,6 +567,15 @@ generate_run_services_file() {
         -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
         "$dest_file"
     
+    if [ "$ENVIRONMENT" = "produccion" ]; then
+        # Usar sed con formato de múltiples líneas
+        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
+        # que habrá en el archivo final, por eso se ve descuadrado.
+        sed -i "/container_name/a\\
+    ${NEW_USER_LINE}
+        " "$dest_file"
+    fi
+
     print_success "Archivo de ejecución generado: $dest_file"
 }
 
