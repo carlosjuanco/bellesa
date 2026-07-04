@@ -450,15 +450,35 @@ EXPLICACION_UID_Y_GID
         NEW_USER_LINE="user: '${UID:-1000}:${GID:-1000}'"
 
         # Usar sed con formato de múltiples líneas
-        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
+        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE}, son los espacios
         # que habrá en el archivo final, por eso se ve descuadrado.
         sed -i "/container_name/a\\
     ${NEW_USER_LINE}
         " "$dest_file"
-
+        # Agregar el directorio de trabajo
         sed -i "/hostname: servidor_mariadb/a\\
     working_dir: ${BASE_DIR}
         " "$dest_file"
+        # Agregar el caché en el host
+        # Cambiar el delimitador de / a |
+        sed -i "\|${BASE_DIR}/api:/home/demo|a\\
+      - ./:${BASE_DIR}
+        " "$dest_file"
+        sed -i "\|- ./:${BASE_DIR}|a\\
+      - ./.composer:/tmp/composer  # 👈 Caché en el host
+        " "$dest_file"
+        # Agregar variables de entorno
+        sed -i "/container_name: ${CONTAINERS[instalar_dependencias_en_api]}/a\\
+    environment:api
+        " "$dest_file"
+        sed -i "/environment:api/a\\
+      - COMPOSER_CACHE_DIR=/tmp/composer  # 👈 Usar caché montado
+        " "$dest_file"
+        
+        # Dejar normal a "environment:api", porque si no me va a marcar error
+        sed -i \
+        -e "s|environment:api|environment:|g" \
+        "$dest_file"
     fi
 
     print_success "Archivo de instalación generado: $dest_file"
@@ -588,15 +608,12 @@ run_services() {
     local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
 
     if [ "$ENVIRONMENT" = "produccion" ]; then
-        print_error "Exportar variable UID y GID globales"
         export UID=$(id -u) GID=$(id -g)
 
-        print_error "Crear el directorio .composer en ${DIRECTORIES[zeus_api]}"
         cd "${DIRECTORIES[zeus_api]}"
         mkdir -p .composer
         chmod 777 .composer
 
-        print_error "Crear el directorio .composer en ${DIRECTORIES[api_mockup]}"
         cd "${DIRECTORIES[api_mockup]}"
         mkdir -p .composer
         chmod 777 .composer
