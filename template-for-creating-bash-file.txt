@@ -457,14 +457,14 @@ EXPLICACION_UID_Y_GID
         " "$dest_file"
         # Agregar el directorio de trabajo
         sed -i "/hostname: servidor_mariadb/a\\
-    working_dir: ${BASE_DIR}
+    working_dir: /home/demo
         " "$dest_file"
         # Agregar el caché en el host
         # Cambiar el delimitador de / a |
         sed -i "\|${BASE_DIR}/api:/home/demo|a\\
-      - ./:${BASE_DIR}
+      - ./:/home/demo
         " "$dest_file"
-        sed -i "\|- ./:${BASE_DIR}|a\\
+        sed -i "\|- ./:/home/demo|a\\
       - ./.composer:/home/demo  # 👈 Caché en el host
         " "$dest_file"
         # Agregar variables de entorno
