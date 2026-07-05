@@ -602,6 +602,14 @@ run_services() {
 
     if [ "$ENVIRONMENT" = "produccion" ]; then
         export UID=$(id -u) GID=$(id -g)
+
+        cd "${DIRECTORIES[zeus_api]}"
+        mkdir -p .composer
+        chmod 777 .composer
+
+        cd "${DIRECTORIES[api_mockup]}"
+        mkdir -p .composer
+        chmod 777 .composer
     fi
     
     # Instalar dependencias
