@@ -37,8 +37,14 @@ readonly -A DIRECTORIES=(
 )
 declare -r DIRECTORIES
 
-# Base de datos
-readonly DB_NAME="${PROJECT_NAME}"
+case $ENVIRONMENT in
+    "maqueta")
+        readonly DB_NAME="${PROJECT_NAME}"
+        ;;
+    "desarrollo")
+        readonly DB_NAME="${PROJECT_NAME}_dev"
+        ;;
+esac
 readonly MOCKUP_DB_NAME="${PROJECT_NAME}_mockup"
 readonly DB_ROOT_PASSWORD={{ DB_ROOT_PASSWORD }}
 readonly DB_CONTAINER_IP_WEB_NETWORK={{ DB_CONTAINER_IP_WEB_NETWORK }}
@@ -77,12 +83,26 @@ readonly REPO_API="https://github.com/carlosjuanco/zeus-api.git"
 readonly REPO_APP="https://github.com/carlosjuanco/meca-app.git"
 
 # Ramas Git por entorno
-declare -A GIT_BRANCHES=(
-    ["api"]="${PROJECT_NAME}"
-    ["api_mockup"]="${PROJECT_NAME}-mockup"
-    ["app"]="${PROJECT_NAME}"
-    ["app_mockup"]="${PROJECT_NAME}-mockup"
-)
+case $ENVIRONMENT in
+    "maqueta")
+        declare -A GIT_BRANCHES=(
+            ["api"]="${PROJECT_NAME}"
+            ["api_mockup"]="${PROJECT_NAME}-mockup"
+            ["app"]="${PROJECT_NAME}"
+            ["app_mockup"]="${PROJECT_NAME}-mockup"
+        )
+        ;;
+    "desarrollo")
+        declare -A GIT_BRANCHES=(
+            ["api"]="${PROJECT_NAME}"
+            ["api_dev"]="${PROJECT_NAME}-dev"
+            ["api_mockup"]="${PROJECT_NAME}-mockup"
+            ["app"]="${PROJECT_NAME}"
+            ["app_dev"]="${PROJECT_NAME}-dev"
+            ["app_mockup"]="${PROJECT_NAME}-mockup"
+        )
+        ;;
+esac
 
 # ============================================================================
 # VERIFICANDO AUTENTICACIÓN DE DOCKER
@@ -259,11 +279,25 @@ clone_repositories() {
     print_section "CLONANDO REPOSITORIOS"
     
     # Clonar repositorios de API
-    clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api]}"
+    case $ENVIRONMENT in
+        "maqueta")
+            clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api]}"
+            ;;
+        "desarrollo")
+            clone_repo "$REPO_API" "${DIRECTORIES[zeus_api]}" "${GIT_BRANCHES[api_dev]}"
+            ;;
+    esac
     clone_repo "$REPO_API" "${DIRECTORIES[api_mockup]}" "${GIT_BRANCHES[api_mockup]}"
     
     # Clonar repositorios de APP
-    clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app]}"
+    case $ENVIRONMENT in
+        "maqueta")
+            clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app]}"
+            ;;
+        "desarrollo")
+            clone_repo "$REPO_APP" "${DIRECTORIES[meca_app]}" "${GIT_BRANCHES[app_dev]}"
+            ;;
+    esac
     clone_repo "$REPO_APP" "${DIRECTORIES[app_mockup]}" "${GIT_BRANCHES[app_mockup]}"
 }
 
@@ -584,6 +618,14 @@ monitor_installation_logs() {
             if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
                 ((npm_count++))
             fi
+
+            case $ENVIRONMENT in
+                "desarrollo")
+                    if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
+                        ((npm_count++))
+                    fi
+                    ;;
+            esac
 
             if [ "$npm_count" -eq 2 ]; then
                 print_success "Instalación de API completada"
