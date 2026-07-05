@@ -237,7 +237,8 @@ ip_control_in_containers() {
         if echo "$CURRENT_DIR" | grep -q "Documentos"; then
             DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/Documentos\/bellesa/.docker/config.json}
         else
-            DOCKER_CONFIGURATION_FILE=${CURRENT_DIR/bellesa/.docker/config.json}
+            # Especificamente con el usuario ROOT
+            DOCKER_CONFIGURATION_FILE='/root/.docker/config.json'
         fi
 
         # Nombre de la imagen
