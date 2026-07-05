@@ -615,13 +615,16 @@ monitor_installation_logs() {
         while IFS= read -r line; do
             echo "$line" # Mostrar
             
-            if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
-                ((npm_count++))
-            fi
-
             case $ENVIRONMENT in
+                "maqueta")
+                    if grep -q "FillInTheValuesForThePermissionsFieldSeeder.*DONE" <<< "$line"; then
+                        ((npm_count++))
+                    fi
+                    ;;
                 "desarrollo")
                     if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
+                        ((npm_count++))
+                    elif grep -q "SetPermissionsOnAdministrativeRolePagesSeeder.*DONE" <<< "$line"; then
                         ((npm_count++))
                     fi
                     ;;
