@@ -415,68 +415,6 @@ generate_install_services_file() {
         -e "s|ipv4_address: 192.168.20.11|ipv4_address: ${API_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
 
-    if [ "$ENVIRONMENT" = "produccion" ]; then
-: <<'EXPLICACION_UID_Y_GID'
-    🔍 Desglose de user: "${UID:-1000}:${GID:-1000}"
-    user: - La instrucción de Docker Compose
-    "${UID:-1000}:${GID:-1000}" - La sintaxis de variables de entorno con valor por defecto
-
-    1️⃣ La instrucción user:
-
-    En Docker Compose, user: especifica con qué usuario y grupo se ejecutará el proceso
-    principal dentro del contenedor.
-
-    user: "UID:GID"
-    # o
-    user: "nombre_usuario:nombre_grupo"
-
-    2️⃣ La sintaxis ${UID:-1000}:${GID:-1000}
-
-    Esta es una expansión de parámetros de Shell/Bash que funciona en docker-compose.yml.
-    Se lee así:
-
-    ${UID:-1000}
-
-    Parte  |    Significado
-    ${...}      Indica que es una variable de entorno
-    UID         Nombre de la variable a buscar
-    :-          Operador de "valor por defecto"
-    1000        Valor a usar si la variable UID no está definida
-
-    Traducción completa:
-
-    "Usa el valor de la variable de entorno UID. Si no está definida, usa 1000."
-EXPLICACION_UID_Y_GID
-        
-        NEW_USER_LINE="user: '${UID:-1000}:${GID:-1000}'"
-
-        # Usar sed con formato de múltiples líneas
-        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE}, son los espacios
-        # que habrá en el archivo final, por eso se ve descuadrado.
-        sed -i "/container_name/a\\
-    ${NEW_USER_LINE}
-        " "$dest_file"
-        
-         sed -i "/hostname: servidor_mariadb/a\\
-    working_dir: /home/demo
-        " "$dest_file"
-        sed -i "\|${BASE_DIR}/api:/home/demo|a\\
-      - ${DIRECTORIES[tmp]}:/tmp/composer
-        " "$dest_file"
-        # Agregar variables de entorno
-        sed -i "/container_name: ${CONTAINERS[instalar_dependencias_en_api]}/a\\
-    environment:api
-        " "$dest_file"
-        sed -i "/environment:api/a\\
-      - COMPOSER_CACHE_DIR=/tmp/composer  # 👈 Usar caché montado
-        " "$dest_file"
-        
-        # Dejar normal a "environment:api", porque si no me va a marcar error
-        sed -i \
-        -e "s|environment:api|environment:|g" \
-        "$dest_file"
-    fi
-
     print_success "Archivo de instalación generado: $dest_file"
 
     # Generar archivo de instalación para la APP
@@ -506,15 +444,6 @@ EXPLICACION_UID_Y_GID
         -e "s|ipv4_address: 192.168.20.13|ipv4_address: ${APP_CONTAINER_INSTALL_DEPENDENCIES_IP}|g" \
         "$dest_file"
     
-    if [ "$ENVIRONMENT" = "produccion" ]; then
-        # Usar sed con formato de múltiples líneas
-        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
-        # que habrá en el archivo final, por eso se ve descuadrado.
-        sed -i "/container_name/a\\
-    ${NEW_USER_LINE}
-        " "$dest_file"
-    fi
-
     print_success "Archivo de instalación generado: $dest_file"
 }
 
@@ -546,15 +475,6 @@ generate_run_services_file() {
         -e "s|--host=192.168.20.12 --port=81|--host=$API_CONTAINER_IP --port=83|g" \
         "$dest_file"
     
-    if [ "$ENVIRONMENT" = "produccion" ]; then
-        # Usar sed con formato de múltiples líneas
-        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
-        # que habrá en el archivo final, por eso se ve descuadrado.
-        sed -i "/container_name/a\\
-    ${NEW_USER_LINE}
-        " "$dest_file"
-    fi
-
     print_success "Archivo de ejecución generado: $dest_file"
 
     # Generar archivo de ejecución para la APP
@@ -583,15 +503,6 @@ generate_run_services_file() {
         -e "s|npm run serve -- --port 81|npm run serve -- --port $APP_PORT_INTERNAL|g" \
         "$dest_file"
     
-    if [ "$ENVIRONMENT" = "produccion" ]; then
-        # Usar sed con formato de múltiples líneas
-        # Literalmente los espacios en blanco que hay antes de ${NEW_USER_LINE},son los espacios
-        # que habrá en el archivo final, por eso se ve descuadrado.
-        sed -i "/container_name/a\\
-    ${NEW_USER_LINE}
-        " "$dest_file"
-    fi
-
     print_success "Archivo de ejecución generado: $dest_file"
 }
 
@@ -603,18 +514,6 @@ run_services() {
     local execution_file_for_the_api="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_api.yml"
     local execution_file_for_the_app="$CURRENT_DIR/run_${PROJECT_NAME}_services_in_the_app.yml"
 
-    if [ "$ENVIRONMENT" = "produccion" ]; then
-        export UID=$(id -u) GID=$(id -g)
-
-        cd "${DIRECTORIES[zeus_api]}"
-        mkdir -p .composer
-        chmod 777 .composer
-
-        cd "${DIRECTORIES[api_mockup]}"
-        mkdir -p .composer
-        chmod 777 .composer
-    fi
-    
     # Instalar dependencias
     
     if sudo docker-compose -f "$installation_file_for_the_api" up -d; then
