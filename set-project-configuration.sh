@@ -703,35 +703,4 @@ main() {
 # =============================================================================
 # EJECUCIÓN
 # =============================================================================
-
-: <<'EXPLICACION_EUID'
-    Verificar que se ejecute como usuario normal (no root)
-
-    Verifica si el script se está ejecutando con privilegios de superusuario (root).
-    Si es así, muestra una advertencia y detiene la ejecución del script para evitar
-    que se ejecute como root.
-
-    Aprendiendo Paso a Paso
-
-    Vamos a desglosar cada parte para que entiendas perfectamente qué está pasando:
-
-    1. if [[ $EUID -eq 0 ]]; then
-
-    if: Inicia una estructura condicional.
-    [[ ... ]]: Es una construcción de Bash para evaluar condiciones. Es más potente y seguro que los corchetes simples [ ... ].
-    $EUID: Es una variable de entorno especial en Linux/Unix que contiene el ID de usuario efectivo del proceso que está ejecutando el script.
-
-    EUID significa Effective User ID.
-    Si el script lo ejecuta root, el valor de $EUID es 0.
-    Si lo ejecuta un usuario normal (como "juan", "maria"), $EUID tiene un número diferente (ej. 1000, 1001, etc.).
-    -eq 0: Es un operador de comparación numérica que significa "es igual a 0".
-    then: Marca el comienzo del bloque de código que se ejecutará si la condición es verdadera (es decir, si $EUID es igual a 0, lo que significa que el usuario es root).
-EXPLICACION_EUID
-
-if [[ $EUID -eq 0 ]]; then
-    print_warning "Ejecutando como root. Se recomienda ejecutar como usuario normal"
-    exit 1
-fi
-
-# Ejecutar script
 main
