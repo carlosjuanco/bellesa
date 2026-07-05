@@ -2,22 +2,22 @@
 # Desinstalar docker solo funciona en ambientes Linux.
 # Solo en debian he probado la desinstalación de docker.
 
-print_info "1.- Detén todos los contenedores y servicios"
+echo  "1.- Detén todos los contenedores y servicios"
 
 sudo systemctl stop docker
 sudo systemctl stop docker.socket
 
-print_info "2.- Elimina los paquetes de Docker"
+echo  "2.- Elimina los paquetes de Docker"
 
 sudo apt purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo apt purge -y docker.io docker-compose
 
-print_info "3.- Elimina también dependencias no usadas"
+echo  "3.- Elimina también dependencias no usadas"
 
 sudo apt autoremove -y
 sudo apt autoclean
 
-print_info "4.- Limpia todos los datos de Docker"
+echo  "4.- Limpia todos los datos de Docker"
 
 sudo rm -rf /var/lib/docker
 sudo rm -rf /var/lib/containerd
