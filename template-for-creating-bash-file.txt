@@ -457,6 +457,9 @@ EXPLICACION_UID_Y_GID
     ${NEW_USER_LINE}
         " "$dest_file"
         
+         sed -i "/hostname: servidor_mariadb/a\\
+    working_dir: /home/demo
+        " "$dest_file"
         sed -i "\|${BASE_DIR}/api:/home/demo|a\\
       - ${DIRECTORIES[tmp]}:/tmp/composer
         " "$dest_file"
