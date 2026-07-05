@@ -29,6 +29,7 @@ readonly -A DIRECTORIES=(
     ["bd"]="$BASE_DIR/bd"
     ["api"]="$BASE_DIR/api"
     ["app"]="$BASE_DIR/app"
+    ["tmp"]="$BASE_DIR/tmp"
     ["zeus_api"]="$BASE_DIR/api/$RENAME_API_REPOSITORY_FOLDER"
     ["meca_app"]="$BASE_DIR/app/$RENAME_APP_REPOSITORY_FOLDER"
     ["api_mockup"]="$BASE_DIR/api/$RENAME_API_REPOSITORY_MOCKUP_FOLDER"
@@ -457,7 +458,7 @@ EXPLICACION_UID_Y_GID
         " "$dest_file"
         
         sed -i "\|${BASE_DIR}/api:/home/demo|a\\
-      - ${BASE_DIR}:/tmp/composer
+      - ${DIRECTORIES[tmp]}:/tmp/composer
         " "$dest_file"
         # Agregar variables de entorno
         sed -i "/container_name: ${CONTAINERS[instalar_dependencias_en_api]}/a\\
@@ -601,14 +602,6 @@ run_services() {
 
     if [ "$ENVIRONMENT" = "produccion" ]; then
         export UID=$(id -u) GID=$(id -g)
-
-        cd "${DIRECTORIES[zeus_api]}"
-        mkdir -p .composer
-        chmod 777 .composer
-
-        cd "${DIRECTORIES[api_mockup]}"
-        mkdir -p .composer
-        chmod 777 .composer
     fi
     
     # Instalar dependencias
