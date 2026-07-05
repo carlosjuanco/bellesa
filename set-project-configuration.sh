@@ -577,9 +577,7 @@ deploy_bash_file() {
                 -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
                 -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
                 -e "s|sed -i |$SED_CMD|g" \
-
-            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
-                -e "s|{{ EXPORTAR_VARIABLE_PARA_DEFINIR_USUARIO }}||g" \
+                -e "s|{{ ENVIRONMENT }}|'$env_type'|g" \
 
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
             ;;
@@ -637,10 +635,7 @@ deploy_bash_file() {
                 -e "s|{{ APP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_DEV|g" \
                 -e "s|{{ APP_MOCKUP_PORT_INTERNAL }}|$PORT_INSIDE_CONTAINER_APP_FOR_MOCKUP|g" \
                 -e "s|{{ VERIFY_THAT_THE_CREDENTIALS_ARE_VALID }}|$VERIFY_THAT_THE_CREDENTIALS_ARE_VALID|g" \
-                -e "s|sed -i |$SED_CMD|g"
-
-            # PASO 1: Tu terminal (el host)
-            run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
+                -e "s|sed -i |$SED_CMD|g" \
                 -e "s|{{ ENVIRONMENT }}|'$env_type'|g" \
 
             print_success "Archivo creado: $CREATE_A_DEVELOPMENT_ENVIRONMENT"
