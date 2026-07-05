@@ -455,24 +455,16 @@ EXPLICACION_UID_Y_GID
         sed -i "/container_name/a\\
     ${NEW_USER_LINE}
         " "$dest_file"
-        # Agregar el directorio de trabajo
-        sed -i "/hostname: servidor_mariadb/a\\
-    working_dir: /home/demo
-        " "$dest_file"
-        # Agregar el caché en el host
-        # Cambiar el delimitador de / a |
+        
         sed -i "\|${BASE_DIR}/api:/home/demo|a\\
-      - ./:/home/demo
-        " "$dest_file"
-        sed -i "\|- ./:/home/demo|a\\
-      - ./.composer:/home/demo  # 👈 Caché en el host
+      - ${BASE_DIR}:/tmp/composer
         " "$dest_file"
         # Agregar variables de entorno
         sed -i "/container_name: ${CONTAINERS[instalar_dependencias_en_api]}/a\\
     environment:api
         " "$dest_file"
         sed -i "/environment:api/a\\
-      - COMPOSER_CACHE_DIR=/home/demo  # 👈 Usar caché montado
+      - COMPOSER_CACHE_DIR=/tmp/composer  # 👈 Usar caché montado
         " "$dest_file"
         
         # Dejar normal a "environment:api", porque si no me va a marcar error
