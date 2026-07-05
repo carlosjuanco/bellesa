@@ -465,14 +465,14 @@ EXPLICACION_UID_Y_GID
       - ./:${BASE_DIR}
         " "$dest_file"
         sed -i "\|- ./:${BASE_DIR}|a\\
-      - ./.composer:${BASE_DIR}  # 👈 Caché en el host
+      - ./.composer:/home/demo  # 👈 Caché en el host
         " "$dest_file"
         # Agregar variables de entorno
         sed -i "/container_name: ${CONTAINERS[instalar_dependencias_en_api]}/a\\
     environment:api
         " "$dest_file"
         sed -i "/environment:api/a\\
-      - COMPOSER_CACHE_DIR=${BASE_DIR}  # 👈 Usar caché montado
+      - COMPOSER_CACHE_DIR=/home/demo  # 👈 Usar caché montado
         " "$dest_file"
         
         # Dejar normal a "environment:api", porque si no me va a marcar error
