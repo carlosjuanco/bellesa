@@ -25,7 +25,7 @@ sudo rm -rf /etc/docker
 sudo rm -rf /run/docker
 sudo rm -rf /var/run/docker.sock
 
-print_info "5.- Verifica que se desinstaló correctamente"
+echo "5.- Verifica que se desinstaló correctamente"
 
 # Al ejecutar sudo docker --version, deberia regresar "command not found"
 # Es decir hubo un error
@@ -38,5 +38,5 @@ print_info "5.- Verifica que se desinstaló correctamente"
 if command -v docker &> /dev/null; then 
     print_warning "Algo paso en la desinstalación de docker"
 else
-    print_info "Docker desinstalado correctamente"
+    echo "Docker desinstalado correctamente"
 fi
