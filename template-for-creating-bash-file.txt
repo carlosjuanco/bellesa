@@ -622,7 +622,7 @@ monitor_installation_logs() {
                     fi
                     ;;
                 "desarrollo")
-                    if grep -q "AddSchoolRecordsSeeder.*DONE" <<< "$line"; then
+                    if grep -q "CreateTeacherRecordsSeeder.*DONE" <<< "$line"; then
                         ((npm_count++))
                     elif grep -q "SetPermissionsOnAdministrativeRolePagesSeeder.*DONE" <<< "$line"; then
                         ((npm_count++))
