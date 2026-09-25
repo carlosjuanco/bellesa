@@ -312,7 +312,7 @@ ip_control_in_containers() {
     export TEMPLATE_FOR_CREATING_BASH_FILE
     export CREATE_A_DEVELOPMENT_ENVIRONMENT
 
-    print_success "Se termino de reemplazar informacion del proyecto"
+    print_success "Se termino de reemplazar información del proyecto"
 }
 
 # ============================================================================
@@ -602,7 +602,7 @@ deploy_bash_file() {
             # Usar la función para usar correcamente "sed -i ''" en este archivo
             # debido a que se manejaba las comillas simples en una variable
             # pero esto causaba que se creaban dos archivos.
-            # Sin embargo para la sustitucion en el archivo final,
+            # Sin embargo para la sustitución en el archivo final,
             # funciona correctamente
             run_sed "$CREATE_A_DEVELOPMENT_ENVIRONMENT" \
                 -e "s|{{ PROJECT_NAME }}|'$PROJECT'|g" \
