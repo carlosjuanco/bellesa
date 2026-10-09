@@ -19,5 +19,6 @@ cd Documents
 git clone https://github.com/carlosjuanco/bellesa.git
 # 3.-Entrar en la carpeta bellesa
 cd bellesa
-# 4.-Ejecutar el archivo bash
-./create_development_environment.sh
+# 4.-Ir a la rama set-up-development-environment
+# 5.-Ejecutar el archivo bash
+./set-project-configuration.sh
