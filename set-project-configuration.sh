@@ -103,7 +103,7 @@ EXPLICACION_UNAME
     print_info "Kernel: $OS_KERNEL"
     print_info "Versión: $OS_VERSION"
     print_info "Nombre: $OS_PRETTY_NAME"
-    [[ -n "$OS_CODENAME" ]] && echo "Codename: $OS_CODENAME"
+    print_info "Codename: $OS_CODENAME"
 }
 
 # =============================================================================
@@ -155,9 +155,13 @@ install_docker() {
     sudo apt-get update -y
     
     # Versión específica (ajustable según necesidades)
-    # Para Debian 12 Bookworm
-    VERSION_STRING="5:26.0.0-1~debian.12~bookworm"
-    
+    if [[ "$OS_VERSION" -eq 12 ]]; then
+        # Para Debian 12 Bookworm
+        VERSION_STRING="5:26.0.0-1~debian.12~bookworm"
+    elif [[ "$OS_VERSION" -eq 13 ]]; then
+        VERSION_STRING="5:29.0.0-1~debian.13~trixie"
+    fi
+
     sudo apt-get install -y docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
     
     # Verificar instalación
