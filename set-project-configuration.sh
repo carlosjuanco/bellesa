@@ -155,6 +155,7 @@ install_docker() {
     sudo apt-get update -y
     
     # Versión específica (ajustable según necesidades)
+    # Fuente: https://docs.docker.com/engine/install/debian/#install-using-the-repository
     if [[ "$OS_VERSION" -eq 12 ]]; then
         # Para Debian 12 Bookworm
         VERSION_STRING="5:26.0.0-1~debian.12~bookworm"
