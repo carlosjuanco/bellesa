@@ -550,7 +550,7 @@ run_services() {
 
     # Instalar dependencias
     
-    if sudo docker-compose -f "$installation_file_for_the_api" up -d; then
+    if sudo docker compose -f "$installation_file_for_the_api" up -d; then
         print_success "Servicios instalados en la API"
         
         # Monitorear logs de instalación
@@ -563,7 +563,7 @@ run_services() {
         return 1
     fi
 
-    if sudo docker-compose -f "$installation_file_for_the_app" up -d; then
+    if sudo docker compose -f "$installation_file_for_the_app" up -d; then
         print_success "Servicios instalados en la APP"
         
         # Monitorear logs de instalación
@@ -578,7 +578,7 @@ run_services() {
     
     # Ejecutar servicios principales
     print_info "Iniciando servicios principales..."
-    if sudo docker-compose -f "$execution_file_for_the_api" up -d; then
+    if sudo docker compose -f "$execution_file_for_the_api" up -d; then
         print_success "Servicios iniciados"
         
         # Monitorear logs iniciales
@@ -588,7 +588,7 @@ run_services() {
         return 1
     fi
 
-    if sudo docker-compose -f "$execution_file_for_the_app" up -d; then
+    if sudo docker compose -f "$execution_file_for_the_app" up -d; then
         print_success "Servicios iniciados"
         
         # Monitorear logs iniciales
